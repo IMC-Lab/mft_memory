@@ -16,3 +16,4 @@ responses$reponse <- apply(responses, 1, function(x) {
 })
 
 responses$correct <- responses$response == responses$correct_answer
+print(responses$correct)
