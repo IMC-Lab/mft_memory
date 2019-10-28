@@ -1,0 +1,104 @@
+---
+title: "MFT Memory"
+output: html_notebook
+---
+
+This is a project testing memory for vignettes of moral transgressions. 
+
+# Design
+
+Participants (n = 28) incidentally encoded 120 vignettes, 15 from each of the different foundations articulated by Moral Foundations Theory (cite), by reading and vividly imagining the vignette for 6 seconds and then making a moral judgement. 
+
+During recognition, participants were cued with each vignette presented during study + 7-8 lures per foundation. Each vignette had up to 4 words removed, and participants were asked to select which word or words completed the vignette as they studied it as well as their confidence in their response. 
+
+Encoding took place in the scanner but retrieval did not. We plan to conduct a PLS analysis on the neural data, but are getting started with analyzing behavior first. 
+
+```{r echo=FALSE}
+# load packages
+library(dplyr)
+library(knitr)
+library(ggplot2)
+library(psych)
+library(lme4)
+library(lmerTest)
+library(ggpubr)
+se <- function(x) sqrt(var(x)/length(x))
+```
+
+
+```{r echo=FALSE}
+# load data
+files = list.files('C:/Users/imclab/Desktop/MFT re-analysis/data/retrieval', full.names = TRUE, pattern = '.csv', recursive = FALSE)
+retFull = do.call(rbind, lapply(files, function(x){read.csv(x, header = TRUE, stringsAsFactors = FALSE)}))
+key <- read.csv('C:/Users/imclab/Desktop/MFT re-analysis/key.csv', stringsAsFactors = FALSE)
+```
+
+
+```{r echo=FALSE}
+# tidy
+ret <- retFull
+ret$resp <- sapply(ret$resp, function(s) as.numeric(substr(s, 1, 2))) #get rid of symbols
+ret$confresp <- sapply(ret$confresp, function(s) as.numeric(substr(s, 1, 2))) #get rid of symbols
+ret <- as.data.frame(sapply(ret, function(x) gsub("\" *| *\"", "", x)), stringsAsFactors = FALSE) #get rid of quotation marks
+key <- as.data.frame(sapply(key, function(x) gsub("\" *| *\"", "", x)), stringsAsFactors = FALSE)
+key <- subset(key, select = -c(correct_answer, choice1, choice2, choice3)) #delete extra columns
+ret <- left_join(ret, key) #make column with category for each cue
+ret$old <- as.integer(substr(ret$category, 1,4) != 'Lure') #add old/new status of each item
+ret <- as.data.frame(sapply(ret, function(x) gsub("Lure-", "", x)), stringsAsFactors = FALSE) #get rid of 'Lure-' prefix
+
+#homogenize variable names
+ret$category[ret$category == "SN"] <- "Social-Norms"
+ret$category[ret$category == "Lib"] <- "Liberty"
+ret$category[ret$category == "Loy"] <- "Loyalty"
+ret$category[ret$category == "Pure"] <- "Purity"
+ret$category[ret$category == "Auth"] <- "Authority"
+ret$category[ret$category == "Fair"] <- "Fairness"
+ret$category[ret$category == "Social-Norms"] <- "Social Norms"
+
+#make text-based response column; new responses = NA
+ret$text_response = ''
+i = 0
+for (n in ret$resp) {
+  i = i + 1
+  if (is.na(n) == TRUE) {                       
+    ret$text_response[i] = NA
+  }
+  else if (n == 1) {
+    ret$text_response[i] = ret$choice1[i]
+  }
+  else if (n == 2) {
+    ret$text_response[i] = ret$choice2[i]
+  }
+  else if (n == 3) {
+    ret$text_response[i] = ret$choice3[i]
+  }
+  else {
+    ret$text_response[i] = NA
+  }
+} 
+
+#make column for calculating proportion correct
+ret$correct <- as.numeric((!is.na(ret$text_response) & ret$text_response == ret$correct_answer) |
+  (is.na(ret$text_response) & ret$old == 0))
+# 
+# #make column assigning each response hit, miss, false alarm, correct rejection
+# ret$hits[ret$old == 1 & ret$correct == 1] = 1
+# ret$misses[ret$old == 1 & ret$correct == 0] = 1
+# ret$correct_rejections[ret$old == 0 & ret$correct == 1] = 1
+# ret$false_alarms[ret$old == 0 & ret$correct == 0] = 1
+# 
+# ret$SDT[ret$old == 1 & ret$correct == 1] = 'hit'
+# ret$SDT[ret$old == 1 & ret$correct == 0] = 'miss'
+# ret$SDT[ret$old == 0 & ret$correct == 1] = 'correct rejection'
+# ret$SDT[ret$old == 0 & ret$correct == 0] = 'false alarm'
+
+```
+
+# Memory Accuracy
+## Corrected recognition
+```{r}
+model <- glmer(correct ~ old + (1 + old | subID), data=ret, family=binomial(link = 'logit'))
+summary(model)
+plot(model)
+```
+
