@@ -37,6 +37,8 @@ se <- function(x) sqrt(var(x)/length(x))
 # load encoding data
 encodingfiles = list.files('C:/Users/imclab/Desktop/MFT re-analysis/data/encoding', full.names = TRUE, pattern = '.csv', recursive = FALSE)
 encodingFull = do.call(rbind, lapply(encodingfiles, function(x){read.csv(x, header = TRUE, stringsAsFactors = FALSE)}))
+earlyencodingfiles = list.files('C:/Users/imclab/Desktop/MFT re-analysis/data/encoding/old', full.names = TRUE, pattern = '.csv', recursive = FALSE)
+encodingEarly = do.call(rbind, lapply(earlyencodingfiles, function(x){read.csv(x, header = TRUE, stringsAsFactors = FALSE)}))
 
 # load retrieval data
 retfiles = list.files('C:/Users/imclab/Desktop/MFT re-analysis/data/retrieval', full.names = TRUE, pattern = '.csv', recursive = FALSE)
@@ -58,9 +60,21 @@ all_surveys <- read.csv('C:/Users/imclab/Desktop/MFT re-analysis/data/qualtrics/
 envars <- names(encodingFull) %in% c('run','pres_order','vignum','trialstart_raw','trialstart_zeroed','trialstart_TR','trialdur','intended_jitter','ITI_start_raw','ITI_start_zeroed','ITI_start_TR','ITI_duration','ITI_accuracy', 'foundation', 'vigtext') 
 encoding_behav_all <- encodingFull[!envars]
 encoding_behav_all <- filter(encoding_behav_all, vigfile != 99999)
-encoding_behav_all <- as.data.frame(sapply(encoding_behav_all, function(x) gsub(".jpg", "", x)), stringsAsFactors = FALSE) #get rid of '.jpg' suffix
+encodingEarly <- filter(encodingEarly, vigfile != ' vignette')
+#get rid of '.jpg' suffix
+encoding_behav_all <- as.data.frame(sapply(encoding_behav_all, function(x) gsub(".jpg", "", x)), stringsAsFactors = FALSE) 
+encodingEarly <-as.data.frame(sapply(encodingEarly, function(x) gsub(".JPG", "", x)), stringsAsFactors = FALSE)
+encodingEarly <- select(encodingEarly, -trialstart)
+#homogenize column names
 names(encoding_behav_all)[4]<-"encoding_RT"
-encoding_behav_all <- as.data.frame(sapply(encoding_behav_all, function(x) gsub("^\t* *\"* *| *\"* *\t*$", "", x)), stringsAsFactors = FALSE) #get rid of quotation marks & any white space
+names(encodingEarly)[4]<-"encoding_RT"
+#get rid of symbols, quotation marks, & any white space
+encodingEarly$moral_decision <- sapply(encodingEarly$moral_decision, function(s) as.numeric(substr(s, 1, 2))) #gets rid of symbols
+encoding_behav_all$moral_decision <- as.numeric(encoding_behav_all$moral_decision)
+encodingEarly <- as.data.frame(sapply(encodingEarly, function(x) gsub("^\t* *\"* *| *\"* *\t*$", "", x)), stringsAsFactors = FALSE) 
+encoding_behav_all <- as.data.frame(sapply(encoding_behav_all, function(x) gsub("^\t* *\"* *| *\"* *\t*$", "", x)), stringsAsFactors = FALSE) 
+encoding_behav_all <- full_join(encoding_behav_all, encodingEarly, by = c('subID', 'vigfile', 'moral_decision', 'encoding_RT'))
+
 
 # tidy key
 key <- as.data.frame(sapply(key, function(x) gsub("^\t* *\"* *| *\"* *\t*$", "", x)), stringsAsFactors = FALSE)
@@ -182,7 +196,6 @@ data$hits[data$old == 1 & data$correct == 1] = 1
 data$hits[data$old == 1 & data$correct == 0] = 0
 
 
-
 # separate questionnaires
 mfq <- select(all_surveys, starts_with('sub'), starts_with('mfq'))
 disgust_scale <- select(all_surveys, starts_with('sub'), starts_with('disgust'))
@@ -193,10 +206,14 @@ iri <- select(all_surveys, starts_with('sub'), starts_with('iri'))
 test <- data %>% 
         group_by(subID) %>%
         summarise(confmean = mean(as.numeric(confresp), na.rm = TRUE))
+testOld <- ret_all %>% group_by(subID) %>% summarise(confmean = mean(as.numeric(confresp), na.rm = TRUE))
+
 all_surveys$subID <- as.numeric(all_surveys$subID)
 test$subID %in% all_surveys$subID
-# ppts in test that are not in qualtrics: 23, 7; 20 is in there but they stopped responding after MFQ
-# there's 1 subject whose id was 'LP' that I think is ppt 7 but need to do further digging to verify
+# ppts in test that are not in qualtrics: 23; 20 is in there but they stopped responding after MFQ
+
+testOld$subID %in% all_surveys$subID
+
 
 # score MFQ
 #part one
@@ -228,6 +245,9 @@ hist(mfq$fairnessScore)
 hist(mfq$loyaltyScore)
 hist(mfq$authorityScore)
 hist(mfq$purityScore)
+# add to retrieval file
+mfq_ret <- subset(mfq, subID %in% ret_all$subID) %>% filter(subID != '20') %>% select(contains('Score'), contains('subID'))
+ret_all <- left_join(ret_all, mfq_ret, by = 'subID')
 
 
 # score disgust_scale
@@ -298,17 +318,27 @@ reverseScoredSECS <- c('1', '5')
 secs[,reverseScoredSECS] <- reverse100(secs[,reverseScoredSECS])
 secs <- secs %>% mutate(SocialConservatism = rowMeans(select(., social), na.rm = TRUE),
                        EconomicConservatism = rowMeans(select(., economic), na.rm = TRUE))
+secs_ret <- subset(secs, subID %in% ret_all$subID) %>% filter(!is.nan(SocialConservatism)) %>% select(contains('subID'),contains('Conservatism'))
+
 # explore spread
 hist(secs$SocialConservatism)
 count(secs, SocialConservatism >= 50)
 hist(secs$EconomicConservatism)
 count(secs, EconomicConservatism >= 50)
 
-
 # tidy emorate
+emorate <- read.csv('C:/Users/imclab/Desktop/MFT re-analysis/data/qualtrics/emorate.csv', stringsAsFactors = FALSE)
 emorate[2:30, 2:721] <- as.data.frame(sapply(emorate[2:30, 2:721], function(s) substr(s, 1, 2)), stringsAsFactors = FALSE)
 names(emorate)[1] <- 'subID'
-emorate <- emorate %>% separate()
+emorate <- emorate[2:nrow(emorate),] %>% pivot_longer(2:ncol(emorate), names_to=c('vigfile', 'emotion'), names_pattern='([a-z]+\\d+)\\.*(.*)' , values_to='emoresp')
+emorate$emotion[emorate$emotion == ''] = 'angry'
+emorate$emotion[emorate$emotion == '1'] = 'sad'
+emorate$emotion[emorate$emotion == '2'] = 'disgusted'
+emorate$emotion[emorate$emotion == '3'] = 'afraid'
+emorate$emotion[emorate$emotion == '4'] = 'contemptuous'
+emorate$emotion[emorate$emotion == '5'] = 'amused'
+emorate$emoresp <- as.numeric(emorate$emoresp)
+emorate_ret <- subset(emorate, subID %in% ret_all$subID)
 
 ```
 
@@ -598,7 +628,7 @@ print(p)
 ```
 
 # Generalized Linear Mixed Model
-``` {r, fig.width=15, fig.height=8}
+``` {r, fig.width=15, fig.height=5}
 
 ## some handy commands
 # exp(fixef(modelOld1)): transforms model output from log likelihood to odds ratio
@@ -607,24 +637,35 @@ print(p)
 # emmeans(modelNew, 'category', type='response'): gives you probabilities for each level of the fixed effect factor
 # emmeans(modelOld1, pairwise ~ category, lmer.df = "satterthwaite"): gives you probabilities for each fixed effect and odds ratios + p-values for pairwise comparisons among levels of the fixed effect factor
 
+ret_old <- subset(data, old == 1) %>% subset(subID %in% mfq_ret$subID)
+ret_new <- subset(data, old == 0) %>% subset(subID %in% mfq_ret$subID)
+ret_old_qualtrics <- data %>% subset(old == 1) %>% subset(subID %in% mfq_ret$subID)
+ret_new_qualtrics <- data %>% subset(old == 0) %>% subset(subID %in% mfq_ret$subID)
+ret_old_qualtrics <- left_join(ret_old_qualtrics, mfq_ret, by='subID')
+ret_old_qualtrics <- left_join(ret_old_qualtrics, secs_ret, by='subID')
+ret_new_qualtrics <- left_join(ret_new_qualtrics, mfq_ret, by='subID')
+ret_new_qualtrics <- left_join(ret_new_qualtrics, secs_ret, by='subID')
 
-ret_old <- subset(data, old == 1)
-ret_new <- subset(data, old == 0)
+count(ret_old_qualtrics, SocialConservatism > 50)
+count(ret_old_qualtrics, EconomicConservatism > 50)
+ret_old_qualtrics$socially_conservative[ret_old_qualtrics$SocialConservatism > 50] = 1
+ret_old_qualtrics$socially_conservative[ret_old_qualtrics$SocialConservatism < 50] = 0
+ret_old_qualtrics$fiscally_conservative[ret_old_qualtrics$EconomicConservatism > 50] = 1
+ret_old_qualtrics$fiscally_conservative[ret_old_qualtrics$EconomicConservatism < 50] = 0
 
 ret_old$confresp <- as.factor(as.numeric(ret_old$confresp))
 ret_new$confresp <- as.factor(as.numeric(ret_new$confresp))
+ret_old_qualtrics$confresp <- as.factor(as.numeric(ret_old_qualtrics$confresp))
+ret_new_qualtrics$confresp <- as.factor(as.numeric(ret_new_qualtrics$confresp))
 
 # predicting correct using category and moral decision
-modelOld1 <- glmer(correct ~ moral_decision + category + confresp + (1 + moral_decision + confresp | subID),
-               data=ret_old, family=binomial(link = 'logit'), control=glmerControl(optCtrl=list(maxfun=25000)))
-summary(modelOld1)
-plot(modelOld1)
+modelOld1 <- glmer(correct ~ moral_decision + category + (1 + moral_decision | subID),
+               data=ret_old_qualtrics, family=binomial(link = 'logit'), control=glmerControl(optCtrl=list(maxfun=50000)))
 
-               data=ret_old, family=binomial(link = 'logit'), control=glmerControl(optCtrl=list(maxfun=25000)))
-summary(modelOld2)
-modelOld2 <- glmer(correct ~ moral_decision + category  + (1 + category | subID),
-plot(modelOld2)
+modelOld2 <- glmer(correct ~ moral_decision + category + socially_conservative + fiscally_conservative + (1 + moral_decision + careScore + fairnessScore + loyaltyScore + authorityScore + purityScore + SocialConservatism + EconomicConservatism | subID), data = ret_old_qualtrics, family = binomial(link = 'logit'), control=glmerControl(optCtrl = list(maxfun=50000)))
+
 anova(modelOld1, modelOld2)
+
 
 modelOld <- glmer(correct ~ moral_decision * category * confresp + (1 + category | subID),
                data=ret_old, family=binomial(link = 'logit'),control=glmerControl(optCtrl=list(maxfun=50000)))
@@ -632,10 +673,10 @@ summary(modelOld)
 plot(modelOld)
 
 # plot predictions
-modelOld %>% ggpredict(terms=c('moral_decision', 'category')) %>%
+modelOld1 %>% ggpredict(terms=c('moral_decision', 'category')) %>%
   ggplot(aes(x=interaction(x, group), y=predicted, group=group, fill=group)) + geom_col() + geom_errorbar(aes(ymax=conf.high, ymin=conf.low)) + ggtitle('Predicted accuracy (proportion correct) n=25')
 
-modelOld %>% ggpredict(terms=c('moral_decision')) %>%
+modelOld1 %>% ggpredict(terms=c('moral_decision')) %>%
   ggplot(aes(x=x, y=predicted, fill=x)) + geom_col() + geom_errorbar(aes(ymax=conf.high, ymin=conf.low)) + ggtitle('Predicted accuracy (proportion correct) n=25')
 
 
@@ -645,10 +686,10 @@ modelOld %>% ggpredict(terms=c('moral_decision')) %>%
 #   ggplot(aes(x=x, y=predicted)) + geom_col() + geom_errorbar(aes(ymax=conf.high, ymin=conf.low))
 
 # predicting correct using category 
-modelNew <- glmer(correct ~ category * confresp + (1 + category | subID), data=ret_new, family=binomial(link = 'logit'), control=glmerControl(optCtrl=list(maxfun=50000)))
+modelNew <- glmer(correct ~ category + (1 + category | subID), data=ret_new, family=binomial(link = 'logit'), control=glmerControl(optCtrl=list(maxfun=25000)))
 summary(modelNew)
 plot(modelNew)
-
+ggpredict()
 modelNew %>% ggpredict(terms=c('category')) %>%
   ggplot(aes(x=x, y=predicted)) + geom_col() + geom_errorbar(aes(ymax=conf.high, ymin=conf.low)) + ggtitle('Predicted accuracy (proportion correct) n=25')
 
