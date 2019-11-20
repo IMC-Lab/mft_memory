@@ -1,0 +1,124 @@
+subID, run, pres_order, foundation, vigfile, vignum, vigtext, moral_decision, trialstart_raw, trialstart_zeroed, trialstart_TR, trialdur, RT, intended_jitter, ITI_start_raw, ITI_start_zeroed, ITI_start_TR, ITI_duration, ITI_accuracy
+37,1,99999,99999,99999,99999,99999,99999,8,0,0,1,99999,99999,9,1,0.5,1,99999
+37,1,1, pur, pur05.jpg,95, You_see_a_man_in_a_bar_using_his_phone_to_watch_people_having_sex_with_animals., NaN,10.090962,2.090962,1.045481,6, NaN,6,16.091612,8.091612,4.045806,6.018676,0
+37,1,2, auth, auth09.jpg,9, You_see_a_boy_turning_up_the_TV_as_his_father_talks_about_his_military_service., NaN,22.273936,14.273936,7.136968,6, NaN,7.50E+00,28.274031,20.274031,10.137016,7.502185,0
+37,1,3, pur, pur15.jpg,105, You_see_a_college_student_drinking_until_she_vomits_on_herself_and_falls_asleep., NaN,35.823799,27.823799,13.911899,6, NaN,4.50E+00,41.823879,33.823879,16.91194,4.501555,0
+37,1,4, fair, fair02.jpg,47, You_see_a_runner_taking_a_shortcut_on_the_course_during_the_marathon_in_order_to_win.,4,46.37367,38.37367,19.186835,6,0.141812,7.50E+00,52.373682,44.373682,22.186841,7.501899,0
+37,1,5, socn, socnorm01.jpg,106, You_see_someone_using_an_old_rotary_phone_and_refusing_to_go_buy_a_new_one., NaN,59.890247,51.890247,25.945123,6, NaN,6,65.890288,57.890288,28.945144,6.001537,0
+37,1,6, carep, carephys05.jpg,35, You_see_a_man_lashing_his_pony_with_a_whip_for_breaking_loose_from_its_pen.,2,71.906859,63.906859,31.953429,6,6.000024,6,77.907074,69.907074,34.953537,6.001821,0
+37,1,7, fair, fair10.jpg,55, You_see_a_girl_asking_for_allowance_even_though_her_brother_did_her_chores_for_her.,2,83.940096,75.940096,37.970048,6,5.312201,7.50E+00,89.940124,81.940124,40.970062,7.501696,0
+37,1,8, loy, loy08.jpg,83, You_see_a_head_cheerleader_booing_her_high_school's_team_during_a_homecoming_game., NaN,97.473322,89.473322,44.736661,6, NaN,6,103.473372,95.473372,47.736686,6.001405,0
+37,1,9, carep, carephys03.jpg,33, You_see_someone_leaving_his_dog_outside_in_the_rain_after_it_dug_in_the_trash., NaN,109.489892,101.489892,50.744946,6, NaN,3,115.489931,107.489931,53.744966,3.001329,0
+37,1,10, auth, auth04.jpg,4, You_see_an_intern_disobeying_an_order_to_dress_professionally_and_comb_his_hair., NaN,118.523102,110.523102,55.261551,6, NaN,4.50E+00,124.523195,116.523195,58.261598,4.50136,0
+37,1,11, carem, careemo13.jpg,28, You_see_a_girl_telling_a_boy_that_his_older_brother_is_much_more_attractive_than_him., NaN,129.039673,121.039673,60.519837,6, NaN,3,135.039771,127.039771,63.519885,3.001203,0
+37,1,12, loy, loy09.jpg,84, You_see_a_class_president_saying_on_TV_that_her_rival_college_is_a_better_school., NaN,138.056273,130.056273,65.028136,6, NaN,3,144.056345,136.056345,68.028172,3.001102,0
+37,1,13, socn, socnorm05.jpg,110, You_see_a_woman_continuing_to_wear_a_large_sun_hat_inside_her_apartment_complex., NaN,147.089535,139.089535,69.544767,6, NaN,4.50E+00,153.089577,145.089577,72.544789,4.501358,0
+37,1,14, carep, carephys02.jpg,32, You_see_a_woman_throwing_her_cat_across_the_room_for_scratching_the_furniture.,1,157.622788,149.622788,74.811394,6,4.557763,4.50E+00,163.622826,155.622826,77.811413,4.501494,0
+37,1,15, carem, careemo05.jpg,20, You_see_a_boy_telling_a_woman_that_she_looks_just_like_her_overweight_bulldog., NaN,168.189381,160.189381,80.09469,6, NaN,3,174.189484,166.189484,83.094742,3.001218,0
+37,1,16, carem, careemo03.jpg,18, You_see_a_woman_commenting_out_loud_about_how_fat_another_woman_looks_in_her_jeans.,3,177.205972,169.205972,84.602986,6,0.009208,4.50E+00,183.205999,175.205999,87.603,4.501426,0
+37,1,17, lib, lib09.jpg,69, You_see_a_woman_pressuring_her_daughter_to_become_a_famous_evening_news_anchor.,3,187.739226,179.739226,89.869613,6,5.515279,4.50E+00,193.739345,185.739345,92.869673,4.501361,0
+37,1,18, socn, socnorm09.jpg,114, You_see_a_man_putting_ketchup_all_over_his_chicken_Caesar_salad_while_at_lunch., NaN,198.255837,190.255837,95.127919,6, NaN,3,204.255849,196.255849,98.127925,3.001162,0
+37,1,19, loy, loy12.jpg,87, You_see_an_American_telling_foreigners_that_the_US_is_an_evil_force_in_the_world., NaN,207.305739,199.305739,99.65287,6, NaN,4.50E+00,213.305755,205.305755,102.652878,4.501265,0
+37,1,20, fair, fair13.jpg,58, You_see_a_woman_lying_about_the_number_of_vacation_days_she_has_taken_at_work., NaN,217.822314,209.822314,104.911157,6, NaN,6,223.822423,215.822423,107.911212,6.001534,0
+37,1,21, pur, pur02.jpg,92, You_see_a_family_eating_the_carcass_of_their_pet_dog_that_had_been_run_over.,2,229.838914,221.838914,110.919457,6,6.000096,4.50E+00,235.839203,227.839203,113.919601,4.501414,0.333333
+37,1,22, pur, pur10.jpg,100, You_see_a_girl_and_her_sister_making_out_with_each_other_just_for_practice., NaN,240.372131,232.372131,116.186065,6, NaN,6,246.37214,238.37214,119.18607,6.001552,0
+37,1,23, lib, lib13.jpg,73, You_see_a_teacher_ordering_a_student_to_get_a_normal_haircut_before_coming_to_class., NaN,252.405423,244.405423,122.202712,6, NaN,4.50E+00,258.405484,250.405484,125.202742,4.501413,0
+37,1,24, auth, auth02.jpg,2, You_see_a_woman_refusing_to_stand_when_the_judge_walks_into_the_courtroom.,2,262.938632,254.938632,127.469316,6,5.947863,7.50E+00,268.938747,260.938747,130.469373,7.501631,0
+37,1,25, lib, lib05.jpg,65, You_see_a_man_telling_his_girlfriend_that_she_must_convert_to_his_religion., NaN,276.455204,268.455204,134.227602,6, NaN,4.50E+00,282.455278,274.455278,137.227639,4.501306,0
+37,1,26, socn, socnorm15.jpg,120, You_see_a_woman_answering_a_phone_call_with_the_word_goodbye_instead_of_hello.,4,286.971756,278.971756,139.485878,6,5.91509,3,292.971793,284.971793,142.485896,3.001146,0
+37,1,27, fair, fair04.jpg,49, You_see_a_soccer_player_pretending_to_be_seriously_fouled_by_an_opposing_player.,2,296.005029,288.005029,144.002514,6,4.724475,4.50E+00,302.005096,294.005096,147.002548,4.501395,0
+37,1,28, carep, carephys01.jpg,31, You_see_a_woman_swerving_her_car_in_order_to_intentionally_run_over_a_squirrel., NaN,306.521603,298.521603,149.260801,6, NaN,9,312.521677,304.521677,152.260838,9.001947,0.166667
+37,1,29, carem, careemo14.jpg,29, You_see_a_girl_telling_her_classmate_that_she_looks_like_she_has_gained_weight.,3,321.538217,313.538217,156.769108,6,6.000109,6,327.53852,319.53852,159.76926,6.001493,0
+37,1,30, pur, pur08.jpg,98, You_see_a_homosexual_in_a_gay_bar_offering_sex_to_anyone_who_buys_him_a_drink., NaN,333.554773,325.554773,162.777387,6, NaN,3,339.554874,331.554874,165.777437,3.001098,0
+37,1,31, carem, careemo10.jpg,25, You_see_a_man_loudly_telling_his_wife_that_the_dinner_she_cooked_tastes_awful., NaN,342.604643,334.604643,167.302322,6, NaN,3,348.604755,340.604755,170.302378,3.001251,0
+37,1,32, auth, auth12.jpg,12, You_see_a_group_of_women_having_a_long_and_loud_conversation_during_a_church_sermon.,3,351.637904,343.637904,171.818952,6,5.999924,3,357.63806,349.63806,174.81903,3.001377,0
+37,1,33, loy, loy10.jpg,85, You_see_a_Hollywood_star_agreeing_with_a_foreign_dictator's_denunciation_of_the_US., NaN,360.67117,352.67117,176.335585,6, NaN,6,366.671285,358.671285,179.335643,6.001441,0
+37,1,34, lib, lib01.jpg,61, You_see_a_man_telling_his_fiancee_that_she_has_to_switch_to_his_political_party., NaN,372.704464,364.704464,182.352232,6, NaN,7.50E+00,378.704545,370.704545,185.352272,7.5016,0.2
+37,1,35, carep, carephys14.jpg,44, You_see_a_woman_spanking_her_child_with_a_spatula_for_getting_bad_grades_in_school.,2,386.237694,378.237694,189.118847,6,5.508347,4.50E+00,392.237726,384.237726,192.118863,4.501346,0
+37,1,36, auth, auth14.jpg,14, You_see_a_student_stating_that_her_professor_is_a_fool_during_an_afternoon_class., NaN,396.754265,388.754265,194.377132,6, NaN,4.50E+00,402.754354,394.754354,197.377177,4.501303,0
+37,1,37, lib, lib14.jpg,74, You_see_a_teenager_at_a_cafeteria_forcing_a_younger_student_to_pay_for_her_lunch.,2,407.2708,399.2708,199.6354,6,5.38671,6,413.270812,405.270812,202.635406,6.001388,0
+37,1,38, loy, loy15.jpg,90, You_see_a_US_swimmer_cheering_as_a_Chinese_foe_beats_his_teammate_to_win_the_gold., NaN,419.30408,411.30408,205.65204,6, NaN,3,425.304151,417.304151,208.652075,3.001242,0
+37,1,39, socn, socnorm03.jpg,108, You_see_a_woman_drinking_her_entire_cup_of_coffee_using_a_stirring_spoon., NaN,428.337295,420.337295,210.168648,6, NaN,6,434.337395,426.337395,213.168697,6.001605,0
+37,1,40, fair, fair06.jpg,51, You_see_a_judge_taking_on_a_criminal_case_although_he_is_friends_with_the_defendant.,1,440.370592,432.370592,216.185296,6,5.157078,3,446.370644,438.370644,219.185322,3.001473,0
+37,2,99999,99999,99999,99999,99999,99999,8,0,0,1,99999,99999,9,1,0.5,1,99999
+37,2,1, pur, pur12.jpg,102, You_see_a_man_searching_through_the_trash_to_find_women's_discarded_underwear., NaN,10.063791,2.063791,1.031896,6, NaN,4.50E+00,16.065088,8.065088,4.032544,4.508906,0
+37,2,2, auth, auth07.jpg,7, You_see_an_employee_trying_to_undermine_all_of_her_bosss_ideas_in_front_of_others.,2,20.647129,12.647129,6.323565,6,5.687733,3,26.648249,18.648249,9.324125,3.001422,0
+37,2,3, fair, fair09.jpg,54, You_see_a_woman_getting_hired_only_because_her_father_is_close_friends_with_the_boss.,4,29.680302,21.680302,10.840151,6,5.122529,4.50E+00,35.680343,27.680343,13.840172,4.501434,0
+37,2,4, lib, lib06.jpg,66, You_see_a_mother_telling_her_son_that_she_is_going_to_choose_all_of_his_friends., NaN,40.19688,32.19688,16.09844,6, NaN,4.50E+00,46.19695,38.19695,19.098475,4.501326,0
+37,2,5, pur, pur07.jpg,97, You_see_a_woman_having_intimate_relations_with_a_recently_deceased_loved_one., NaN,50.713446,42.713446,21.356723,6, NaN,4.50E+00,56.713519,48.713519,24.35676,4.501345,0.333333
+37,2,6, pur, pur09.jpg,99, You_see_an_employee_at_a_morgue_eating_his_pepperoni_pizza_off_of_a_dead_body.,1,61.230048,53.230048,26.615024,6,5.126049,7.50E+00,67.2301,59.2301,29.61505,7.501935,0
+37,2,7, pur, pur06.jpg,96, You_see_a_teenage_male_in_a_dorm_bathroom_secretly_using_a_stranger's_toothbrush.,3,74.746649,66.746649,33.373325,6,6.000062,3,80.746904,72.746904,36.373452,3.00125,0
+37,2,8, carem, careemo12.jpg,27, You_see_a_woman_clearly_avoiding_sitting_next_to_an_obese_woman_on_the_bus.,3,83.779863,75.779863,37.889932,6,5.318413,6,89.779902,81.779902,40.889951,6.001597,0
+37,2,9, socn, socnorm06.jpg,111, You_see_someone_at_the_school_gym_lifting_free_weights_in_nice_business_clothes.,4,95.813157,87.813157,43.906578,6,5.67252,6,101.81325,93.81325,46.906625,6.001517,0
+37,2,10, lib, lib12.jpg,72, You_see_a_father_requiring_his_son_to_take_up_the_family_restaurant_business.,4,107.829758,99.829758,49.914879,6,4.328875,7.50E+00,113.829844,105.829844,52.914922,7.50174,0
+37,2,11, auth, auth08.jpg,8, You_see_a_player_publicly_yelling_at_his_soccer_coach_during_a_playoff_game.,4,121.346277,113.346277,56.673139,6,5.324871,6,127.346363,119.346363,59.673181,6.001517,0
+37,2,12, carem, careemo04.jpg,19, You_see_a_man_quickly_canceling_a_blind_date_as_soon_as_he_sees_the_woman., NaN,133.362849,125.362849,62.681424,6, NaN,4.50E+00,139.362879,131.362879,65.681439,4.501359,0
+37,2,13, fair, fair05.jpg,50, You_see_a_referee_intentionally_making_bad_calls_that_help_his_favored_team_win.,2,143.879383,135.879383,67.939692,6,4.373311,6,149.879469,141.879469,70.939735,6.001604,0
+37,2,14, auth, auth05.jpg,5, You_see_a_teenage_girl_coming_home_late_and_ignoring_her_parents_strict_curfew.,3,155.912686,147.912686,73.956343,6,5.505758,3,161.912728,153.912728,76.956364,3.001208,0
+37,2,15, carep, carephys11.jpg,41, You_see_a_boy_placing_a_thumbtack_sticking_up_on_the_chair_of_another_student.,2,164.945897,156.945897,78.472948,6,4.777156,3,170.94594,162.94594,81.47297,3.001235,0
+37,2,16, auth, auth10.jpg,10, You_see_a_teaching_assistant_talking_back_to_the_teacher_in_front_of_the_classroom.,4,173.962495,165.962495,82.981248,6,5.214195,7.50E+00,179.962595,171.962595,85.981297,7.501835,0
+37,2,17, pur, pur13.jpg,103, You_see_two_first_cousins_getting_married_to_each_other_in_an_elaborate_wedding., NaN,187.479036,179.479036,89.739518,6, NaN,4.50E+00,193.479064,185.479064,92.739532,4.501533,0
+37,2,18, fair, fair12.jpg,57, You_see_a_boy_skipping_to_the_front_of_the_line_because_his_friend_is_an_employee., NaN,197.995626,189.995626,94.997813,6, NaN,6,203.995691,195.995691,97.997846,6.001562,0
+37,2,19, socn, socnorm10.jpg,115, You_see_a_man_walking_down_a_dark_hallway_while_still_wearing_his_sunglasses.,4,210.01224,202.01224,101.00612,6,4.914542,3,216.012351,208.012351,104.006175,3.001244,0
+37,2,20, lib, lib15.jpg,75, You_see_a_mayor_trying_to_ban_people_from_hugging_and_kissing_in_public_in_his_city.,1,219.028785,211.028785,105.514392,6,4.651765,4.50E+00,225.028826,217.028826,108.514413,4.50144,0
+37,2,21, carep, carephys13.jpg,43, You_see_a_teacher_hitting_a_student's_hand_with_a_ruler_for_falling_asleep_in_class.,1,229.578757,221.578757,110.789379,6,4.256905,4.50E+00,235.578807,227.578807,113.789404,4.50127,0
+37,2,22, carem, careemo07.jpg,22, You_see_a_girl_saying_that_another_girl_is_too_ugly_to_be_a_varsity_cheerleader.,3,240.095331,232.095331,116.047666,6,5.654593,4.50E+00,246.09536,238.09536,119.04768,4.50147,0
+37,2,23, fair, fair07.jpg,52, You_see_a_student_getting_an_A_on_a_group_project_when_he_didn't_do_his_part., NaN,250.628524,242.628524,121.314262,6, NaN,4.50E+00,256.628624,248.628624,124.314312,4.501403,0
+37,2,24, carem, careemo02.jpg,17, You_see_a_girl_laughing_at_another_student_forgetting_her_lines_at_a_school_play.,3,261.145106,253.145106,126.572553,6,3.766579,4.50E+00,267.145232,259.145232,129.572616,4.501418,0
+37,2,25, loy, loy13.jpg,88, You_see_the_coach's_wife_sponsoring_a_bake_sale_for_her_husband's_rival_team., NaN,271.661696,263.661696,131.830848,6, NaN,4.50E+00,277.66181,269.66181,134.830905,4.501313,0
+37,2,26, lib, lib03.jpg,63, You_see_a_man_blocking_his_wife_from_leaving_home_or_interacting_with_others.,2,282.178271,274.178271,137.089135,6,5.941766,7.50E+00,288.178297,280.178297,140.089148,7.501752,0
+37,2,27, fair, fair08.jpg,53, You_see_an_employee_lying_about_how_many_hours_she_worked_during_the_week.,1,295.694899,287.694899,143.84745,6,3.22464,7.50E+00,301.694974,293.694974,146.847487,7.501786,0
+37,2,28, carep, carephys08.jpg,38, You_see_a_boy_setting_a_series_of_traps_to_kill_stray_cats_in_his_neighborhood.,2,309.228111,301.228111,150.614055,6,5.631287,6,315.228137,307.228137,153.614068,6.001672,0
+37,2,29, loy, loy01.jpg,76, You_see_an_employee_joking_with_competitors_about_how_bad_his_company_did_last_year.,3,321.244681,313.244681,156.62234,6,4.496199,3,327.244816,319.244816,159.622408,3.001188,0
+37,2,30, loy, loy02.jpg,77, You_see_a_coach_celebrating_with_the_opposing_team's_players_who_just_won_the_game.,4,330.277891,322.277891,161.138946,6,5.620625,3,336.278002,328.278002,164.139001,3.001138,0
+37,2,31, socn, socnorm08.jpg,113, You_see_a_woman_using_a_fork_to_eat_a_bowl_of_vanilla_ice_cream_and_marshmallows.,4,339.311154,331.311154,165.655577,6,5.458122,6,345.311336,337.311336,168.655668,6.001527,0
+37,2,32, loy, loy11.jpg,86, You_see_a_college_president_singing_a_rival_school's_fight_song_during_a_pep_rally.,4,351.327784,343.327784,171.663892,6,5.38019,6,357.327849,349.327849,174.663924,6.00154,0
+37,2,33, carem, careemo15.jpg,30, You_see_a_man_laughing_at_a_disabled_co-worker_while_at_an_office_softball_game.,2,363.34435,355.34435,177.672175,6,4.511229,9,369.344417,361.344417,180.672208,9.001788,0
+37,2,34, socn, socnorm02.jpg,107, You_see_a_man_staying_inside_his_home_with_the_shades_drawn_on_a_rare_sunny_day.,4,378.360908,370.360908,185.180454,6,6.000016,4.50E+00,384.361117,376.361117,188.180558,4.501437,0
+37,2,35, loy, loy05.jpg,80, You_see_the_US_Ambassador_joking_in_Great_Britain_about_the_stupidity_of_Americans.,2,388.910751,380.910751,190.455376,6,5.921129,3,394.910842,386.910842,193.455421,3.00126,0
+37,2,36, auth, auth11.jpg,11, You_see_a_staff_member_talking_loudly_and_interrupting_the_mayor's_speech_to_the_public.,3,397.943999,389.943999,194.971999,6,5.255619,6,403.944111,395.944111,197.972056,6.001457,0
+37,2,37, socn, socnorm13.jpg,118, You_see_someone_reading_the_ending_of_a_spy_novel_before_reading_the_beginning.,4,409.977311,401.977311,200.988656,6,4.597282,3,415.977359,407.977359,203.98868,3.001222,0
+37,2,38, carep, carephys10.jpg,40, You_see_a_girl_throwing_her_hot_coffee_on_a_woman_who_is_dating_her_ex-boyfriend.,3,418.993856,410.993856,205.496928,6,5.576319,6,424.993931,416.993931,208.496966,6.001573,0
+37,2,39, lib, lib02.jpg,62, You_see_a_father_requiring_his_son_to_become_a_commercial_airline_pilot_like_him., NaN,431.01047,423.01047,211.505235,6, NaN,3,437.010595,429.010595,214.505297,3.001312,0
+37,2,40, carep, carephys12.jpg,42, You_see_a_woman_slapping_another_woman_who_she_is_arguing_with_in_the_parking_lot.,2,440.027002,432.027002,216.013501,6,4.134562,3,446.027122,438.027122,219.013561,3.001179,0
+37,3,99999,99999,99999,99999,99999,99999,8,0,0,1,99999,99999,9,1,0.5,1,99999
+37,3,1, lib, lib08.jpg,68, You_see_a_boss_pressuring_employees_to_buy_goods_from_her_family's_general_store.,2,10.064423,2.064423,1.032211,6,5.171781,6,16.066444,8.066444,4.033222,6.007171,0
+37,3,2, fair, fair03.jpg,48, You_see_a_tenant_bribing_a_landlord_to_be_the_first_to_get_their_apartment_repainted.,4,22.114369,14.114369,7.057184,6,5.829167,6,28.114476,20.114476,10.057238,6.001549,0
+37,3,3, carem, careemo01.jpg,16, You_see_a_teenage_boy_chuckling_at_an_amputee_he_passes_by_while_on_the_subway.,2,34.147543,26.147543,13.073772,6,4.072852,3,40.147624,32.147624,16.073812,3.001322,0
+37,3,4, socn, socnorm14.jpg,119, You_see_a_teenage_girl_wearing_a_long_trench_coat_on_a_hot_summer_afternoon.,4,43.164137,35.164137,17.582068,6,4.12911,3,49.164227,41.164227,20.582113,3.001153,0
+37,3,5, auth, auth13.jpg,13, You_see_a_man_turn_his_back_and_walk_away_while_his_boss_questions_his_work., NaN,52.180727,44.180727,22.090363,6, NaN,3,58.180836,50.180836,25.090418,3.001257,0
+37,3,6, pur, pur01.jpg,91, You_see_a_man_having_sex_with_a_frozen_chicken_before_cooking_it_for_dinner.,1,61.213985,53.213985,26.606993,6,4.345714,4.50E+00,67.214047,59.214047,29.607024,4.501378,0
+37,3,7, socn, socnorm12.jpg,117, You_see_a_woman_watching_a_game_on_television_in_black-and-white_instead_of_color.,4,71.730572,63.730572,31.865286,6,4.767137,7.50E+00,77.730642,69.730642,34.865321,7.501538,0
+37,3,8, socn, socnorm04.jpg,109, You_see_a_woman_eating_dessert_before_her_main_entree_arrives_on_the_table.,4,85.247183,77.247183,38.623592,6,3.599915,7.50E+00,91.247295,83.247295,41.623648,7.501776,0
+37,3,9, carep, carephys04.jpg,34, You_see_a_zoo_trainer_jabbing_a_dolphin_to_get_it_to_entertain_his_customers.,2,98.780402,90.780402,45.390201,6,4.784335,6,104.780518,96.780518,48.390259,6.00153,0
+37,3,10, socn, socnorm07.jpg,112, You_see_a_man_eating_a_bowl_cereal_in_the_morning_with_water_instead_of_milk.,4,110.813681,102.813681,51.406841,6,3.972851,4.50E+00,116.81381,108.81381,54.406905,4.501365,0
+37,3,11, loy, loy06.jpg,81, You_see_a_man_leaving_his_family_business_to_go_work_for_their_main_competitor.,3,121.346841,113.346841,56.673421,6,5.998173,3,127.346877,119.346877,59.673438,3.00117,0
+37,3,12, lib, lib07.jpg,67, You_see_a_man_forbidding_his_wife_to_wear_clothing_that_he_has_not_first_approved.,2,130.363434,122.363434,61.181717,6,5.118435,6,136.363505,128.363505,64.181753,6.001611,0
+37,3,13, auth, auth01.jpg,1, You_see_a_girl_ignoring_her_fathers_orders_by_taking_the_car_after_her_curfew., NaN,142.396764,134.396764,67.198382,6, NaN,3,148.396863,140.396863,70.198432,3.00118,0
+37,3,14, loy, loy07.jpg,82, You_see_a_teacher_publicly_saying_she_hopes_another_school_wins_the_math_contest.,3,151.413276,143.413276,71.706638,6,4.892886,6,157.413321,149.413321,74.70666,6.001712,0
+37,3,15, lib, lib04.jpg,64, You_see_a_manager_coercing_her_employees_into_eating_at_her_brother's_diner.,2,163.44655,155.44655,77.723275,6,5.999884,6,169.446623,161.446623,80.723311,6.001646,0
+37,3,16, carep, carephys07.jpg,37, You_see_a_woman_snatching_away_her_dog's_food_for_making_a_mess_in_the_living_room., NaN,175.463121,167.463121,83.731561,6, NaN,3,181.463258,173.463258,86.731629,3.001147,0
+37,3,17, pur, pur03.jpg,93, You_see_a_drunk_elderly_man_offering_to_have_oral_sex_with_anyone_in_the_bar.,1,184.479649,176.479649,88.239824,6,5.220659,4.50E+00,190.479746,182.479746,91.239873,4.501332,0
+37,3,18, carem, careemo08.jpg,23, You_see_a_teenage_girl_openly_staring_at_a_disfigured_woman_as_she_walks_past.,3,194.996246,186.996246,93.498123,6,5.950583,3,200.996306,192.996306,96.498153,3.001213,0
+37,3,19, fair, fair14.jpg,59, You_see_a_professor_giving_a_bad_grade_to_a_student_just_because_he_dislikes_him.,2,204.012842,196.012842,98.006421,6,5.3399,6,210.012924,202.012924,101.006462,6.001477,0
+37,3,20, auth, auth06.jpg,6, You_see_a_boy_spray-painting_anarchy_symbols_on_the_side_of_the_police_station.,1,216.029459,208.029459,104.01473,6,5.298989,3,222.029501,214.029501,107.014751,3.001291,0
+37,3,21, carem, careemo06.jpg,21, You_see_a_girl_laughing_when_she_realizes_her_friend's_dad_is_the_janitor.,2,225.046002,217.046002,108.523001,6,4.603511,6,231.046047,223.046047,111.523024,6.001508,0
+37,3,22, pur, pur14.jpg,104, You_see_a_very_drunk_woman_making_out_with_multiple_strangers_on_the_city_bus.,2,237.07924,229.07924,114.53962,6,5.095704,6,243.079325,235.079325,117.539662,6.001553,0
+37,3,23, loy, loy03.jpg,78, You_see_a_former_US_General_saying_publicly_he_would_never_buy_any_American_product., NaN,249.095867,241.095867,120.547934,6, NaN,4.50E+00,255.09594,247.09594,123.54797,4.501332,0
+37,3,24, fair, fair11.jpg,56," You_see_a_girl_taking_all_the_Halloween_candy_from_a_bowl,_leaving_none_for_others.",2,259.612401,251.612401,125.806201,6,4.609942,7.50E+00,265.612541,257.612541,128.80627,7.501805,0
+37,3,25, loy, loy14.jpg,89, You_see_a_former_Secretary_of_State_publicly_giving_up_his_citizenship_to_the_US., NaN,273.129015,265.129015,132.564507,6, NaN,6,279.129112,271.129112,135.564556,6.001547,0
+37,3,26, loy, loy04.jpg,79, You_see_a_mayor_saying_that_the_neighboring_town_is_a_much_better_town.,3,285.162253,277.162253,138.581126,6,4.721513,3,291.162294,283.162294,141.581147,3.00118,0
+37,3,27, fair, fair15.jpg,60, You_see_a_politician_using_federal_tax_dollars_to_build_an_extension_on_his_home.,1,294.178785,286.178785,143.089392,6,4.240583,4.50E+00,300.178884,292.178884,146.089442,4.50127,0
+37,3,28, carep, carephys06.jpg,36, You_see_a_girl_shooting_geese_repeatedly_with_a_pellet_gun_out_in_the_woods.,1,304.695366,296.695366,148.347683,6,3.587784,4.50E+00,310.695407,302.695407,151.347703,4.501378,0
+37,3,29, carem, careemo11.jpg,26, You_see_a_man_telling_a_woman_that_her_painting_looks_like_it_was_done_by_children.,3,315.211985,307.211985,153.605993,6,5.713823,4.50E+00,321.21212,313.21212,156.60606,4.501394,0
+37,3,30, carem, careemo09.jpg,24, You_see_a_boy_making_fun_of_his_brother_for_getting_dumped_by_his_girlfriend., NaN,325.728534,317.728534,158.864267,6, NaN,4.50E+00,331.728575,323.728575,161.864287,4.501578,0
+37,3,31, auth, auth15.jpg,15, You_see_a_star_player_ignoring_her_coach's_order_to_come_to_the_bench_during_a_game.,3,336.2785,328.2785,164.13925,6,5.900713,4.50E+00,342.278624,334.278624,167.139312,4.501459,0
+37,3,32, fair, fair01.jpg,46, You_see_a_student_copying_a_classmate's_answer_sheet_on_a_makeup_final_exam.,1,346.795035,338.795035,169.397517,6,4.243792,4.50E+00,352.79506,344.79506,172.39753,4.50143,0
+37,3,33, socn, socnorm11.jpg,116, You_see_someone_driving_around_in_a_dirty_car_that_has_not_been_washed_recently.,3,357.328286,349.328286,174.664143,6,5.552494,7.50E+00,363.328326,355.328326,177.664163,7.501779,0
+37,3,34, lib, lib10.jpg,70, You_see_a_public_leader_on_TV_trying_to_ban_the_wearing_of_hooded_sweatshirts., NaN,370.861556,362.861556,181.430778,6, NaN,3,376.861587,368.861587,184.430793,3.001207,0
+37,3,35, lib, lib11.jpg,71, You_see_a_mother_forcing_her_daughter_to_enroll_as_a_pre-med_student_in_college.,3,379.8781,371.8781,185.93905,6,4.349129,4.50E+00,385.878234,377.878234,188.939117,4.501469,0
+37,3,36, pur, pur11.jpg,101, You_see_a_story_about_a_remote_tribe_eating_the_flesh_of_their_deceased_members., NaN,390.394685,382.394685,191.197343,6, NaN,7.50E+00,396.39481,388.39481,194.197405,7.501641,0
+37,3,37, auth, auth03.jpg,3, You_see_a_girl_repeatedly_interrupting_her_teacher_as_he_explains_a_new_concept.,3,403.911298,395.911298,197.955649,6,4.00413,4.50E+00,409.911431,401.911431,200.955715,4.50151,0
+37,3,38, carep, carephys15.jpg,45, You_see_a_wife_hitting_her_husband_on_the_side_of_his_head_for_coming_home_late.,2,414.444487,406.444487,203.222244,6,5.765844,3,420.444579,412.444579,206.22229,3.001246,0
+37,3,39, carep, carephys09.jpg,39, You_see_a_woman_throwing_a_stapler_at_her_colleague_who_is_snoring_during_her_talk.,1,423.461119,415.461119,207.730559,6,4.597014,4.50E+00,429.461181,421.461181,210.73059,4.501468,0
+37,3,40, pur, pur04.jpg,94, You_see_a_teenager_urinating_in_the_wave_pool_at_a_crowded_amusement_park.,3,433.97766,425.97766,212.98883,6,5.965883,9,439.977699,431.977699,215.988849,9.00178,0
