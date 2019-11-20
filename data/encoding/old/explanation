@@ -1,0 +1,2 @@
+These data were collected several months before the rest of the dataset, as a pilot. Because the files don't have the same structure, 
+it's easier to load these in separately and then tidy everything up in R. 
