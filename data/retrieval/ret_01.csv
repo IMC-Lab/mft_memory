@@ -1,0 +1,184 @@
+subID, vignette, correct_answer, choice1, choice2, choice3, resp, RT, confresp, confRT
+1," ""You see __ getting married to each other in an elaborate wedding."""," ""two first cousins""",two sisters,two first cousins,an uncle and niece, 2@,4.269613, 3#,6.181673
+1," ""You see __ joking in Great Britain about the stupidity of Americans."""," ""the US ambassador""",the US ambassador,a US politician,a US diplomat, 1!,7.114622, 3#,8.508933
+1," ""You see a __ calling the president a nasty name in the middle of a speech."""," ""reporter""",reporter,bystander,newscaster, 4$,3.940688, 3#,5.984514
+1," ""You see a __ celebrating with the opposing team's players who just won the game."""," ""coach""",manager,player,coach, 3#,11.78526, 2@,13.442252
+1," ""You see a __ drinking until she vomits on herself and falls asleep."""," ""college student""",teenager,college student,high schooler, 1!,12.283647, 2@,13.576263
+1," ""You see a __ intentionally making bad calls that help his favored team win."""," ""referee""",line judge,umpire,referee, 3#,6.056878, 3#,7.339934
+1," ""You see a __ player pretending to be seriously fouled by an opposing player."""," ""soccer""",basketball,football,soccer, 3#,3.300022, 3#,4.5995
+1," ""You see a __ saying that the neighboring town is a much better town."""," ""mayor""",city official,sheriff,mayor, 3#,8.056095, 3#,9.552986
+1," ""You see a __ taking all the tips that are supposed to be shared among employees."""," ""barista""",waiter,bartender,barista, 4$,3.60562, 3#,4.903318
+1," ""You see a __ trying to ban student dances held at public schools."""," ""community leader""",community leader,city councilman,PTA member, 4$,3.873574, 3#,5.441814
+1," ""You see a boss pressuring employees to buy __ from her family's general store."""," ""goods""",products,groceries,goods, 3#,25.137336, 1!,26.709653
+1," ""You see a boss requiring that she gets access to her employees' __ accounts."""," ""Facebook""",Twitter,Facebook,Gmail, 4$,4.131539, 3#,6.861502
+1," ""You see a boy laughing at another student for his poor score on __."""," ""the final exam""",his report card,the final exam,the standardized test, 4$,6.781561, 2@,8.103684
+1," ""You see a boy making fun of his brother for getting __ his girlfriend."""," ""dumped by""",dumped by,in trouble with,yelled at by, 1!,4.908837, 3#,6.409523
+1," ""You see a boy placing a thumbtack sticking up on the __ of another student."""," ""chair""",stool,seat,chair, 2@,10.281093, 2@,11.571835
+1," ""You see a boy setting a series of traps to kill stray cats in his __."""," ""neighborhood""",neighborhood,backyard,garage, 1!,8.65514, 3#,11.094379
+1," ""You see a boy skipping to the front of the line because his friend is __."""," ""an employee""",a cashier,an employee,the manager, 2@,6.546474, 3#,8.327307
+1," ""You see a boy spray-painting __ symbols on the side of the police station."""," ""anarchy""",anarchy,dirty,gang, 1!,2.404216, 3#,3.882889
+1," ""You see a boy telling a woman that she looks just like her overweight __ ."""," ""bulldog""",beagle,pug,bulldog, 3#,5.260368, 3#,6.777912
+1," ""You see a boy tripping a classmate in order to be the first __."""," ""in the cafeteria line""",on the schoolbus,out on the playground,in the cafeteria line, 4$,7.293668, 3#,8.555161
+1," ""You see a boy turning up the __ as his father talks about his military service."""," ""TV""",TV,radio,volume, 1!,6.188975, 3#,7.740603
+1," ""You see a Brazilian at the World Cup cheering for __ to win every medal."""," ""Germany""",Britain,Portugal,Germany, 4$,7.164294, 3#,9.138165
+1," ""You see a brother kicking his sister's __ that took many hours to build."""," ""sandcastle""",sandcastle,house of cards,Lego tower, 4$,5.421176, 3#,7.535185
+1," ""You see a campaign manager cheering as an opponent pulls ahead to win the __."""," ""election""",race,popular vote,election, 4$,4.431427, 3#,5.8201
+1," ""You see a college president singing a rival school's fight song during __."""," ""a pep rally""",the homecoming game,the championship,a pep rally, 3#,4.628815, 3#,6.339419
+1," ""You see a customer greeting every stranger she sees while __."""," ""in a coffee shop""",in a coffee shop,sitting at the bar,waiting in the lobby, 4$,5.564571, 3#,6.891231
+1," ""You see a drug addict offering to provide any service for __."""," ""a bump of cocaine""",a hit of heroin,an ounce of meth,a bump of cocaine, 4$,5.085701, 3#,6.572532
+1," ""You see a drunk elderly man offering to __ with anyone at the bar."""," ""have oral sex""",cuddle,make out,have oral sex, 3#,10.712142, 3#,12.650127
+1," ""You see a family eating the carcass of their pet __ that had been run over."""," ""dog""",kitten,dog,turtle, 2@,2.857565, 3#,4.361619
+1," ""You see a father requiring his son to become a __ like him."""," ""commercial airline pilot""",chemical engineer,corporate entrepreneur,commercial airline pilot, 3#,3.341202, 3#,4.834329
+1," ""You see a father requiring his son to take up the family __ business."""," ""restaurant""",restaurant,mechanic,plumbing, 1!,3.926608, 3#,5.411724
+1," ""You see a former Secretary of __ publicly giving up his citizenship to the US."""," ""State""",Defense,State,Treasury, 2@,4.321735, 3#,6.146235
+1," ""You see a former US __ saying publicly he would never buy any American product."""," ""general""",president,general,congressman, 2@,3.678894, 3#,5.023033
+1," ""You see a girl and her __ making out with each other just for practice."""," ""sister""",sister,cousin,brother, 1!,5.548806, 3#,7.911836
+1," ""You see a girl asking for allowance even though her brother __ for her."""," ""did her chores""",cleaned her room,made her bed,did her chores, 3#,4.492313, 3#,6.203544
+1," ""You see a girl ignoring her father's orders by taking the car __."""," ""after her curfew""",after her curfew,without permission,out while grounded, 1!,9.691774, 3#,11.0243
+1," ""You see a girl laughing at another student forgetting her lines __ ."""," ""at a school play""",at a poetry recital,in front of everyone,at a school play, 3#,3.576015, 3#,5.482711
+1," ""You see a girl laughing when she realizes her friend's dad is the __ ."""," ""janitor""",janitor,schoolbus driver,school nurse, 1!,2.139592, 3#,3.392719
+1," ""You see a girl quitting her father's __ team to play for their biggest rival."""," ""soccer""",baseball,basketball,soccer, 4$,5.822012, 3#,7.105015
+1," ""You see a girl repeatedly interrupting her __ as he explains a new concept."""," ""teacher""",teacher,tutor,professor, 3#,3.553505, 3#,4.885915
+1," ""You see a girl rolling her eyes as her father tells her to __."""," ""do her homework""",do her homework,clean her room,eat her vegetables, 4$,6.878414, 3#,8.909126
+1," ""You see a girl saying that another girl is too ugly to __."""," ""be a varsity cheerleader""",be her bridesmaid,find a prom date,be a varsity cheerleader, 3#,4.203301, 3#,6.415193
+1," ""You see a girl shooting geese repeatedly with a pellet gun out __."""," ""in the woods""",at the pond,in her backyard,in the woods, 2@,8.576257, 2@,11.016264
+1," ""You see a girl taking all the Halloween candy from a __, leaving none for others."""," ""bowl""",dish,bowl,bag, 2@,7.119646, 2@,8.624006
+1," ""You see a girl telling a boy that his __ is much more attractive than him."""," ""older brother""",best friend,older brother,cousin, 2@,4.745983, 3#,7.402666
+1," ""You see a girl telling her __ that she looks like she has gained weight."""," ""classmate""",mother,sister,classmate, 3#,4.954367, 3#,6.26704
+1," ""You see a girl throwing __ on a woman who is dating her ex-boyfriend."""," ""her hot coffee""",her hot coffee,her hot tea,a glass of wine, 1!,7.432524, 3#,9.482766
+1," ""You see a group of women having a long and loud conversation __."""," ""during a church sermon""",during a meditation class,with a funeral nearby,during a church sermon, 3#,4.327239, 3#,5.79898
+1," ""You see a head cheerleader booing her __ team during a homecoming game."""," ""high school's""",high school's,university's,college's, 1!,7.270312, 2@,8.514651
+1," ""You see a Hollywood star agreeing with a foreign __ denunciation of the US."""," ""dictator's""",dictator's,leader's,tyrant's, 1!,4.404319, 3#,5.759811
+1," ""You see a homosexual in a gay bar offering sex to anyone who __."""," ""buys him a drink""",will drive him home,wants to have sex,buys him a drink, 3#,8.95306, 3#,10.305663
+1," ""You see a judge taking on __ case although he is friends with the defendant."""," ""a criminal""",a civil,an appeals,a criminal, 3#,6.681029, 2@,8.007366
+1," ""You see a man being openly rude to a police officer he passes __."""," ""on the sidewalk""",on his bike,at a crosswalk,on the sidewalk, 4$,3.730247, 3#,5.549941
+1," ""You see a man blocking his wife from leaving home or __."""," ""interacting with others""",having a job,interacting with others,watching the news, 2@,3.733447, 3#,4.967398
+1," ""You see a man eating a bowl of cereal in the morning with __ instead of milk."""," ""water""",orange juice,water,creamer, 2@,3.184869, 3#,5.622799
+1," ""You see a man elbowing someone as he struggles to get __ quickly."""," ""off the plane""",out the door,off the plane,out of the elevator, 4$,4.739147, 3#,6.115838
+1," ""You see a man entering __ while still wearing all his work clothes."""," ""a hot tub""",the shower,a swimming pool,a hot tub, 4$,5.890438, 3#,7.669318
+1," ""You see a man forbidding his wife to __ that he has not first approved."""," ""wear clothing""",see movies,wear clothing,read books, 2@,7.124731, 2@,8.47815
+1," ""You see a man fulfilling a deceased stranger's request by eating some of his __."""," ""flesh""",skin,flesh,hair, 4$,3.516494, 3#,4.786325
+1," ""You see a man having sex with a frozen chicken before __ for dinner."""," ""cooking it""",heating it up,preparing it,cooking it, 3#,8.830366, 2@,10.739376
+1," ""You see a man in a bar using his __ to watch people having sex with animals."""," ""phone""",iPad,phone,laptop, 2@,7.95672, 2@,9.214871
+1," ""You see a man lashing his __ with a whip for breaking loose from its pen."""," ""pony""",pony,goat,donkey, 1!,3.181716, 3#,4.893129
+1," ""You see a man laughing at a disabled co-worker while at an office __."""," ""softball game""",softball game,beach retreat,charity run, 1!,3.941622, 3#,5.237879
+1," ""You see a man leaving his family business to go work __."""," ""for their main competitor""",for a start-up,somewhere that pays better,for their main competitor, 3#,4.356896, 3#,6.256802
+1," ""You see a man loudly telling his wife that the __ tastes awful."""," ""dinner she cooked""",dinner she cooked,breakfast she prepared,cake she baked, 1!,4.920196, 3#,6.439259
+1," ""You see a man moving multiple __ pieces while his opponent is distracted."""," ""chess""",checkers,backgammon,chess, 4$,3.703023, 3#,5.014704
+1," ""You see a man purposely stepping hard on the foot of someone who __ ."""," ""is in his way""",is in his way,got on his nerves,took his seat, 4$,3.513565, 3#,4.776191
+1," ""You see a man pushing someone to the ground while trying to __."""," ""catch a foul ball""",see the band,catch a foul ball,see the parade, 4$,8.587699, 3#,10.162459
+1," ""You see a man putting __ all over his chicken Caesar salad while at lunch."""," ""ketchup""",mayonnaise,mustard,ketchup, 3#,4.471837, 3#,6.67342
+1," ""You see a man quickly canceling a blind date as soon as he __ ."""," ""sees the woman""",sees the woman,learns she's overweight,sees her profile picture, 1!,4.166021, 3#,5.822069
+1," ""You see a man refusing to allow his daughter to participate in any __."""," ""type of sports""",type of sports,co-ed activities,after school clubs, 4$,3.78045, 3#,5.140967
+1," ""You see a man searching through the trash to find women's discarded __."""," ""underwear""",pantyhose,underwear,lingerie, 2@,4.887568, 3#,7.117357
+1," ""You see a man spending several hours at a strip club every day right after __."""," ""work""",class,work,dinner, 4$,3.734898, 3#,5.641722
+1," ""You see a man staying inside his home with the __ on a rare sunny day."""," ""shades drawn""",curtains closed,shades drawn,lights off, 1!,14.986651, 2@,16.23406
+1," ""You see a man telling a woman that her painting looks like it __."""," ""was done by children""",was done by children,belongs in the closet,is beginner's work, 1!,5.113407, 3#,6.453249
+1," ""You see a man telling his __ that she has to switch to his political party."""," ""fiancee""",wife,girlfriend,fiancee, 2@,8.892406, 2@,10.871435
+1," ""You see a man telling his girlfriend that she must __."""," ""convert to his religion""",vote a certain way,quit her job,convert to his religion, 3#,5.702729, 3#,7.723487
+1," ""You see a man turn his back and walk away while his boss questions his __."""," ""work""",attitude,ideas,work, 3#,9.06536, 3#,10.330544
+1," ""You see a man walking down a dark __ while still wearing his sunglasses."""," ""hallway""",alley,hallway,staircase, 2@,3.553121, 3#,4.973217
+1," ""You see a man walking down the street wearing a neon green suit with __."""," ""a top hat""",cowboy boots,a long cape,a top hat, 4$,3.568728, 3#,4.933084
+1," ""You see a man wearing __ with socks that clearly do not match each other."""," ""a suit""",a suit,sandals,pants, 4$,4.688308, 3#,6.064808
+1," ""You see a manager coercing her employees into eating at her brother's __."""," ""diner""",diner,restaurant,café, 1!,3.651829, 3#,5.728002
+1," ""You see a mayor trying to ban people from __ in public in his city."""," ""hugging and kissing""",holding hands,singing songs,hugging and kissing, 3#,3.780215, 3#,5.771539
+1," ""You see a mother forcing her daughter to enroll as a __ student in college."""," ""pre-med""",pre-med,pre-law,business, 1!,4.089373, 3#,6.246661
+1," ""You see a mother preventing her teenage son from wearing __ clothes to school."""," ""pink""",purple,pink,lavender, 4$,3.333505, 3#,4.598476
+1," ""You see a mother telling her son that she is going to choose all of his __ ."""," ""friends""",friends,classes,outfits, 1!,6.655323, 3#,8.034401
+1," ""You see a mother who is still breast-feeding her needy __."""," ""eight year old""",nine year old,seven year old,eight year old, 4$,3.981182, 3#,5.409704
+1," ""You see a player publicly yelling at his soccer coach during __ game."""," ""a play-off""",a tournament,an all-star,a play-off, 1!,20.777895, 2@,22.623415
+1," ""You see a player questioning the __ of his coach during a team practice."""," ""competence""",athleticism,intelligence,competence, 4$,3.965895, 3#,5.576336
+1," ""You see a politician using federal tax dollars to build an extension on his __."""," ""home""",lake house,beach condo,home, 3#,7.544027, 3#,9.12561
+1," ""You see a principal publicly wishing that a rival school wins __."""," ""a prestigious grant""",the tournament,the choir competition,a prestigious grant, 4$,10.22629, 3#,11.531887
+1," ""You see a professor forcing all her students to write papers supporting her __."""," ""views""",theories,views,beliefs, 4$,3.022031, 3#,4.238799
+1," ""You see a professor giving a __ grade to a student just because he dislikes him."""," ""bad""",lower,bad,failing, 2@,3.911885, 3#,5.300787
+1," ""You see a public leader on TV trying to ban the wearing of __."""," ""hooded sweatshirts""",baggy pants,baseball caps,hooded sweatshirts, 3#,3.653051, 3#,5.154286
+1," ""You see a runner taking a shortcut on the course during the __ in order to win."""," ""marathon""",triathlon,relay race,marathon, 3#,4.685585, 3#,6.091125
+1," ""You see a staff member talking loudly and interrupting the __ speech to the public."""," ""mayor's""",CEO's,mayor's,candidate's, 2@,8.528151, 3#,9.947588
+1," ""You see a star player ignoring her coach's order to come to the bench during __."""," ""a game""",practice,a game,a time out, 2@,9.015044, 3#,10.585587
+1," ""You see a story about a remote tribe eating the __ of their deceased members."""," ""flesh""",brains,eyes,flesh, 3#,5.919761, 3#,7.975447
+1," ""You see a student copying a classmate's answer sheet on a makeup __."""," ""final exam""",quiz,final exam,midterm exam, 2@,5.768349, 3#,7.448054
+1," ""You see a student getting an A on a group project when he didn't __."""," ""do his part""",do his part,deserve it,contribute anything, 1!,18.820058, 2@,20.357313
+1," ""You see a student stating that her professor is __ during an afternoon class."""," ""a fool""",an idiot,a moron,a fool, 3#,3.547867, 3#,4.80807
+1," ""You see a student talking back to the __ in front of the classroom."""," ""principal""",principal,teacher,superintendent, 2@,17.206903, 1!,18.596053
+1," ""You see a teacher hitting a student's hand with a ruler for __ in class."""," ""falling asleep""",daydreaming,falling asleep,passing notes, 2@,3.810292, 3#,5.805323
+1," ""You see a teacher ordering a student to __ before coming to class."""," ""get a normal haircut""",wipe her makeup off,cover up her tattoo,get a normal haircut, 3#,4.306174, 3#,6.166758
+1," ""You see a teacher ordering a student to go __ for having a weird hairstyle."""," ""to detention""",to detention,to the principal's office,home, 4$,4.169976, 2@,5.429828
+1," ""You see a teacher publicly saying she hopes another school wins the __."""," ""math contest""",quiz bowl,math contest,science fair, 2@,6.181178, 2@,7.633207
+1," ""You see a teaching assistant talking back to the teacher in front of the __."""," ""classroom""",kindergarten class,classroom,students, 2@,10.135708, 2@,12.293256
+1," ""You see a teenage boy chuckling at an amputee he passes by while on the __."""," ""subway""",sidewalk,subway,train, 1!,10.014525, 3#,11.926102
+1," ""You see a teenage boy offering his classmate money to write his __."""," ""history essay""",book report,history essay,biology paper, 4$,3.497894, 3#,4.842339
+1," ""You see a teenage girl at __ mocking a man's stuttering speech."""," ""the local mall""",the local mall,a café,the post office, 4$,5.919928, 3#,7.586269
+1," ""You see a teenage girl coming home late and ignoring her parents' __."""," ""strict curfew""",text messages,questions,strict curfew, 3#,3.423874, 3#,5.487919
+1," ""You see a teenage girl drinking a _ of her friend's urine on a dare."""," ""cup""",mug,cup,bottle, 4$,3.901563, 3#,5.196135
+1," ""You see a teenage girl forbidding friends from ever disagreeing with her __."""," ""in public""",in public,on Facebook,about fashion, 4$,3.571099, 3#,4.778742
+1," ""You see a teenage girl openly staring at a __ as she walks past."""," ""disfigured woman""",burn victim,very large person,disfigured woman, 3#,6.237805, 3#,7.848761
+1," ""You see a teenage girl wearing a long __ on a hot summer afternoon."""," ""trench coat""",trench coat,bath robe,wool coat, 1!,3.531553, 3#,5.076609
+1," ""You see a teenage male in a dorm bathroom secretly using a stranger's __."""," ""toothbrush""",razor,toothbrush,towel, 2@,3.638451, 3#,5.120214
+1," ""You see a teenage woman carrying an open umbrella on a cloudless day in __."""," ""October""",November,October,September, 4$,5.545367, 3#,8.033223
+1," ""You see a teenager at a cafeteria forcing a younger student to__."""," ""pay for her lunch""",get her a soda,sit somewhere else,pay for her lunch, 3#,5.579136, 3#,7.545408
+1," ""You see a teenager urinating in the wave pool at a crowded __ park."""," ""amusement""",amusement,theme,water, 1!,8.837606, 2@,10.126172
+1," ""You see a teenager wearing all of their clothes inside out while __."""," ""at a movie theater""",at the mall,at a movie theater,at the library, 4$,3.504792, 3#,5.417102
+1," ""You see a tenant bribing a landlord to be the first to get their apartment __."""," ""repainted""",remodeled,repainted,carpeted, 2@,5.777965, 3#,7.098964
+1," ""You see a track coach quitting in the middle of the season after __."""," ""winning the lottery""",marrying a wealthy man,inheriting lots of money,winning the lottery, 4$,4.883864, 3#,6.502663
+1," ""You see a US __ cheering as a Chinese foe beats his teammate to win the gold."""," ""swimmer""",swimmer,wrestler,gymnast, 1!,6.099251, 3#,8.170697
+1," ""You see a very drunk woman dancing on a table while men laugh and __."""," ""cheer her on""",cheer her on,take pictures,buy her drinks, 4$,3.735838, 3#,5.217895
+1," ""You see a very drunk woman making out with multiple strangers __."""," ""on the city bus""",at the subway stop,on the city bus,at the gas station, 2@,6.035433, 3#,7.294775
+1," ""You see a wife hitting her husband on the side of his head for __."""," ""coming home late""",not doing the dishes,not paying attention,coming home late, 3#,3.756015, 3#,5.061736
+1," ""You see a wife turning in her husband to the police for __."""," ""overdue parking fines""",littering on the sidewalk,illegal music downloads,overdue parking fines, 4$,4.993241, 3#,6.297836
+1," ""You see a woman __ before her main entree arrives on the table."""," ""eating dessert""",paying for her meal,having a breath mint,eating dessert, 3#,4.509108, 3#,6.999964
+1," ""You see a woman __ when the judge walks into the courtroom."""," ""refusing to stand""",raise her middle finger,talking on her phone,refusing to stand, 3#,5.803948, 3#,7.167439
+1," ""You see a woman __ with the word ""goodbye"" instead of ""hello."""""," ""answering a phone call""",beginning a letter,typing an e-mail,answering a phone call, 3#,6.016906, 3#,7.996687
+1," ""You see a woman accidentally knocking over a child while __ on her cell phone."""," ""talking""",playing a game,talking,texting, 4$,4.459504, 3#,5.814146
+1," ""You see a woman buying herself an expensive __ with a stolen credit card."""," ""necklace""",necklace,pair of earrings,bracelet, 4$,3.175842, 3#,4.683013
+1," ""You see a woman clearly avoiding sitting next to an obese woman __."""," ""on the bus""",in the lobby,in a theater,on the bus, 3#,2.800453, 3#,4.163402
+1," ""You see a woman collecting child support for a __ who no longer lives with her."""," ""girl""",girl,child,teenager, 4$,5.669328, 3#,7.303984
+1," ""You see a woman commenting out loud about how fat another woman looks in her __ ."""," ""jeans""",swimsuit,skirt,jeans, 3#,8.989693, 2@,10.446557
+1," ""You see a woman continuing to wear a __ inside her apartment complex."""," ""large sun hat""",large sun hat,big shady visor,pair of sunglasses, 1!,5.679779, 3#,7.495896
+1," ""You see a woman drinking her entire cup of __ using a stirring spoon."""," ""coffee""",tea,coffee,cocoa, 2@,3.68697, 3#,5.212655
+1," ""You see a woman driving recklessly through a school zone to __."""," ""make a meeting""",get to a luncheon,make a meeting,make an appointment, 4$,3.310289, 3#,4.71435
+1," ""You see a woman getting hired only because her father __ with the boss."""," ""is close friends""",is close friends,went to college,plays golf, 1!,3.499448, 3#,4.864333
+1," ""You see a woman happily admitting that she has not paid any taxes in over __ years."""," ""ten""",two,five,ten, 4$,4.631992, 3#,5.946261
+1," ""You see a woman having intimate relations with a recently deceased __."""," ""loved one""",stranger,loved one,close friend, 2@,3.16927, 3#,4.53644
+1," ""You see a woman having sex with an extremely obese man in exchange for __."""," ""fifteen dollars""",twenty-five dollars,fifteen dollars,twenty dollars, 4$,9.572945, 3#,12.274437
+1," ""You see a woman insulting a severely obese man who is sitting in the __."""," ""park""",park,doctor's office,airport, 4$,5.013839, 3#,6.599783
+1," ""You see a woman laughing out loud about a young man's __."""," ""receding hairline""",receding hairline,graying hair,bald spot, 4$,3.577599, 3#,4.883031
+1," ""You see a woman laughing with her friend about __ of her family members."""," ""the poor taste""",the silly traditions,the poor taste,embarrassing stories, 4$,3.694077, 3#,4.979341
+1," ""You see a woman lying about the number of __ days she has taken at work."""," ""vacation""",vacation,sick,personal, 1!,3.542015, 3#,5.229956
+1," ""You see a woman pressuring her daughter to become a famous __."""," ""evening news anchor""",evening news anchor,ice skater,ballet dancer, 1!,4.771136, 3#,6.813331
+1," ""You see a woman slapping another woman who she is arguing with in the __."""," ""parking lot""",hotel lobby,grocery store,parking lot, 3#,4.479199, 3#,5.78033
+1," ""You see a woman snatching away her dog's food for making a mess in the __."""," ""living room""",living room,bedroom,kitchen, 1!,11.022172, 2@,12.525628
+1," ""You see a woman spanking her child with a __ for getting bad grades in school."""," ""spatula""",spatula,rolling pin,wooden spoon, 1!,2.915652, 3#,4.385985
+1," ""You see a woman squeezing a baby's __ hard because it will not stop crying."""," ""arm""",foot,shoulder,arm, 4$,3.910971, 3#,5.466527
+1," ""You see a woman swerving her car in order to intentionally run over a __."""," ""squirrel""",squirrel,snake,possum, 1!,3.47579, 3#,4.932121
+1," ""You see a woman taking credit at work for an idea she overheard __."""," ""at lunch""",in the break room,in the hall,at lunch, 4$,3.972888, 3#,5.781343
+1," ""You see a woman telling a group of homeless people on the __ to go find jobs."""," ""subway""",curb,street,subway, 4$,3.700272, 3#,5.1206
+1," ""You see a woman throwing a stapler at her colleague who is __ during her talk."""," ""snoring""",snoring,laughing,whispering, 1!,4.403803, 3#,6.085164
+1," ""You see a woman throwing her cat across the room for __."""," ""scratching the furniture""",jumping on the bed,scratching the furniture,not using the litterbox, 2@,3.685451, 3#,5.417257
+1," ""You see a woman tripping someone in order to get the last __ in her size."""," ""shirt""",pair of shoes,shirt,jacket, 4$,4.903785, 3#,6.612427
+1," ""You see a woman using a fork to eat a bowl of __ ice cream and marshmallows."""," ""vanilla""",vanilla,strawberry,chocolate, 1!,3.796028, 3#,5.341595
+1," ""You see a woman watching __ on television in black-and-white instead of color."""," ""a game""",the news,the soap opera,a game, 1!,6.072366, 2@,7.322797
+1," ""You see a woman with __ hair riding a unicycle to work every day."""," ""blue and orange""",green and black,purple and pink,blue and orange, 4$,4.735688, 3#,6.206024
+1," ""You see a young adult openly refusing to follow __ dress code."""," ""her school's""",her workplace's,her school's,her religion's, 4$,5.07117, 3#,6.355619
+1," ""You see a young boy teasing another boy because his father recently __."""," ""passed away""",divorced his mother,was deployed overseas,passed away, 4$,4.242715, 3#,6.767247
+1," ""You see a zoo trainer jabbing __ to get it to entertain his customers."""," ""a dolphin""",an elephant,a dolphin,a panda, 2@,6.452931, 3#,8.682701
+1," ""You see an American __ publicly defecting to Iran for a large sum of money."""," ""celebrity""",celebrity,talk show host,newscaster, 4$,4.681969, 3#,5.990396
+1," ""You see an American telling foreigners that the US is __ force in the world."""," ""an evil""",a negative,an evil,a destructive, 2@,3.355714, 3#,4.663945
+1," ""You see an employee at a morgue eating his __ pizza off of a dead body."""," ""pepperoni""",sausage,pepperoni,cheese, 2@,8.924701, 2@,10.358429
+1," ""You see an employee joking with competitors about how bad his company did __."""," ""last year""",this month,this quarter,last year, 3#,6.937917, 3#,8.546888
+1," ""You see an employee lying about how many hours she worked __."""," ""during the week""",overtime,over the pay period,during the week, 2@,14.071961, 2@,16.712572
+1," ""You see an employee receiving __ for work that was really done by others."""," ""a bonus""",praise,an award,a bonus, 4$,4.916109, 3#,6.576605
+1," ""You see an employee trying to undermine her boss's __."""," ""ideas""",credibility,financial strategy,ideas, 3#,26.661435, 2@,28.015409
+1," ""You see an intern disobeying an order to dress professionally and __."""," ""comb his hair""",shave,comb his hair,get a haircut, 2@,6.987442, 3#,8.859371
+1," ""You see boys making fun of a girl's tattered clothes as she __."""," ""boards the bus""",sits at her desk,enters the lunchroom,boards the bus, 4$,8.664071, 2@,10.014692
+1," ""You see children ignoring their __ orders to get ready to go to school."""," ""mom's""",mom's,grandmother's,dad's, 4$,3.294756, 3#,4.554279
+1," ""You see someone at the __ lifting free weights in nice business clothes."""," ""school gym""",rec center,health club,school gym, 3#,4.268539, 3#,5.605532
+1," ""You see someone driving around in a dirty __ that has not been washed recently."""," ""car""",car,minivan,sedan, 1!,7.017237, 2@,8.316865
+1," ""You see someone giving the finger to the __ back is turned."""," ""boss, while the boss's""","dentist, while the dentist's","policeman, while the policeman's","boss, while the boss's", 4$,10.161547, 3#,11.616016
+1," ""You see someone leaving his dog outside in the rain after it dug in the __."""," ""trash""",sandbox,vegetable garden,trash, 3#,4.427218, 3#,6.480928
+1," ""You see someone reading the ending of a __ novel before reading the beginning."""," ""spy""",spy,mystery,fantasy, 1!,2.606109, 3#,3.875376
+1," ""You see someone using an old __ and refusing to go buy a new one."""," ""rotary phone""",rotary phone,laptop,printer, 1!,4.379923, 3#,6.188594
+1," ""You see someone wearing a __ costume on a day that is not Halloween."""," ""superhero""",superhero,zombie,pirate, 4$,3.394681, 3#,4.835851
+1," ""You see the class __ saying on TV that her rival college is a better school."""," ""president""",president,secretary,treasurer, 1!,5.519646, 3#,6.984855
+1," ""You see the coach's wife __ for her husband's rival team."""," ""sponsoring a bake sale""",cheering loudly,sponsoring a bake sale,raising money, 2@,4.986694, 3#,7.123756
+1," ""You see the head of a law firm ordering her juniors to __ every day."""," ""shine her shoes""",wash her car,shine her shoes,get her coffee, 4$,3.826669, 3#,5.571276

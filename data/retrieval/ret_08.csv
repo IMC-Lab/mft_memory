@@ -1,0 +1,184 @@
+subID, vignette, correct_answer, choice1, choice2, choice3, resp, RT, confresp, confRT
+8," ""You see a boy placing a thumbtack sticking up on the __ of another student."""," ""chair"""," ""chair"""," ""seat"""," ""stool""", 3#,5.507214, 2@,7.404364
+8," ""You see boys making fun of a girl's tattered clothes as she __."""," ""boards the bus"""," ""sits at her desk"""," ""enters the lunchroom"""," ""boards the bus""", 4$,4.229386, 3#,7.814486
+8," ""You see a man quickly canceling a blind date as soon as he __ ."""," ""sees the woman"""," ""learns she's overweight"""," ""sees her profile picture"""," ""sees the woman""", 3#,7.19214, 3#,8.948902
+8," ""You see a US __ cheering as a Chinese foe beats his teammate to win the gold."""," ""swimmer"""," ""wrestler"""," ""gymnast"""," ""swimmer""", 3#,7.287495, 1!,8.716629
+8," ""You see a wife hitting her husband on the side of his head for __."""," ""coming home late"""," ""not doing the dishes"""," ""not paying attention"""," ""coming home late""", 3#,5.039597, 3#,7.38891
+8," ""You see a man fulfilling a deceased stranger's request by eating some of his __."""," ""flesh"""," ""flesh"""," ""hair"""," ""skin""", 4$,5.395233, 3#,7.45691
+8," ""You see a player questioning the __ of his coach during a team practice."""," ""competence"""," ""intelligence"""," ""competence"""," ""athleticism""", 1!,5.865309, 2@,7.160027
+8," ""You see a mayor trying to ban people from __ in public in his city."""," ""hugging and kissing"""," ""singing songs"""," ""hugging and kissing"""," ""holding hands""", 2@,4.438916, 3#,5.292908
+8," ""You see a woman accidentally knocking over a child while __ on her cell phone."""," ""talking"""," ""texting"""," ""talking"""," ""playing a game""", 4$,3.037727, 3#,5.009266
+8," ""You see a __ taking all the tips that are supposed to be shared among employees."""," ""barista"""," ""waiter"""," ""bartender"""," ""barista""", 4$,3.332359, 4$,5.66554
+8," ""You see a mother preventing her teenage son from wearing __ clothes to school."""," ""pink"""," ""lavender"""," ""pink"""," ""purple""", 3#,5.770749, 1!,8.950046
+8," ""You see a man putting __ all over his chicken Caesar salad while at lunch."""," ""ketchup"""," ""mayonnaise"""," ""ketchup"""," ""mustard""", 2@,4.639927, 3#,5.452173
+8," ""You see a teacher ordering a student to __ before coming to class."""," ""get a normal haircut"""," ""get a normal haircut"""," ""wipe her makeup off"""," ""cover up her tattoo""", 1!,5.679485, 3#,6.930596
+8," ""You see a brother kicking his sister's __ that took many hours to build."""," ""sandcastle"""," ""Lego tower"""," ""sandcastle"""," ""house of cards""", 4$,4.0964, 2@,7.57341
+8," ""You see a __ trying to ban student dances held at public schools."""," ""community leader"""," ""PTA member"""," ""community leader"""," ""city councilman""", 4$,5.46849, 2@,6.794749
+8," ""You see a boy telling a woman that she looks just like her overweight __ ."""," ""bulldog"""," ""beagle"""," ""bulldog"""," ""pug""", 2@,6.719401, 2@,7.984826
+8," ""You see a man entering __ while still wearing all his work clothes."""," ""a hot tub"""," ""a hot tub"""," ""a swimming pool"""," ""the shower""", 2@,5.539554, 3#,6.806874
+8," ""You see a woman using a fork to eat a bowl of __ ice cream and marshmallows."""," ""vanilla"""," ""chocolate"""," ""strawberry"""," ""vanilla""", 2@,7.240258, 1!,8.258902
+8," ""You see a __ calling the president a nasty name in the middle of a speech."""," ""reporter"""," ""newscaster"""," ""bystander"""," ""reporter""", 4$,6.031927, 2@,7.235539
+8," ""You see someone giving the finger to the __ back is turned."""," ""boss, while the boss's"""," ""dentist, while the dentist's"""," ""boss, while the boss's"""," ""policeman, while the policeman's""", 4$,4.012105, 3#,5.551674
+8," ""You see a teenage girl openly staring at a __ as she walks past."""," ""disfigured woman"""," ""burn victim"""," ""disfigured woman"""," ""very large person""", 2@,6.643857, 1!,7.458511
+8," ""You see someone at the __ lifting free weights in nice business clothes."""," ""school gym"""," ""school gym"""," ""health club"""," ""rec center""", 1!,3.887945, 3#,5.093743
+8," ""You see a college president singing a rival school's fight song during __."""," ""a pep rally"""," ""a pep rally"""," ""the championship"""," ""the homecoming game""", 1!,8.426662, 2@,9.216325
+8," ""You see a girl saying that another girl is too ugly to __."""," ""be a varsity cheerleader"""," ""be her bridesmaid"""," ""find a prom date"""," ""be a varsity cheerleader""", 3#,7.551174, 2@,8.453116
+8," ""You see a man wearing __ with socks that clearly do not match each other."""," ""a suit"""," ""sandals"""," ""pants"""," ""a suit""", 4$,3.717056, 3#,7.713006
+8," ""You see a __ drinking until she vomits on herself and falls asleep."""," ""college student"""," ""college student"""," ""teenager"""," ""high schooler""", 1!,4.313416, 3#,7.853785
+8," ""You see a man turn his back and walk away while his boss questions his __."""," ""work"""," ""work"""," ""attitude"""," ""ideas""", 3#,5.086041, 3#,6.330635
+8," ""You see a family eating the carcass of their pet __ that had been run over."""," ""dog"""," ""kitten"""," ""turtle"""," ""dog""", 3#,4.098137, 3#,5.042163
+8," ""You see a track coach quitting in the middle of the season after __."""," ""winning the lottery"""," ""winning the lottery"""," ""marrying a wealthy man"""," ""inheriting lots of money""", 4$,5.816191, 4$,7.739313
+8," ""You see a tenant bribing a landlord to be the first to get their apartment __."""," ""repainted"""," ""carpeted"""," ""remodeled"""," ""repainted""", 2@,7.140539, 2@,8.308935
+8," ""You see a man refusing to allow his daughter to participate in any __."""," ""type of sports"""," ""after school clubs"""," ""co-ed activities"""," ""type of sports""", 4$,7.317482, 1!,8.592286
+8," ""You see an employee at a morgue eating his __ pizza off of a dead body."""," ""pepperoni"""," ""sausage"""," ""cheese"""," ""pepperoni""", 3#,3.358903, 3#,4.185072
+8," ""You see a man purposely stepping hard on the foot of someone who __ ."""," ""is in his way"""," ""is in his way"""," ""took his seat"""," ""got on his nerves""", 4$,6.161419, 2@,7.102322
+8," ""You see a woman slapping another woman who she is arguing with in the __."""," ""parking lot"""," ""hotel lobby"""," ""parking lot"""," ""grocery store""", 2@,10.76713, 2@,11.597824
+8," ""You see a former Secretary of __ publicly giving up his citizenship to the US."""," ""State"""," ""Defense"""," ""State"""," ""Treasury""", 2@,5.049499, 3#,6.133767
+8," ""You see a boss pressuring employees to buy __ from her family's general store."""," ""goods"""," ""goods"""," ""groceries"""," ""products""", 3#,6.656022, 1!,7.45083
+8," ""You see a student copying a classmate's answer sheet on a makeup __."""," ""final exam"""," ""quiz"""," ""final exam"""," ""midterm exam""", 3#,7.401069, 2@,8.133223
+8," ""You see a girl rolling her eyes as her father tells her to __."""," ""do her homework"""," ""eat her vegetables"""," ""clean her room"""," ""do her homework""", 4$,3.61391, 2@,4.396043
+8," ""You see a young boy teasing another boy because his father recently __."""," ""passed away"""," ""divorced his mother"""," ""passed away"""," ""was deployed overseas""", 4$,8.105781, 2@,10.976033
+8," ""You see a student getting an A on a group project when he didn't __."""," ""do his part"""," ""do his part"""," ""deserve it"""," ""contribute anything""", 1!,3.556719, 3#,5.308713
+8," ""You see a student talking back to the __ in front of the classroom."""," ""principal"""," ""principal"""," ""teacher"""," ""superintendent""", 2@,7.524933, 3#,8.891744
+8," ""You see a man leaving his family business to go work __."""," ""for their main competitor"""," ""somewhere that pays better"""," ""for a start-up"""," ""for their main competitor""", 3#,5.195371, 3#,5.973992
+8," ""You see an employee trying to undermine her boss's __."""," ""ideas"""," ""credibility"""," ""financial strategy"""," ""ideas""", 3#,9.009745, 2@,9.794304
+8," ""You see a wife turning in her husband to the police for __."""," ""overdue parking fines"""," ""illegal music downloads"""," ""overdue parking fines"""," ""littering on the sidewalk""", 4$,4.025769, 3#,5.453703
+8," ""You see a woman __ with the word ""goodbye"" instead of ""hello."""""," ""answering a phone call"""," ""answering a phone call"""," ""typing an e-mail"""," ""beginning a letter""", 1!,3.519756, 3#,9.910771
+8," ""You see a man loudly telling his wife that the __ tastes awful."""," ""dinner she cooked"""," ""cake she baked"""," ""dinner she cooked"""," ""breakfast she prepared""", 2@,7.253749, 2@,8.021684
+8," ""You see a man having sex with a frozen chicken before __ for dinner."""," ""cooking it"""," ""heating it up"""," ""preparing it"""," ""cooking it""", 3#,3.568966, 3#,4.439087
+8," ""You see __ joking in Great Britain about the stupidity of Americans."""," ""the US ambassador"""," ""the US ambassador"""," ""a US politician"""," ""a US diplomat""", 1!,4.839643, 2@,5.696446
+8," ""You see a girl quitting her father's __ team to play for their biggest rival."""," ""soccer"""," ""baseball"""," ""basketball"""," ""soccer""", 2@,9.770994, 1!,10.56601
+8," ""You see a woman throwing a stapler at her colleague who is __ during her talk."""," ""snoring"""," ""snoring"""," ""whispering"""," ""laughing""", 1!,5.922427, 2@,6.675591
+8," ""You see a man blocking his wife from leaving home or __."""," ""interacting with others"""," ""interacting with others"""," ""watching the news"""," ""having a job""", 1!,3.121559, 3#,4.068355
+8," ""You see a boy setting a series of traps to kill stray cats in his __."""," ""neighborhood"""," ""neighborhood"""," ""garage"""," ""backyard""", 1!,3.352024, 3#,4.254507
+8," ""You see a woman insulting a severely obese man who is sitting in the __."""," ""park"""," ""airport"""," ""doctor's office"""," ""park""", 4$,4.406102, 2@,6.552775
+8," ""You see a __ intentionally making bad calls that help his favored team win."""," ""referee"""," ""referee"""," ""umpire"""," ""line judge""", 1!,4.256766, 3#,5.062448
+8," ""You see someone using an old __ and refusing to go buy a new one."""," ""rotary phone"""," ""laptop"""," ""printer"""," ""rotary phone""", 3#,4.091461, 3#,4.956721
+8," ""You see a man laughing at a disabled co-worker while at an office __."""," ""softball game"""," ""softball game"""," ""beach retreat"""," ""charity run""", 1!,5.922322, 1!,6.741017
+8," ""You see a teenage woman carrying an open umbrella on a cloudless day in __."""," ""October"""," ""November"""," ""September"""," ""October""", 2@,4.228016, 1!,5.886163
+8," ""You see a head cheerleader booing her __ team during a homecoming game."""," ""high school's"""," ""high school's"""," ""university's"""," ""college's""", 1!,3.196534, 2@,4.031902
+8," ""You see a man spending several hours at a strip club every day right after __."""," ""work"""," ""dinner"""," ""class"""," ""work""", 4$,3.762693, 1!,5.486064
+8," ""You see an American telling foreigners that the US is __ force in the world."""," ""an evil"""," ""an evil"""," ""a destructive"""," ""a negative""", 1!,4.023574, 2@,5.106712
+8," ""You see a young adult openly refusing to follow __ dress code."""," ""her school's"""," ""her religion's"""," ""her school's"""," ""her workplace's""", 2@,4.931436, 2@,6.617854
+8," ""You see a Hollywood star agreeing with a foreign __ denunciation of the US."""," ""dictator's"""," ""dictator's"""," ""tyrant's"""," ""leader's""", 1!,3.474155, 3#,4.436445
+8," ""You see a boy skipping to the front of the line because his friend is __."""," ""an employee"""," ""a cashier"""," ""the manager"""," ""an employee""", 3#,3.77042, 3#,4.531872
+8," ""You see a woman spanking her child with a __ for getting bad grades in school."""," ""spatula"""," ""spatula"""," ""wooden spoon"""," ""rolling pin""", 2@,4.26503, 2@,5.863356
+8," ""You see the head of a law firm ordering her juniors to __ every day."""," ""shine her shoes"""," ""shine her shoes"""," ""wash her car"""," ""get her coffee""", 4$,3.350088, 3#,4.900759
+8," ""You see a girl laughing at another student forgetting her lines __ ."""," ""at a school play"""," ""at a poetry recital"""," ""at a school play"""," ""in front of everyone""", 2@,2.902969, 3#,3.71113
+8," ""You see a father requiring his son to become a __ like him."""," ""commercial airline pilot"""," ""corporate entrepreneur"""," ""chemical engineer"""," ""commercial airline pilot""", 3#,3.294801, 3#,4.024771
+8," ""You see a man telling a woman that her painting looks like it __."""," ""was done by children"""," ""was done by children"""," ""belongs in the closet"""," ""is beginner's work""", 1!,2.927708, 3#,3.707219
+8," ""You see a woman buying herself an expensive __ with a stolen credit card."""," ""necklace"""," ""necklace"""," ""pair of earrings"""," ""bracelet""", 4$,3.333361, 3#,4.546485
+8," ""You see a father requiring his son to take up the family __ business."""," ""restaurant"""," ""plumbing"""," ""mechanic"""," ""restaurant""", 3#,6.408419, 2@,7.179992
+8," ""You see a girl asking for allowance even though her brother __ for her."""," ""did her chores"""," ""cleaned her room"""," ""made her bed"""," ""did her chores""", 3#,4.928759, 3#,5.606123
+8," ""You see a teenage male in a dorm bathroom secretly using a stranger's __."""," ""toothbrush"""," ""razor"""," ""towel"""," ""toothbrush""", 3#,2.165448, 3#,2.985998
+8," ""You see a boss requiring that she gets access to her employees' __ accounts."""," ""Facebook"""," ""Gmail"""," ""Facebook"""," ""Twitter""", 4$,2.250466, 3#,3.695814
+8," ""You see a woman watching __ on television in black-and-white instead of color."""," ""a game"""," ""the soap opera"""," ""a game"""," ""the news""", 2@,6.353172, 2@,7.576592
+8," ""You see a mother forcing her daughter to enroll as a __ student in college."""," ""pre-med"""," ""pre-med"""," ""pre-law"""," ""business""", 2@,4.860682, 3#,5.874938
+8," ""You see an intern disobeying an order to dress professionally and __."""," ""comb his hair"""," ""comb his hair"""," ""get a haircut"""," ""shave""", 2@,3.585103, 3#,4.720162
+8," ""You see a drunk elderly man offering to __ with anyone at the bar."""," ""have oral sex"""," ""make out"""," ""have oral sex"""," ""cuddle""", 4$,26.924982, 1!,30.160287
+8," ""You see a Brazilian at the World Cup cheering for __ to win every medal."""," ""Germany"""," ""Portugal"""," ""Germany"""," ""Britain""", 4$,6.709863, 2@,8.060065
+8," ""You see a principal publicly wishing that a rival school wins __."""," ""a prestigious grant"""," ""the tournament"""," ""a prestigious grant"""," ""the choir competition""", 1!,3.461036, 2@,4.424401
+8," ""You see a homosexual in a gay bar offering sex to anyone who __."""," ""buys him a drink"""," ""will drive him home"""," ""buys him a drink"""," ""wants to have sex""", 2@,4.263816, 3#,5.982296
+8," ""You see a student stating that her professor is __ during an afternoon class."""," ""a fool"""," ""a moron"""," ""a fool"""," ""an idiot""", 3#,6.113664, 2@,6.923003
+8," ""You see a teenager at a cafeteria forcing a younger student to__."""," ""pay for her lunch"""," ""pay for her lunch"""," ""sit somewhere else"""," ""get her a soda""", 1!,3.534035, 3#,4.323704
+8," ""You see a teenager urinating in the wave pool at a crowded __ park."""," ""amusement"""," ""amusement"""," ""water"""," ""theme""", 2@,3.904796, 3#,4.711084
+8," ""You see a player publicly yelling at his soccer coach during __ game."""," ""a play-off"""," ""a play-off"""," ""a tournament"""," ""an all-star""", 1!,3.914139, 3#,4.684987
+8," ""You see a public leader on TV trying to ban the wearing of __."""," ""hooded sweatshirts"""," ""hooded sweatshirts"""," ""baseball caps"""," ""baggy pants""", 1!,2.818293, 3#,3.825074
+8," ""You see a boy making fun of his brother for getting __ his girlfriend."""," ""dumped by"""," ""yelled at by"""," ""dumped by"""," ""in trouble with""", 2@,2.74716, 3#,3.543007
+8," ""You see a woman laughing out loud about a young man's __."""," ""receding hairline"""," ""graying hair"""," ""receding hairline"""," ""bald spot""", 4$,3.119588, 2@,4.203373
+8," ""You see a man searching through the trash to find women's discarded __."""," ""underwear"""," ""underwear"""," ""lingerie"""," ""pantyhose""", 1!,2.291017, 3#,3.511116
+8," ""You see a teenage boy chuckling at an amputee he passes by while on the __."""," ""subway"""," ""subway"""," ""train"""," ""sidewalk""", 3#,3.954778, 1!,4.782395
+8," ""You see a star player ignoring her coach's order to come to the bench during __."""," ""a game"""," ""practice"""," ""a time out"""," ""a game""", 3#,4.09244, 2@,4.926138
+8," ""You see a girl taking all the Halloween candy from a __, leaving none for others."""," ""bowl"""," ""bowl"""," ""bag"""," ""dish""", 1!,6.017794, 2@,6.761489
+8," ""You see a woman having sex with an extremely obese man in exchange for __."""," ""fifteen dollars"""," ""twenty dollars"""," ""twenty-five dollars"""," ""fifteen dollars""", 4$,3.112716, 3#,4.983732
+8," ""You see a teenage boy offering his classmate money to write his __."""," ""history essay"""," ""book report"""," ""biology paper"""," ""history essay""", 4$,2.356282, 3#,3.074501
+8," ""You see a teenager wearing all of their clothes inside out while __."""," ""at a movie theater"""," ""at the library"""," ""at a movie theater"""," ""at the mall""", 4$,2.686001, 2@,3.430115
+8," ""You see a teenage girl drinking a _ of her friend's urine on a dare."""," ""cup"""," ""bottle"""," ""cup"""," ""mug""", 4$,2.369473, 3#,3.203368
+8," ""You see a mother who is still breast-feeding her needy __."""," ""eight year old"""," ""eight year old"""," ""nine year old"""," ""seven year old""", 4$,1.982787, 3#,2.715731
+8," ""You see a woman taking credit at work for an idea she overheard __."""," ""at lunch"""," ""in the break room"""," ""at lunch"""," ""in the hall""", 4$,3.540504, 3#,4.417518
+8," ""You see an American __ publicly defecting to Iran for a large sum of money."""," ""celebrity"""," ""talk show host"""," ""celebrity"""," ""newscaster""", 4$,6.414682, 2@,7.103607
+8," ""You see a teenage girl at __ mocking a man's stuttering speech."""," ""the local mall"""," ""the post office"""," ""a café"""," ""the local mall""", 3#,5.543438, 1!,6.60479
+8," ""You see a man moving multiple __ pieces while his opponent is distracted."""," ""chess"""," ""checkers"""," ""chess"""," ""backgammon""", 4$,3.623676, 2@,4.698571
+8," ""You see a campaign manager cheering as an opponent pulls ahead to win the __."""," ""election"""," ""election"""," ""race"""," ""popular vote""", 1!,6.527473, 2@,7.305543
+8," ""You see a man lashing his __ with a whip for breaking loose from its pen."""," ""pony"""," ""donkey"""," ""pony"""," ""goat""", 2@,5.306504, 3#,6.048494
+8," ""You see a man in a bar using his __ to watch people having sex with animals."""," ""phone"""," ""phone"""," ""laptop"""," ""iPad""", 1!,4.285707, 3#,4.926322
+8," ""You see a story about a remote tribe eating the __ of their deceased members."""," ""flesh"""," ""eyes"""," ""brains"""," ""flesh""", 3#,2.75961, 3#,3.496724
+8," ""You see an employee lying about how many hours she worked __."""," ""during the week"""," ""during the week"""," ""overtime"""," ""over the pay period""", 3#,4.437413, 3#,5.665456
+8," ""You see a teacher ordering a student to go __ for having a weird hairstyle."""," ""to detention"""," ""home"""," ""to the principal's office"""," ""to detention""", 3#,3.629945, 1!,5.186704
+8," ""You see a boy turning up the __ as his father talks about his military service."""," ""TV"""," ""TV"""," ""radio"""," ""volume""", 1!,4.530099, 3#,5.308169
+8," ""You see a girl shooting geese repeatedly with a pellet gun out __."""," ""in the woods"""," ""at the pond"""," ""in the woods"""," ""in her backyard""", 3#,4.087977, 2@,4.85187
+8," ""You see a teaching assistant talking back to the teacher in front of the __."""," ""classroom"""," ""classroom"""," ""kindergarten class"""," ""students""", 1!,4.726477, 3#,6.027361
+8," ""You see a man walking down a dark __ while still wearing his sunglasses."""," ""hallway"""," ""staircase"""," ""hallway"""," ""alley""", 2@,4.446733, 3#,5.258682
+8," ""You see a woman clearly avoiding sitting next to an obese woman __."""," ""on the bus"""," ""in a theater"""," ""in the lobby"""," ""on the bus""", 3#,2.557162, 3#,3.748642
+8," ""You see someone driving around in a dirty __ that has not been washed recently."""," ""car"""," ""sedan"""," ""minivan"""," ""car""", 3#,7.039896, 1!,8.174528
+8," ""You see a drug addict offering to provide any service for __."""," ""a bump of cocaine"""," ""a bump of cocaine"""," ""a hit of heroin"""," ""an ounce of meth""", 3#,6.751438, 1!,7.841623
+8," ""You see a man forbidding his wife to __ that he has not first approved."""," ""wear clothing"""," ""wear clothing"""," ""read books"""," ""see movies""", 1!,5.982179, 3#,6.805054
+8," ""You see someone reading the ending of a __ novel before reading the beginning."""," ""spy"""," ""fantasy"""," ""mystery"""," ""spy""", 3#,4.841652, 3#,5.568519
+8," ""You see a boy laughing at another student for his poor score on __."""," ""the final exam"""," ""the standardized test"""," ""the final exam"""," ""his report card""", 3#,4.234795, 2@,5.205681
+8," ""You see a woman having intimate relations with a recently deceased __."""," ""loved one"""," ""loved one"""," ""stranger"""," ""close friend""", 1!,2.650706, 3#,4.200127
+8," ""You see a girl telling her __ that she looks like she has gained weight."""," ""classmate"""," ""classmate"""," ""mother"""," ""sister""", 1!,5.586676, 2@,6.30265
+8," ""You see a customer greeting every stranger she sees while __."""," ""in a coffee shop"""," ""waiting in the lobby"""," ""in a coffee shop"""," ""sitting at the bar""", 4$,3.166259, 2@,5.367708
+8," ""You see a judge taking on __ case although he is friends with the defendant."""," ""a criminal"""," ""a criminal"""," ""a civil"""," ""an appeals""", 2@,3.613629, 3#,4.408221
+8," ""You see a man pushing someone to the ground while trying to __."""," ""catch a foul ball"""," ""see the band"""," ""catch a foul ball"""," ""see the parade""", 4$,4.721244, 3#,5.391548
+8," ""You see a teacher hitting a student's hand with a ruler for __ in class."""," ""falling asleep"""," ""falling asleep"""," ""daydreaming"""," ""passing notes""", 3#,5.646943, 2@,6.472074
+8," ""You see a girl repeatedly interrupting her __ as he explains a new concept."""," ""teacher"""," ""teacher"""," ""tutor"""," ""professor""", 1!,3.786502, 2@,4.559496
+8," ""You see someone wearing a __ costume on a day that is not Halloween."""," ""superhero"""," ""zombie"""," ""superhero"""," ""pirate""", 4$,2.549049, 3#,3.346996
+8," ""You see a man elbowing someone as he struggles to get __ quickly."""," ""off the plane"""," ""out of the elevator"""," ""out the door"""," ""off the plane""", 4$,2.409899, 3#,3.224776
+8," ""You see a girl telling a boy that his __ is much more attractive than him."""," ""older brother"""," ""cousin"""," ""older brother"""," ""best friend""", 2@,3.82917, 3#,4.57905
+8," ""You see the coach's wife __ for her husband's rival team."""," ""sponsoring a bake sale"""," ""cheering loudly"""," ""sponsoring a bake sale"""," ""raising money""", 2@,4.274048, 3#,4.949668
+8," ""You see a __ saying that the neighboring town is a much better town."""," ""mayor"""," ""mayor"""," ""sheriff"""," ""city official""", 1!,2.271367, 3#,2.958822
+8," ""You see a woman getting hired only because her father __ with the boss."""," ""is close friends"""," ""plays golf"""," ""went to college"""," ""is close friends""", 3#,3.62109, 3#,4.29564
+8," ""You see a woman swerving her car in order to intentionally run over a __."""," ""squirrel"""," ""possum"""," ""snake"""," ""squirrel""", 3#,2.493923, 3#,3.136003
+8," ""You see a man telling his girlfriend that she must __."""," ""convert to his religion"""," ""convert to his religion"""," ""vote a certain way"""," ""quit her job""", 1!,2.98235, 3#,3.55552
+8," ""You see a boy tripping a classmate in order to be the first __."""," ""in the cafeteria line"""," ""in the cafeteria line"""," ""out on the playground"""," ""on the schoolbus""", 4$,3.259705, 2@,3.992602
+8," ""You see a professor giving a __ grade to a student just because he dislikes him."""," ""bad"""," ""failing"""," ""bad"""," ""lower""", 2@,4.420271, 2@,5.123547
+8," ""You see a woman throwing her cat across the room for __."""," ""scratching the furniture"""," ""jumping on the bed"""," ""not using the litterbox"""," ""scratching the furniture""", 3#,3.682272, 3#,4.305114
+8," ""You see a staff member talking loudly and interrupting the __ speech to the public."""," ""mayor's"""," ""mayor's"""," ""candidate's"""," ""CEO's""", 2@,5.255027, 2@,5.802384
+8," ""You see a girl ignoring her father's orders by taking the car __."""," ""after her curfew"""," ""after her curfew"""," ""out while grounded"""," ""without permission""", 1!,4.113543, 3#,5.324949
+8," ""You see a very drunk woman making out with multiple strangers __."""," ""on the city bus"""," ""on the city bus"""," ""at the gas station"""," ""at the subway stop""", 1!,7.033917, 3#,8.875853
+8," ""You see a boy spray-painting __ symbols on the side of the police station."""," ""anarchy"""," ""gang"""," ""dirty"""," ""anarchy""", 3#,2.880269, 3#,3.658714
+8," ""You see a woman laughing with her friend about __ of her family members."""," ""the poor taste"""," ""the silly traditions"""," ""the poor taste"""," ""embarrassing stories""", 4$,3.97759, 3#,5.914088
+8," ""You see a former US __ saying publicly he would never buy any American product."""," ""general"""," ""president"""," ""congressman"""," ""general""", 3#,5.773307, 3#,6.499494
+8," ""You see a woman __ before her main entree arrives on the table."""," ""eating dessert"""," ""having a breath mint"""," ""eating dessert"""," ""paying for her meal""", 2@,5.934682, 3#,6.602355
+8," ""You see a girl and her __ making out with each other just for practice."""," ""sister"""," ""sister"""," ""brother"""," ""cousin""", 1!,3.830987, 3#,4.540109
+8," ""You see a teenage girl wearing a long __ on a hot summer afternoon."""," ""trench coat"""," ""wool coat"""," ""trench coat"""," ""bath robe""", 2@,3.063534, 3#,3.677666
+8," ""You see a woman collecting child support for a __ who no longer lives with her."""," ""girl"""," ""girl"""," ""child"""," ""teenager""", 4$,2.345229, 3#,3.093136
+8," ""You see a woman tripping someone in order to get the last __ in her size."""," ""shirt"""," ""pair of shoes"""," ""jacket"""," ""shirt""", 4$,2.612379, 3#,4.086023
+8," ""You see a professor forcing all her students to write papers supporting her __."""," ""views"""," ""theories"""," ""beliefs"""," ""views""", 2@,5.45368, 1!,6.162468
+8," ""You see a man being openly rude to a police officer he passes __."""," ""on the sidewalk"""," ""at a crosswalk"""," ""on his bike"""," ""on the sidewalk""", 1!,7.099329, 1!,7.857583
+8," ""You see a zoo trainer jabbing __ to get it to entertain his customers."""," ""a dolphin"""," ""a panda"""," ""an elephant"""," ""a dolphin""", 3#,3.2256, 3#,4.266432
+8," ""You see a manager coercing her employees into eating at her brother's __."""," ""diner"""," ""restaurant"""," ""diner"""," ""café""", 2@,5.396693, 2@,6.07438
+8," ""You see children ignoring their __ orders to get ready to go to school."""," ""mom's"""," ""mom's"""," ""dad's"""," ""grandmother's""", 4$,4.223968, 2@,4.970131
+8," ""You see a woman lying about the number of __ days she has taken at work."""," ""vacation"""," ""personal"""," ""sick"""," ""vacation""", 3#,3.282006, 3#,4.032098
+8," ""You see a woman continuing to wear a __ inside her apartment complex."""," ""large sun hat"""," ""big shady visor"""," ""pair of sunglasses"""," ""large sun hat""", 4$,7.29474, 1!,8.075956
+8," ""You see a runner taking a shortcut on the course during the __ in order to win."""," ""marathon"""," ""relay race"""," ""triathlon"""," ""marathon""", 3#,2.44744, 3#,3.141317
+8," ""You see someone leaving his dog outside in the rain after it dug in the __."""," ""trash"""," ""trash"""," ""sandbox"""," ""vegetable garden""", 1!,8.685537, 3#,9.275255
+8," ""You see a woman happily admitting that she has not paid any taxes in over __ years."""," ""ten"""," ""ten"""," ""two"""," ""five""", 4$,1.705658, 3#,2.391576
+8," ""You see a __ player pretending to be seriously fouled by an opposing player."""," ""soccer"""," ""football"""," ""soccer"""," ""basketball""", 2@,1.770561, 3#,2.377631
+8," ""You see an employee receiving __ for work that was really done by others."""," ""a bonus"""," ""an award"""," ""a bonus"""," ""praise""", 3#,3.929331, 2@,4.674114
+8," ""You see a woman telling a group of homeless people on the __ to go find jobs."""," ""subway"""," ""curb"""," ""subway"""," ""street""", 4$,2.440624, 3#,3.536286
+8," ""You see a woman commenting out loud about how fat another woman looks in her __ ."""," ""jeans"""," ""swimsuit"""," ""jeans"""," ""skirt""", 1!,4.14332, 2@,5.094429
+8," ""You see a girl throwing __ on a woman who is dating her ex-boyfriend."""," ""her hot coffee"""," ""her hot tea"""," ""her hot coffee"""," ""a glass of wine""", 2@,2.621431, 3#,3.241649
+8," ""You see a woman __ when the judge walks into the courtroom."""," ""refusing to stand"""," ""talking on her phone"""," ""raise her middle finger"""," ""refusing to stand""", 3#,7.64145, 3#,8.52276
+8," ""You see a politician using federal tax dollars to build an extension on his __."""," ""home"""," ""lake house"""," ""home"""," ""beach condo""", 1!,5.217291, 2@,6.127626
+8," ""You see a __ celebrating with the opposing team's players who just won the game."""," ""coach"""," ""coach"""," ""manager"""," ""player""", 1!,4.02207, 1!,6.123692
+8," ""You see a woman snatching away her dog's food for making a mess in the __."""," ""living room"""," ""living room"""," ""bedroom"""," ""kitchen""", 1!,4.363677, 1!,5.383556
+8," ""You see a group of women having a long and loud conversation __."""," ""during a church sermon"""," ""with a funeral nearby"""," ""during a meditation class"""," ""during a church sermon""", 3#,3.353659, 3#,4.074402
+8," ""You see a very drunk woman dancing on a table while men laugh and __."""," ""cheer her on"""," ""cheer her on"""," ""buy her drinks"""," ""take pictures""", 1!,5.229843, 2@,6.052771
+8," ""You see a man eating a bowl of cereal in the morning with __ instead of milk."""," ""water"""," ""orange juice"""," ""water"""," ""creamer""", 2@,2.277429, 3#,2.9069
+8," ""You see a teenage girl coming home late and ignoring her parents' __."""," ""strict curfew"""," ""text messages"""," ""strict curfew"""," ""questions""", 2@,3.148307, 3#,4.004597
+8," ""You see a woman pressuring her daughter to become a famous __."""," ""evening news anchor"""," ""evening news anchor"""," ""ballet dancer"""," ""ice skater""", 1!,4.239884, 3#,5.036265
+8," ""You see a teenage girl forbidding friends from ever disagreeing with her __."""," ""in public"""," ""in public"""," ""about fashion"""," ""on Facebook""", 4$,3.511197, 4$,4.052207
+8," ""You see a woman with __ hair riding a unicycle to work every day."""," ""blue and orange"""," ""blue and orange"""," ""purple and pink"""," ""green and black""", 4$,4.490251, 3#,5.383666
+8," ""You see a mother telling her son that she is going to choose all of his __ ."""," ""friends"""," ""outfits"""," ""friends"""," ""classes""", 2@,3.613588, 3#,4.337852
+8," ""You see a man walking down the street wearing a neon green suit with __."""," ""a top hat"""," ""a long cape"""," ""cowboy boots"""," ""a top hat""", 4$,3.597536, 3#,4.681827
+8," ""You see an employee joking with competitors about how bad his company did __."""," ""last year"""," ""this quarter"""," ""last year"""," ""this month""", 2@,3.706733, 1!,4.459666
+8," ""You see a woman drinking her entire cup of __ using a stirring spoon."""," ""coffee"""," ""cocoa"""," ""coffee"""," ""tea""", 2@,3.970421, 2@,4.700713
+8," ""You see __ getting married to each other in an elaborate wedding."""," ""two first cousins"""," ""an uncle and niece"""," ""two sisters"""," ""two first cousins""", 3#,2.754712, 3#,3.438771
+8," ""You see a girl laughing when she realizes her friend's dad is the __ ."""," ""janitor"""," ""janitor"""," ""schoolbus driver"""," ""school nurse""", 1!,2.663964, 3#,3.400957
+8," ""You see a woman squeezing a baby's __ hard because it will not stop crying."""," ""arm"""," ""foot"""," ""shoulder"""," ""arm""", 4$,3.323101, 2@,4.025753
+8," ""You see the class __ saying on TV that her rival college is a better school."""," ""president"""," ""president"""," ""treasurer"""," ""secretary""", 1!,3.172945, 2@,4.435628
+8," ""You see a teacher publicly saying she hopes another school wins the __."""," ""math contest"""," ""science fair"""," ""math contest"""," ""quiz bowl""", 2@,6.27776, 2@,6.903616
+8," ""You see a man staying inside his home with the __ on a rare sunny day."""," ""shades drawn"""," ""curtains closed"""," ""shades drawn"""," ""lights off""", 1!,5.149691, 2@,5.862697
+8," ""You see a woman driving recklessly through a school zone to __."""," ""make a meeting"""," ""get to a luncheon"""," ""make an appointment"""," ""make a meeting""", 4$,2.506128, 3#,3.205661
+8," ""You see a man telling his __ that she has to switch to his political party."""," ""fiancee"""," ""girlfriend"""," ""fiancee"""," ""wife""", 1!,4.974152, 3#,5.661559
