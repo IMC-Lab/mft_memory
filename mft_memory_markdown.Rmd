@@ -31,29 +31,28 @@ se <- function(x) sqrt(var(x)/length(x))
 `%notin%` <- Negate(`%in%`)
 ```
 
-
+# Load in data
 ```{r echo=FALSE}
-
 # load encoding data
-encodingfiles = list.files('C:/Users/imclab/Desktop/MFT re-analysis/data/encoding', full.names = TRUE, pattern = '.csv', recursive = FALSE)
+encodingfiles = list.files('data/encoding', full.names = TRUE, pattern = '.csv', recursive = FALSE)
 encodingFull = do.call(rbind, lapply(encodingfiles, function(x){read.csv(x, header = TRUE, stringsAsFactors = FALSE)}))
-earlyencodingfiles = list.files('C:/Users/imclab/Desktop/MFT re-analysis/data/encoding/old', full.names = TRUE, pattern = '.csv', recursive = FALSE)
+earlyencodingfiles = list.files('data/encoding/old', full.names = TRUE, pattern = '.csv', recursive = FALSE)
 encodingEarly = do.call(rbind, lapply(earlyencodingfiles, function(x){read.csv(x, header = TRUE, stringsAsFactors = FALSE)}))
 
 # load retrieval data
-retfiles = list.files('C:/Users/imclab/Desktop/MFT re-analysis/data/retrieval', full.names = TRUE, pattern = '.csv', recursive = FALSE)
+retfiles = list.files('data/retrieval', full.names = TRUE, pattern = '.csv', recursive = FALSE)
 retFull = do.call(rbind, lapply(retfiles, function(x){read.csv(x, header = TRUE, stringsAsFactors = FALSE)}))
 
 # load vignette key
-key <- read.csv('C:/Users/imclab/Desktop/MFT re-analysis/key.csv', stringsAsFactors = FALSE)
+key <- read.csv('data/key.csv', stringsAsFactors = FALSE)
 
 # load qualtrics
-foundation_matching <- read.csv('C:/Users/imclab/Desktop/MFT re-analysis/data/qualtrics/foundation_matching_all.csv', stringsAsFactors = FALSE)
-emorate <- read.csv('C:/Users/imclab/Desktop/MFT re-analysis/data/qualtrics/emorate.csv', stringsAsFactors = FALSE)
-all_surveys <- read.csv('C:/Users/imclab/Desktop/MFT re-analysis/data/qualtrics/all_surveys.csv', stringsAsFactors = FALSE)
+foundation_matching <- read.csv('data/qualtrics/foundation_matching_all.csv', stringsAsFactors = FALSE)
+emorate <- read.csv('data/qualtrics/emorate.csv', stringsAsFactors = FALSE)
+all_surveys <- read.csv('data/qualtrics/all_surveys.csv', stringsAsFactors = FALSE)
 ```
 
-
+# Tidy & make encoding/retrieval dataframes
 ```{r echo=FALSE}
 
 # tidy encoding
@@ -74,7 +73,8 @@ encoding_behav_all$moral_decision <- as.numeric(encoding_behav_all$moral_decisio
 encodingEarly <- as.data.frame(sapply(encodingEarly, function(x) gsub("^\t* *\"* *| *\"* *\t*$", "", x)), stringsAsFactors = FALSE) 
 encoding_behav_all <- as.data.frame(sapply(encoding_behav_all, function(x) gsub("^\t* *\"* *| *\"* *\t*$", "", x)), stringsAsFactors = FALSE) 
 encoding_behav_all <- full_join(encoding_behav_all, encodingEarly, by = c('subID', 'vigfile', 'moral_decision', 'encoding_RT'))
-
+## leaves us with 3 different encoding files: encodingFull (all data from participants from whom I have scanner info), encodingEarly (data from first 3 participants),
+## encoding_behav_all (behavioral data from all participants)
 
 # tidy key
 key <- as.data.frame(sapply(key, function(x) gsub("^\t* *\"* *| *\"* *\t*$", "", x)), stringsAsFactors = FALSE)
@@ -92,9 +92,9 @@ ret_all$vigfile[ret_all$vigfile == ''] = NA
 names(ret_all)[8]<-"retrieval_RT"
 
 # one big happy dataframe
-encoding_behav <- subset(encoding_behav_all, encoding_behav_all$subID %in% ret_all$subID)
-ret <- subset(ret_all, ret_all$subID %in% encoding_behav$subID)
-data <- merge(ret, encoding_behav, by=c('subID', 'vigfile'), all.x = TRUE)
+encoding_behav <- subset(encoding_behav_all, encoding_behav_all$subID %in% ret_all$subID) 
+ret <- subset(ret_all, ret_all$subID %in% encoding_behav$subID) 
+data <- merge(ret, encoding_behav, by=c('subID', 'vigfile'), all.x = TRUE) # subset of participants for whom I have both encoding & retrieval files
 
 # homogenize variable names
 data$category[data$category == "SN"] <- "Social-Norms"
@@ -141,59 +141,11 @@ data$SDT[data$old == 0 & data$correct == 1] = 'correctRejection'
 data$high_conf[data$confresp == 1 | data$confresp == 2] = 0
 data$high_conf[data$confresp == 3 | data$confresp == 4] = 1
 
-
-## analysis with only retrieval sample
-ret_all$category[ret_all$category == "SN"] <- "Social-Norms"
-ret_all$category[ret_all$category == "Lib"] <- "Liberty"
-ret_all$category[ret_all$category == "Loy"] <- "Loyalty"
-ret_all$category[ret_all$category == "Pure"] <- "Purity"
-ret_all$category[ret_all$category == "Auth"] <- "Authority"
-ret_all$category[ret_all$category == "Fair"] <- "Fairness"
-ret_all$category[ret_all$category == "Social-Norms"] <- "Social Norms"
-
-# make text-based response column; new responses = NA
-ret_all$text_response = ''
-i = 0
-for (n in ret_all$resp) {
-  i = i + 1
-  if (is.na(n) == TRUE) {                       
-    ret_all$text_response[i] = NA
-  }
-  else if (n == 1) {
-    ret_all$text_response[i] = ret_all$choice1[i]
-  }
-  else if (n == 2) {
-    ret_all$text_response[i] = ret_all$choice2[i]
-  }
-  else if (n == 3) {
-    ret_all$text_response[i] = ret_all$choice3[i]
-  }
-  else {
-    ret_all$text_response[i] = NA
-  }
-}
-
-
-# correct column
-ret_all$correct <- as.numeric((!is.na(ret_all$text_response) & ret_all$text_response == ret_all$correct_answer) |
-  (is.na(ret_all$text_response) & ret_all$old == 0))
-
-# corrected recognition column
-ret_all$SDT[ret_all$old == 1 & ret_all$correct == 1] = 'hit'
-ret_all$SDT[ret_all$old == 0 & ret_all$correct == 0] = 'falseAlarm'
-ret_all$SDT[ret_all$old == 1 & ret_all$correct == 0] = 'miss'
-ret_all$SDT[ret_all$old == 0 & ret_all$correct == 1] = 'correctRejection'
-
-# make column for calculating proportion high confidence responses
-ret_all$high_conf[ret_all$confresp == 1 | ret_all$confresp == 2] = 0
-ret_all$high_conf[ret_all$confresp == 3 | ret_all$confresp == 4] = 1
-
-# make column for moral judgement x memory accuracy correlation
-ret_all$hits[ret_all$old == 1 & ret_all$correct == 1] = 1
-ret_all$hits[ret_all$old == 1 & ret_all$correct == 0] = 0
-
 data$hits[data$old == 1 & data$correct == 1] = 1
 data$hits[data$old == 1 & data$correct == 0] = 0
+
+```
+
 
 
 # separate questionnaires
@@ -688,5 +640,59 @@ ggpredict()
 modelNew %>% ggpredict(terms=c('category')) %>%
   ggplot(aes(x=x, y=predicted)) + geom_col() + geom_errorbar(aes(ymax=conf.high, ymin=conf.low)) + ggtitle('Predicted accuracy (proportion correct) n=25')
 
+
+```
+
+# Analysis with only retrieval sample
+```{r, echo=FALSE}
+
+ret_all$category[ret_all$category == "SN"] <- "Social-Norms"
+ret_all$category[ret_all$category == "Lib"] <- "Liberty"
+ret_all$category[ret_all$category == "Loy"] <- "Loyalty"
+ret_all$category[ret_all$category == "Pure"] <- "Purity"
+ret_all$category[ret_all$category == "Auth"] <- "Authority"
+ret_all$category[ret_all$category == "Fair"] <- "Fairness"
+ret_all$category[ret_all$category == "Social-Norms"] <- "Social Norms"
+
+# make text-based response column; new responses = NA
+ret_all$text_response = ''
+i = 0
+for (n in ret_all$resp) {
+  i = i + 1
+  if (is.na(n) == TRUE) {                       
+    ret_all$text_response[i] = NA
+  }
+  else if (n == 1) {
+    ret_all$text_response[i] = ret_all$choice1[i]
+  }
+  else if (n == 2) {
+    ret_all$text_response[i] = ret_all$choice2[i]
+  }
+  else if (n == 3) {
+    ret_all$text_response[i] = ret_all$choice3[i]
+  }
+  else {
+    ret_all$text_response[i] = NA
+  }
+}
+
+
+# correct column
+ret_all$correct <- as.numeric((!is.na(ret_all$text_response) & ret_all$text_response == ret_all$correct_answer) |
+  (is.na(ret_all$text_response) & ret_all$old == 0))
+
+# corrected recognition column
+ret_all$SDT[ret_all$old == 1 & ret_all$correct == 1] = 'hit'
+ret_all$SDT[ret_all$old == 0 & ret_all$correct == 0] = 'falseAlarm'
+ret_all$SDT[ret_all$old == 1 & ret_all$correct == 0] = 'miss'
+ret_all$SDT[ret_all$old == 0 & ret_all$correct == 1] = 'correctRejection'
+
+# make column for calculating proportion high confidence responses
+ret_all$high_conf[ret_all$confresp == 1 | ret_all$confresp == 2] = 0
+ret_all$high_conf[ret_all$confresp == 3 | ret_all$confresp == 4] = 1
+
+# make column for moral judgement x memory accuracy correlation
+ret_all$hits[ret_all$old == 1 & ret_all$correct == 1] = 1
+ret_all$hits[ret_all$old == 1 & ret_all$correct == 0] = 0
 
 ```
