@@ -3,6 +3,8 @@ title: "MFT Memory"
 output:
   html_document:
     df_print: paged
+editor_options: 
+  chunk_output_type: console
 ---
 
 This is a project testing memory for vignettes of moral transgressions. 
@@ -15,8 +17,7 @@ During recognition, participants were cued with each vignette presented during s
 
 Encoding took place in the scanner but retrieval did not. We plan to conduct a PLS analysis on the neural data, but are getting started with analyzing behavior first. 
 
-```{r echo=FALSE}
-# load packages
+```{r load packages, message=FALSE, warning=FALSE, include=FALSE}
 library(knitr)
 library(ggplot2)
 library(psych)
@@ -25,6 +26,7 @@ library(lmerTest)
 library(ggpubr)
 library(tidyr)
 library(ggeffects)
+library(emmeans)
 library(tidyselect)
 library(dplyr)
 se <- function(x) sqrt(var(x)/length(x))
@@ -32,7 +34,7 @@ se <- function(x) sqrt(var(x)/length(x))
 ```
 
 # Load in data
-```{r echo=FALSE}
+```{r Load in data, include=FALSE}
 # load encoding data
 encodingfiles = list.files('data/encoding', full.names = TRUE, pattern = '.csv', recursive = FALSE)
 encodingFull = do.call(rbind, lapply(encodingfiles, function(x){read.csv(x, header = TRUE, stringsAsFactors = FALSE)}))
@@ -53,7 +55,7 @@ all_surveys <- read.csv('data/qualtrics/all_surveys.csv', stringsAsFactors = FAL
 ```
 
 # Tidy & make encoding/retrieval dataframes
-```{r echo=FALSE}
+```{r Tidy encoding & retrieval dataframes, include=FALSE}
 
 # tidy encoding
 envars <- names(encodingFull) %in% c('run','pres_order','vignum','trialstart_raw','trialstart_zeroed','trialstart_TR','trialdur','intended_jitter','ITI_start_raw','ITI_start_zeroed','ITI_start_TR','ITI_duration','ITI_accuracy', 'foundation', 'vigtext') 
@@ -91,10 +93,22 @@ ret_all <- as.data.frame(sapply(ret_all, function(x) gsub("Lure-", "", x)), stri
 ret_all$vigfile[ret_all$vigfile == ''] = NA
 names(ret_all)[8]<-"retrieval_RT"
 
+# determine which subjects I have all data for
+sort(as.numeric(levels(as.factor(encoding_behav_all$subID))))
+sort(as.numeric(levels(as.factor(ret_all$subID)))) 
+## missing encoding data for sub 35
+## missing retrieval data for sub 36
+
 # one big happy dataframe
-encoding_behav <- subset(encoding_behav_all, encoding_behav_all$subID %in% ret_all$subID) 
-ret <- subset(ret_all, ret_all$subID %in% encoding_behav$subID) 
-data <- merge(ret, encoding_behav, by=c('subID', 'vigfile'), all.x = TRUE) # subset of participants for whom I have both encoding & retrieval files
+encoding_behav <- subset(encoding_behav_all, encoding_behav_all$subID %in% ret_all$subID) # subset of encoding files that have corresponding retrieval files
+ret <- subset(ret_all, ret_all$subID %in% encoding_behav$subID) # subset of retrieval files that have corresponding encoding files
+data <- merge(ret, encoding_behav, by=c('subID', 'vigfile'), all.x = TRUE) # congolomerate of these 
+#sort(as.numeric(levels(as.factor(encoding_behav$subID))))
+#sort(as.numeric(levels(as.factor(data$subID))))
+#sort(as.numeric(levels(as.factor(all_surveys$subID))))
+dataN = length(levels(as.factor(data$subID)))
+dataSubs = sort(as.numeric(levels(as.factor(data$subID))))
+qualtricsSubs = sort(as.numeric(levels(as.factor(all_surveys$subID))))
 
 # homogenize variable names
 data$category[data$category == "SN"] <- "Social-Norms"
@@ -127,45 +141,28 @@ for (n in data$resp) {
   }
 } 
 
-# make column for calculating proportion correct
+# make column for modeling proportion correct
 data$correct <- as.numeric((!is.na(data$text_response) & data$text_response == data$correct_answer) |
   (is.na(data$text_response) & data$old == 0))
 
 # make column for calculating corrected recognition
-data$SDT[data$old == 1 & data$correct == 1] = 'hit'
-data$SDT[data$old == 0 & data$correct == 0] = 'falseAlarm'
-data$SDT[data$old == 1 & data$correct == 0] = 'miss'
-data$SDT[data$old == 0 & data$correct == 1] = 'correctRejection'
+#data$SDT[data$old == 1 & data$correct == 1] = 'hit'
+#data$SDT[data$old == 0 & data$correct == 0] = 'falseAlarm'
+#data$SDT[data$old == 1 & data$correct == 0] = 'miss'
+#data$SDT[data$old == 0 & data$correct == 1] = 'correctRejection'
 
-# make column for calculating confidence
-data$high_conf[data$confresp == 1 | data$confresp == 2] = 0
-data$high_conf[data$confresp == 3 | data$confresp == 4] = 1
-
-data$hits[data$old == 1 & data$correct == 1] = 1
-data$hits[data$old == 1 & data$correct == 0] = 0
+# make column for coding high vs. low confidence
+#data$high_conf[data$confresp == 1 | data$confresp == 2] = 0
+#data$high_conf[data$confresp == 3 | data$confresp == 4] = 1
 
 ```
 
-
-
-# separate questionnaires
+# Tidy Questionnaires
+```{r Tidy questionnaires, include=FALSE}
 mfq <- select(all_surveys, starts_with('sub'), starts_with('mfq'))
 disgust_scale <- select(all_surveys, starts_with('sub'), starts_with('disgust'))
 secs <- select(all_surveys, starts_with('sub'), starts_with('secs'))
 iri <- select(all_surveys, starts_with('sub'), starts_with('iri'))
-
-# check to see which ppts I don't have qualtrics & behavioral data for 
-test <- data %>% 
-        group_by(subID) %>%
-        summarise(confmean = mean(as.numeric(confresp), na.rm = TRUE))
-testOld <- ret_all %>% group_by(subID) %>% summarise(confmean = mean(as.numeric(confresp), na.rm = TRUE))
-
-all_surveys$subID <- as.numeric(all_surveys$subID)
-test$subID %in% all_surveys$subID
-# ppts in test that are not in qualtrics: 23; 20 is in there but they stopped responding after MFQ
-
-testOld$subID %in% all_surveys$subID
-
 
 # score MFQ
 #part one
@@ -192,14 +189,15 @@ mfq <- mfq %>% mutate(careScore = rowSums(select(., c('1','7','12','17','23','28
                      loyaltyScore = rowSums(select(., c('3','9','14','19','25','30')), na.rm = TRUE),
                      authorityScore = rowSums(select(., c('4','10','15','20','26','31')), na.rm = TRUE),
                      purityScore = rowSums(select(., c('5','11','16','21','27','32')), na.rm = TRUE))
-hist(mfq$careScore)
-hist(mfq$fairnessScore)
-hist(mfq$loyaltyScore)
-hist(mfq$authorityScore)
-hist(mfq$purityScore)
+hist(mfq$careScore) #slight negative skew, peak at 20-25 (count=12)
+hist(mfq$fairnessScore) #considerable negative skew, peak at 20-25 (count=15)
+hist(mfq$loyaltyScore) #more centrally distributed, peak at 10-15 (count=11) & 15-20 (count=12)
+hist(mfq$authorityScore) #considerable negative skew, peak at 10-15 (count=12)
+hist(mfq$purityScore) #most normally distributed of them all, peak at 15-20 (count=10)
+
 # add to retrieval file
-mfq_ret <- subset(mfq, subID %in% ret_all$subID) %>% filter(subID != '20') %>% select(contains('Score'), contains('subID'))
-ret_all <- left_join(ret_all, mfq_ret, by = 'subID')
+# mfq_ret <- subset(mfq, subID %in% ret_all$subID) %>% filter(subID != '20') %>% select(contains('Score'), contains('subID'))
+# ret_all <- left_join(ret_all, mfq_ret, by = 'subID')
 
 
 # score disgust_scale
@@ -223,7 +221,7 @@ disgust_scores[,2:25] <- as.numeric(unlist(disgust_scores[,2:25]))
 reverse4 <- function(x) 4 - x
 disgust_scores[,c('1','6','10')] <- reverse4(disgust_scores[,c('1','6','10')])
 disgust_scores$score <- rowSums(disgust_scores[2:25])
-hist(disgust_scores$score)
+hist(disgust_scores$score) #pretty normally distributed, peak at 50-60 (count=11)
 
 
 # score iri
@@ -252,10 +250,10 @@ iri <- iri %>% mutate(PerspectiveTakingScore = rowSums(select(., perspective_tak
                      PersonalDistressScore = rowSums(select(., personal_distress), na.rm = TRUE))
 
 # explore spread
-hist(iri$PerspectiveTakingScore)
-hist(iri$FantasyScore)
-hist(iri$EmpathicConcernScore)
-hist(iri$PersonalDistressScore)
+# hist(iri$PerspectiveTakingScore)
+# hist(iri$FantasyScore)
+# hist(iri$EmpathicConcernScore)
+# hist(iri$PersonalDistressScore)
 
 
 # score secs - conservatism increases with score
@@ -273,325 +271,41 @@ secs <- secs %>% mutate(SocialConservatism = rowMeans(select(., social), na.rm =
 secs_ret <- subset(secs, subID %in% ret_all$subID) %>% filter(!is.nan(SocialConservatism)) %>% select(contains('subID'),contains('Conservatism'))
 
 # explore spread
-hist(secs$SocialConservatism)
-count(secs, SocialConservatism >= 50)
-hist(secs$EconomicConservatism)
-count(secs, EconomicConservatism >= 50)
+# hist(secs$SocialConservatism)
+# count(secs, SocialConservatism >= 50)
+# hist(secs$EconomicConservatism)
+# count(secs, EconomicConservatism >= 50)
 
 # tidy emorate
-emorate <- read.csv('C:/Users/imclab/Desktop/MFT re-analysis/data/qualtrics/emorate.csv', stringsAsFactors = FALSE)
-emorate[2:30, 2:721] <- as.data.frame(sapply(emorate[2:30, 2:721], function(s) substr(s, 1, 2)), stringsAsFactors = FALSE)
-names(emorate)[1] <- 'subID'
-emorate <- emorate[2:nrow(emorate),] %>% pivot_longer(2:ncol(emorate), names_to=c('vigfile', 'emotion'), names_pattern='([a-z]+\\d+)\\.*(.*)' , values_to='emoresp')
-emorate$emotion[emorate$emotion == ''] = 'angry'
-emorate$emotion[emorate$emotion == '1'] = 'sad'
-emorate$emotion[emorate$emotion == '2'] = 'disgusted'
-emorate$emotion[emorate$emotion == '3'] = 'afraid'
-emorate$emotion[emorate$emotion == '4'] = 'contemptuous'
-emorate$emotion[emorate$emotion == '5'] = 'amused'
-emorate$emoresp <- as.numeric(emorate$emoresp)
-emorate_ret <- subset(emorate, subID %in% ret_all$subID)
-
-# add qualtrics information into main dataframe
-data <- left_join(data, mfq_ret, by='subID')
-data <- left_join(data, secs_ret, by='subID')
-count(data, SocialConservatism > 50)
-count(data, EconomicConservatism > 50)
-
-data$socially_conservative[data$SocialConservatism > 50] = 1
-data$socially_conservative[data$SocialConservatism < 50] = 0
-data$fiscally_conservative[data$EconomicConservatism > 50] = 1
-data$fiscally_conservative[data$EconomicConservatism < 50] = 0
-
-```
-
-# Memory Accuracy
-## Corrected recognition
-```{r, fig.width=10, fig.height=4}
-
-corrected_recognition <- ret_all %>%
-                  group_by(subID, category) %>%
-                  count(SDT) %>%
-                  pivot_wider(names_from = SDT, values_from = n) %>%
-                  replace_na(list(correctRejection=0, falseAlarm=0, hit=0, miss=0)) %>%
-                  summarise(hitRate = hit/(hit + miss),
-                            FARate = falseAlarm /(falseAlarm + correctRejection),
-                            nOld = sum(hit) + sum(miss),
-                            nNew = sum(falseAlarm) + sum(correctRejection),
-                            corrected_recognition= hitRate - FARate)
-
-CR_mean <- corrected_recognition %>%
-           group_by(category) %>%
-           summarise(n = length(corrected_recognition),
-                     variance = var(corrected_recognition, na.rm = TRUE),
-                     corrected_recognition = mean(corrected_recognition)
-                     )
-print(kable(CR_mean, caption = 'Corrected recognition by moral foundation'))
-
-
-# order foundations by corrected recognition accuracy
-corrected_recognition$category <- factor(corrected_recognition$category, 
-                                levels=c('Authority', 'Loyalty', 'Liberty', 'Care-Phys', 'Social Norms', 'Fairness', 'Care-Emo', 'Purity'))
-
-
-# plot
-p <- ggplot(data = corrected_recognition, aes(x = category, y = corrected_recognition, fill=category, color=category)) +
-     geom_dotplot(size = 0.01, binaxis='y', stackdir='center', binwidth = 0.02) +
-     stat_summary(fun.y = mean, geom = 'bar', alpha = 0.5, position = position_dodge(1)) +
-     stat_summary(fun.data = mean_se, geom = 'errorbar', fun.args = list(mult = 1.96), 
-                  width = 0.2, color = 'black', size = 0.3, position = position_dodge(1))+
-     ggtitle('Corrected Recognition by Moral Foundation (n=28)')
-     #geom_line(aes(group=subID, color=NA, fill=NA))
-print(p)      
-
-
-# with subset of ppts with encoding + retrieval 
-corrected_recognition_sub <- data %>%
-                  group_by(subID, category) %>%
-                  count(SDT) %>%
-                  pivot_wider(names_from = SDT, values_from = n) %>%
-                  replace_na(list(correctRejection=0, falseAlarm=0, hit=0, miss=0)) %>%
-                  summarise(hitRate = hit/(hit + miss),
-                            FARate = falseAlarm /(falseAlarm + correctRejection),
-                            nOld = sum(hit) + sum(miss),
-                            nNew = sum(falseAlarm) + sum(correctRejection),
-                            corrected_recognition= hitRate - FARate)
-
-# order foundations by corrected recognition accuracy
-corrected_recognition_sub$category <- factor(corrected_recognition_sub$category, 
-                                levels=c('Authority', 'Loyalty', 'Liberty', 'Care-Phys', 'Social Norms', 'Fairness', 'Care-Emo', 'Purity'))
-
-CR_sub_mean <- corrected_recognition_sub %>%
-           group_by(category) %>%
-           summarise(n = length(corrected_recognition_sub),
-                     variance = var(corrected_recognition, na.rm = TRUE),
-                     corrected_recognition = mean(corrected_recognition))
-
-print(kable(CR_sub_mean, caption = 'Corrected recognition by moral foundation (n=25)'))
-
-# plot
-p <- ggplot(data = corrected_recognition_sub, aes(x = category, y = corrected_recognition, fill=category, color=category)) +
-     geom_dotplot(size = 0.01, binaxis='y', stackdir='center', binwidth = 0.02) +
-     stat_summary(fun.y = mean, geom = 'bar', alpha = 0.5, position = position_dodge(1)) +
-     stat_summary(fun.data = mean_se, geom = 'errorbar', fun.args = list(mult = 1.96), 
-                  width = 0.2, color = 'black', size = 0.3, position = position_dodge(1))+
-     ggtitle('Corrected Recognition by Moral Foundation (n=25)')
-     #geom_line(aes(group=subID, color=NA, fill=NA))
-print(p)  
-
-# facet accuracy by individual moral rating
-moral_memory <- subset(data, old == 1) %>%
-                group_by(subID, moral_decision) %>%
-                summarise(prop_correct = mean(hits, na.rm = TRUE)) %>%
-                filter(!is.na(moral_decision))
-
-moral_memory_group_mean <- moral_memory %>%
-                           group_by(moral_decision) %>%
-                           summarise(group_avg = mean(prop_correct))
-
-p <- ggplot(data = moral_memory, aes(x = moral_decision, y = prop_correct, fill=moral_decision, color=moral_decision)) +
-      geom_dotplot(size = 0.01, binaxis='y', stackdir='center', binwidth = 0.02) +
-      stat_summary(fun.y = mean, geom = 'bar', alpha = 0.5, position = position_dodge(1)) +
-      stat_summary(fun.data = mean_se, geom = 'errorbar', fun.args = list(mult = 1.96), 
-                   width = 0.2, color = 'black', size = 0.3, position = position_dodge(1))+
-      theme(aspect.ratio = 4/4) +
-ggtitle('Proportion of Hits by Moral Judgment (n=25)')
-print(p) 
-
-# Correceted recognition by confidence
-corrected_recognition_conf <- ret_all %>%
-                   group_by(subID, confresp) %>%
-                   count(SDT) %>%
-                   pivot_wider(names_from = SDT, values_from = n) %>%
-                   replace_na(list(correctRejection=0, falseAlarm=0, hit=0, miss=0)) %>%
-                   summarise(hitRate = hit/(hit + miss),
-                             FARate = falseAlarm /(falseAlarm + correctRejection),
-                             nOld = sum(hit) + sum(miss),
-                             nNew = sum(falseAlarm) + sum(correctRejection),
-                             corrected_recognition= hitRate - FARate) %>%
-                             mutate_at(vars(hitRate, FARate, corrected_recognition), ~na_if(., 'NaN'))
- 
- CR_conf_mean <- corrected_recognition_conf %>%
-            group_by(confresp) %>%
-            summarise(n = length(corrected_recognition),
-                      variance = var(corrected_recognition, na.rm = TRUE),
-                      avg_cr = mean(corrected_recognition, na.rm = TRUE))
- 
-# print(kable(CR_conf_mean, caption = 'Corrected recognition by moral foundation & confidence'))
- 
-p <- ggplot(data = corrected_recognition_conf, aes(x = confresp, y = corrected_recognition, fill=confresp, color=confresp)) +
-      geom_dotplot(size = 0.02, binaxis='y', stackdir='center', binwidth = 0.02) +
-      stat_summary(fun.y = mean, geom = 'bar', alpha = 0.5, position = position_dodge(1)) +
-      stat_summary(fun.data = mean_se, geom = 'errorbar', fun.args = list(mult = 1.96), 
-                   width = 0.2, color = 'black', size = 0.3, position = position_dodge(1))+
-      theme(aspect.ratio = 4/4) +
-      ggtitle('Corrected Recognition by Confidence (n=28)')
-      print(p)     
-      
-# facet accuracy by moral decision (low vs. high)
-# moral_memory_accuracy <- subset(data, old == 1)
-# moral_memory_accuracy$moral_resp[moral_memory_accuracy$moral_decision == 1 |moral_memory_accuracy$moral_decision == 2] = 'fine'
-# moral_memory_accuracy$moral_resp[moral_memory_accuracy$moral_decision == 3 |moral_memory_accuracy$moral_decision == 4] = 'wrong'
+# emorate <- read.csv('C:/Users/imclab/Desktop/MFT re-analysis/data/qualtrics/emorate.csv', stringsAsFactors = FALSE)
+# emorate[2:30, 2:721] <- as.data.frame(sapply(emorate[2:30, 2:721], function(s) substr(s, 1, 2)), stringsAsFactors = FALSE)
+# names(emorate)[1] <- 'subID'
+# emorate <- emorate[2:nrow(emorate),] %>% pivot_longer(2:ncol(emorate), names_to=c('vigfile', 'emotion'), names_pattern='([a-z]+\\d+)\\.*(.*)' , values_to='emoresp')
+# emorate$emotion[emorate$emotion == ''] = 'angry'
+# emorate$emotion[emorate$emotion == '1'] = 'sad'
+# emorate$emotion[emorate$emotion == '2'] = 'disgusted'
+# emorate$emotion[emorate$emotion == '3'] = 'afraid'
+# emorate$emotion[emorate$emotion == '4'] = 'contemptuous'
+# emorate$emotion[emorate$emotion == '5'] = 'amused'
+# emorate$emoresp <- as.numeric(emorate$emoresp)
+# emorate_ret <- subset(emorate, subID %in% ret_all$subID)
 # 
-# moral_memory_accuracy <- moral_memory_accuracy %>%
-#                          group_by(subID, category, moral_resp) %>%
-#                          summarise(prop_correct = mean(hits, na.rm = TRUE))
+# # add qualtrics information into main dataframe
+# data <- left_join(data, mfq_ret, by='subID')
+# data <- left_join(data, secs_ret, by='subID')
+# count(data, SocialConservatism > 50)
+# count(data, EconomicConservatism > 50)
 # 
-# moral_memory_accuracy <- filter(moral_memory_accuracy, !is.na(moral_resp))
-# 
-# p <- ggplot(data = moral_memory_accuracy, aes(x = category, y = prop_correct, fill=category, color=category)) +
-#       geom_dotplot(size = 0.01, binaxis='y', stackdir='center', binwidth = 0.02) +
-#       stat_summary(fun.y = mean, geom = 'bar', alpha = 0.5, position = position_dodge(1)) +
-#       stat_summary(fun.data = mean_se, geom = 'errorbar', fun.args = list(mult = 1.96), 
-#                    width = 0.2, color = 'black', size = 0.3, position = position_dodge(1))+
-#       facet_grid(cols = vars(moral_resp)) +
-# ggtitle('Proportion of Hits by Moral Judgment')
-# print(p)        
+# data$socially_conservative[data$SocialConservatism > 50] = 1
+# data$socially_conservative[data$SocialConservatism < 50] = 0
+# data$fiscally_conservative[data$EconomicConservatism > 50] = 1
+# data$fiscally_conservative[data$EconomicConservatism < 50] = 0
 
 ```
 
-# Memory Confidence
-```{r, fig.width=10, fig.height=4}
-
-# Accuracy Independent
-confidence <- ret_all %>%
-                  group_by(subID, category) %>%
-                  summarise(PropHigh = mean(high_conf))
-
-confidence_mean <- confidence %>%
-           group_by(category) %>%
-           summarise(group_conf = mean(PropHigh), SD = sd(PropHigh))
-print(kable(confidence_mean, caption = 'Accuracy-Independent Confidence (n=28)'))
-
-# order foundations by corrected recognition accuracy
-confidence$category <- factor(confidence$category, 
-                                levels=c('Authority', 'Loyalty', 'Liberty', 'Care-Phys', 'Social Norms', 'Fairness', 'Care-Emo', 'Purity'))
-
-p <- ggplot(data = confidence, aes(x = category, y = PropHigh, fill=category, color=category)) +
-     geom_dotplot(size = 0.01, binaxis='y', stackdir='center', binwidth = 0.02) +
-     stat_summary(fun.y = mean, geom = 'bar', alpha = 0.5, position = position_dodge(1)) +
-     stat_summary(fun.data = mean_se, geom = 'errorbar', fun.args = list(mult = 1.96), 
-                  width = 0.2, color = 'black', size = 0.3, position = position_dodge(1))+
-     ggtitle('Accuracy-Independent Memory Confidence by Moral Foundation (n=28)')
-print(p)
-
-## subset of ret & encoding
-confidence_sub <- data %>%
-                  group_by(subID, category) %>%
-                  summarise(PropHigh = mean(high_conf))
-
-confidence_mean <- confidence_sub %>%
-           group_by(category) %>%
-           summarise(group_conf = mean(PropHigh), SD = sd(PropHigh))
-print(kable(confidence_mean, caption = 'Accuracy-Independent Confidence (n=28)'))
-
-# order foundations by corrected recognition accuracy
-confidence_sub$category <- factor(confidence_sub$category, 
-                                levels=c('Authority', 'Loyalty', 'Liberty', 'Care-Phys', 'Social Norms', 'Fairness', 'Care-Emo', 'Purity'))
-
-p <- ggplot(data = confidence_sub, aes(x = category, y = PropHigh, fill=category, color=category)) +
-     geom_dotplot(size = 0.01, binaxis='y', stackdir='center', binwidth = 0.02) +
-     stat_summary(fun.y = mean, geom = 'bar', alpha = 0.5, position = position_dodge(1)) +
-     stat_summary(fun.data = mean_se, geom = 'errorbar', fun.args = list(mult = 1.96), 
-                  width = 0.2, color = 'black', size = 0.3, position = position_dodge(1))+
-     ggtitle('Accuracy-Independent Memory Confidence by Moral Foundation (n=25)')
-print(p) 
-
-
-
-# Hits Confidence
-hits_confidence <- subset(ret_all, correct == 1) %>%
-                  group_by(subID, category) %>%
-                  summarise(PropHigh = mean(high_conf))
-
-hits_confidence_mean <- hits_confidence %>%
-                                 group_by(category) %>%
-                                 summarise(group_conf = mean(PropHigh), SD = sd(PropHigh))
-
-print(kable(hits_confidence_mean, caption = 'Confidence: Hits & Correct Rejections'))
-
-# order foundations by corrected recognition accuracy
-confidence$category <- factor(confidence$category, 
-                                levels=c('Authority', 'Loyalty', 'Liberty', 'Care-Phys', 'Social Norms', 'Fairness', 'Care-Emo', 'Purity'))
-
-p <- ggplot(data = hits_confidence, aes(x = category, y = PropHigh, fill=category, color=category)) +
-     geom_dotplot(size = 0.01, binaxis='y', stackdir='center', binwidth = 0.02) +
-     stat_summary(fun.y = mean, geom = 'bar', alpha = 0.5, position = position_dodge(1)) +
-     stat_summary(fun.data = mean_se, geom = 'errorbar', fun.args = list(mult = 1.96), 
-                  width = 0.2, color = 'black', size = 0.3, position = position_dodge(1))+
-     ggtitle('Confidence: Hits & Correct Rejections (n=28)')
-print(p) 
-
-# Misses Confidence
-misses_confidence <- subset(ret_all, correct == 0) %>%
-                  group_by(subID, category) %>%
-                  summarise(PropHigh = mean(high_conf))
-
-misses_confidence_mean <- misses_confidence %>%
-                                 group_by(category) %>%
-                                 summarise(group_conf = mean(PropHigh), SD = sd(PropHigh))
-
-print(kable(misses_confidence_mean, caption = 'Confidence: Hits & Correct Rejections'))
-
-# order foundations by recognition accuracy
-misses_confidence$category <- factor(misses_confidence$category, 
-                                levels=c('Authority', 'Loyalty', 'Liberty', 'Care-Phys', 'Social Norms', 'Fairness', 'Care-Emo', 'Purity'))
-
-p <- ggplot(data = misses_confidence, aes(x = category, y = PropHigh, fill=category, color=category)) +
-     geom_dotplot(size = 0.01, binaxis='y', stackdir='center', binwidth = 0.02) +
-     stat_summary(fun.y = mean, geom = 'bar', alpha = 0.5, position = position_dodge(1)) +
-     stat_summary(fun.data = mean_se, geom = 'errorbar', fun.args = list(mult = 1.96), 
-                  width = 0.2, color = 'black', size = 0.3, position = position_dodge(1))+
-     ggtitle('Confidence: Misses & False Alarms (n=28)')
-print(p) 
-
-```
-
-# Correlation between Accuracy and Moral Judgment
-``` {r, fig.width=15, fig.height=4}
-
-data$moral_decision[data$moral_decision == 'NaN'] = NA
-
-# points = participant estimates
-moral_memory_corr <- subset(data, old == 1) %>%
-                group_by(subID, category) %>%
-                summarise(correlation = fisherz(cor(hits, as.numeric(moral_decision), use = "pairwise.complete.obs")))
-
-# order by increasing recognition accuracy
-moral_memory_corr$category <- factor(moral_memory_corr$category, 
-                                levels=c('Authority', 'Loyalty', 'Liberty', 'Care-Phys', 'Social Norms', 'Fairness', 'Care-Emo', 'Purity'))
-
-p <- ggplot(data = moral_memory_corr, aes(x = category, y = correlation, fill=category, color=category)) +
-     geom_dotplot(size = 0.01, binaxis='y', stackdir='center', binwidth = 0.02) +
-     stat_summary(fun.y = mean, geom = 'bar', alpha = 0.5, position = position_dodge(1)) +
-     stat_summary(fun.data = mean_se, geom = 'errorbar', fun.args = list(mult = 1.96), 
-                  width = 0.2, color = 'black', size = 0.3, position = position_dodge(1))+
-     ggtitle('Correlation between Proportion of Hits & Moral Decision (n=25)')
-print(p)
-
-
-# averaged across participants
-moral_memory_corr_mean <- moral_memory_corr %>%
-                     group_by(category) %>%
-                     summarise(avg_correlation = mean(correlation, na.rm = TRUE))
-
-# order by increasing recognition accuracy
-moral_memory_corr_mean$category <- factor(moral_memory_corr_mean$category, 
-                                levels=c('Authority', 'Loyalty', 'Liberty', 'Care-Phys', 'Social Norms', 'Fairness', 'Care-Emo', 'Purity'))
-
-p <- ggplot(data = moral_memory_corr_mean, aes(x = category, y = avg_correlation, fill=category, color=category)) +
-     stat_summary(fun.y = mean, geom = 'bar', alpha = 0.5, position = position_dodge(1)) +
-     stat_summary(fun.data = mean_se, geom = 'errorbar', fun.args = list(mult = 1.96), 
-                  width = 0.2, color = 'black', size = 0.3, position = position_dodge(1))+
-     ggtitle('Hits & Moral Decision Averaged Across Participants')
-print(p)
-
-
-
-```
-
-# Generalized Linear Mixed Model
-``` {r, fig.width=15, fig.height=5}
+# Analyses: Linear Mixed Models
+## Memory Accuracy: GLMM
+```{r, fig.width=15, fig.height=8}
 
 ## some handy commands
 # exp(fixef(modelOld1)): transforms model output from log likelihood to odds ratio
@@ -600,99 +314,60 @@ print(p)
 # emmeans(modelNew, 'category', type='response'): gives you probabilities for each level of the fixed effect factor
 # emmeans(modelOld1, pairwise ~ category, lmer.df = "satterthwaite"): gives you probabilities for each fixed effect and odds ratios + p-values for pairwise comparisons among levels of the fixed effect factor
 
-ret_old <- subset(data, old == 1)
-ret_new <- subset(data, old == 0)
-ret_old$confresp <- as.factor(as.numeric(ret_old$confresp))
-ret_new$confresp <- as.factor(as.numeric(ret_new$confresp))
-
-# predicting correct using category and moral decision
-modelOld1 <- glmer(correct ~ moral_decision + category + (1 + moral_decision | subID),
-               data=ret_old_qualtrics, family=binomial(link = 'logit'), control=glmerControl(optCtrl=list(maxfun=50000)))
-
-modelOld2 <- glmer(correct ~ moral_decision + category + socially_conservative + fiscally_conservative + (1 + moral_decision + careScore + fairnessScore + loyaltyScore + authorityScore + purityScore + SocialConservatism + EconomicConservatism | subID), data = ret_old_qualtrics, family = binomial(link = 'logit'), control=glmerControl(optCtrl = list(maxfun=50000)))
-
-anova(modelOld1, modelOld2)
+data$high_conf[data$confresp == 1 | data$confresp == 2] = 0
+data$high_conf[data$confresp == 3 | data$confresp == 4] = 1
+data$confresp <- as.factor(as.numeric(data$confresp))
+data$encoding_RT <- as.numeric(data$encoding_RT)
+data$retrieval_RT <- as.numeric(data$retrieval_RT)
+data$confRT <- as.numeric(data$confRT)
+data_old <- subset(data, old == '1' & moral_decision != 'NaN')
+data_new <- subset(data, old == 0)
+data_old$moral_decision <- as.factor(as.numeric(data_old$moral_decision))
 
 
-modelOld <- glmer(correct ~ moral_decision * category * confresp + (1 + category | subID),
-               data=ret_old, family=binomial(link = 'logit'),control=glmerControl(optCtrl=list(maxfun=50000)))
-summary(modelOld)
-plot(modelOld)
+# model comparisons: relevance of moral decision for hits
+modelOld1 <- glmer(correct ~ category + (1 + category | subID),
+               data=data_old, family=binomial(link = 'logit'), control=glmerControl(optCtrl=list(maxfun=50000)))
+modelOld2 <- glmer(correct ~ category + moral_decision + (1 + category | subID),
+               data=data_old, family=binomial(link = 'logit'), control=glmerControl(optCtrl=list(maxfun=50000)))
+modelOld3 <- glmer(correct ~ category * moral_decision + (1 + category | subID),
+               data=data_old, family=binomial(link = 'logit'), control=glmerControl(optCtrl=list(maxfun=50000)))
+anova(modelOld1, modelOld2, modelOld3) #model2 --> winner! 
 
-# plot predictions
-modelOld1 %>% ggpredict(terms=c('moral_decision', 'category')) %>%
-  ggplot(aes(x=interaction(x, group), y=predicted, group=group, fill=group)) + geom_col() + geom_errorbar(aes(ymax=conf.high, ymin=conf.low)) + ggtitle('Predicted accuracy (proportion correct) n=25')
+modelOld4 <- glmer(correct ~ category + (1 | subID),
+               data=data_old, family=binomial(link = 'logit'), control=glmerControl(optCtrl=list(maxfun=50000)))
+modelOld5 <- glmer(correct ~ category + (1 + moral_decision | subID),
+               data=data_old, family=binomial(link = 'logit'), control=glmerControl(optCtrl=list(maxfun=50000)))
+modelOld6 <- glmer(correct ~ category + (1 + moral_decision + category | subID),
+               data=data_old, family=binomial(link = 'logit'), control=glmerControl(optCtrl=list(maxfun=50000)))
+modelOld7 <- glmer(correct ~ category + (1 + moral_decision * category | subID),
+               data=data_old, family=binomial(link = 'logit'), control=glmerControl())
+anova(modelOld4, modelOld5, modelOld2, modelOld6, modelOld7)
 
-modelOld1 %>% ggpredict(terms=c('moral_decision')) %>%
-  ggplot(aes(x=x, y=predicted, fill=x)) + geom_col() + geom_errorbar(aes(ymax=conf.high, ymin=conf.low)) + ggtitle('Predicted accuracy (proportion correct) n=25')
-
-
-# model %>% ggpredict(terms=c('category')) %>%
-#   ggplot(aes(x=x, y=predicted)) + geom_col() + geom_errorbar(aes(ymax=conf.high, ymin=conf.low))
-# model %>% ggpredict(terms=c('old')) %>%
-#   ggplot(aes(x=x, y=predicted)) + geom_col() + geom_errorbar(aes(ymax=conf.high, ymin=conf.low))
-
-# predicting correct using category 
-modelNew <- glmer(correct ~ category + (1 + category | subID), data=ret_new, family=binomial(link = 'logit'), control=glmerControl(optCtrl=list(maxfun=25000)))
-summary(modelNew)
-plot(modelNew)
-ggpredict()
-modelNew %>% ggpredict(terms=c('category')) %>%
-  ggplot(aes(x=x, y=predicted)) + geom_col() + geom_errorbar(aes(ymax=conf.high, ymin=conf.low)) + ggtitle('Predicted accuracy (proportion correct) n=25')
+# plot
+data_old <- data_old %>% 
+            group_by(subID, category, moral_decision) %>%
+            mutate(propCorrect = mean(correct, na.rm = TRUE))
+  
+modelOld1 %>% emmeans(~ category * moral_decision, type='response') %>% as.data.frame %>%
+  ggplot(aes(x=moral_decision, y=prob)) +
+  geom_pointrange(aes(ymax=asymp.LCL, ymin=asymp.UCL), alpha=1, fatten=5, color='black') +
+  facet_wrap(~category, nrow=2) +
+  geom_violin(aes(x=moral_decision, y=propCorrect, color=category, fill=category), data=data_old, alpha=0.4, scale='count') +
+  ggtitle('Hits for old vignettes (n=30)') + xlab('Moral Decision (not morally wrong-extremely morally wrong)')
 
 
 ```
 
-# Analysis with only retrieval sample
-```{r, echo=FALSE}
 
-ret_all$category[ret_all$category == "SN"] <- "Social-Norms"
-ret_all$category[ret_all$category == "Lib"] <- "Liberty"
-ret_all$category[ret_all$category == "Loy"] <- "Loyalty"
-ret_all$category[ret_all$category == "Pure"] <- "Purity"
-ret_all$category[ret_all$category == "Auth"] <- "Authority"
-ret_all$category[ret_all$category == "Fair"] <- "Fairness"
-ret_all$category[ret_all$category == "Social-Norms"] <- "Social Norms"
-
-# make text-based response column; new responses = NA
-ret_all$text_response = ''
-i = 0
-for (n in ret_all$resp) {
-  i = i + 1
-  if (is.na(n) == TRUE) {                       
-    ret_all$text_response[i] = NA
-  }
-  else if (n == 1) {
-    ret_all$text_response[i] = ret_all$choice1[i]
-  }
-  else if (n == 2) {
-    ret_all$text_response[i] = ret_all$choice2[i]
-  }
-  else if (n == 3) {
-    ret_all$text_response[i] = ret_all$choice3[i]
-  }
-  else {
-    ret_all$text_response[i] = NA
-  }
-}
+# Memory Confidence
+```{r, fig.width=8, fig.height=4}
 
 
-# correct column
-ret_all$correct <- as.numeric((!is.na(ret_all$text_response) & ret_all$text_response == ret_all$correct_answer) |
-  (is.na(ret_all$text_response) & ret_all$old == 0))
+```
 
-# corrected recognition column
-ret_all$SDT[ret_all$old == 1 & ret_all$correct == 1] = 'hit'
-ret_all$SDT[ret_all$old == 0 & ret_all$correct == 0] = 'falseAlarm'
-ret_all$SDT[ret_all$old == 1 & ret_all$correct == 0] = 'miss'
-ret_all$SDT[ret_all$old == 0 & ret_all$correct == 1] = 'correctRejection'
+# Correlation between Accuracy and Moral Judgment
+```{r, fig.width=8, fig.height=4}
 
-# make column for calculating proportion high confidence responses
-ret_all$high_conf[ret_all$confresp == 1 | ret_all$confresp == 2] = 0
-ret_all$high_conf[ret_all$confresp == 3 | ret_all$confresp == 4] = 1
-
-# make column for moral judgement x memory accuracy correlation
-ret_all$hits[ret_all$old == 1 & ret_all$correct == 1] = 1
-ret_all$hits[ret_all$old == 1 & ret_all$correct == 0] = 0
 
 ```
