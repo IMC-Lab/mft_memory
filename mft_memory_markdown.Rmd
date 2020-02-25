@@ -29,6 +29,7 @@ library(ggeffects)
 library(emmeans)
 library(tidyselect)
 library(dplyr)
+library(ordinal)
 se <- function(x) sqrt(var(x)/length(x))
 `%notin%` <- Negate(`%in%`)
 ```
@@ -304,6 +305,24 @@ secs_ret <- subset(secs, subID %in% ret_all$subID) %>% filter(!is.nan(SocialCons
 ```
 
 # Analyses: Linear Mixed Models
+## Moral Judgments
+```{r, fig.width=8, fig.height=5}
+
+# look at spreads
+hist(as.numeric(data$moral_decision))
+hist(data$encoding_RT)
+data$moral_decision <- as.factor(data$moral_decision)
+
+modelMoral <- clmm(moral_decision ~ category + (1 + category | subID), data = data, Hess = TRUE)
+summary(modelMoral)
+
+
+
+```
+
+
+
+
 ## Memory Accuracy: GLMM
 ```{r, fig.width=15, fig.height=8}
 
@@ -325,37 +344,21 @@ data_new <- subset(data, old == 0)
 data_old$moral_decision <- as.factor(as.numeric(data_old$moral_decision))
 
 
-# model comparisons: relevance of moral decision for hits
-modelOld1 <- glmer(correct ~ category + (1 + category | subID),
-               data=data_old, family=binomial(link = 'logit'), control=glmerControl(optCtrl=list(maxfun=50000)))
-modelOld2 <- glmer(correct ~ category + moral_decision + (1 + category | subID),
-               data=data_old, family=binomial(link = 'logit'), control=glmerControl(optCtrl=list(maxfun=50000)))
-modelOld3 <- glmer(correct ~ category * moral_decision + (1 + category | subID),
-               data=data_old, family=binomial(link = 'logit'), control=glmerControl(optCtrl=list(maxfun=50000)))
-anova(modelOld1, modelOld2, modelOld3) #model2 --> winner! 
-
-modelOld4 <- glmer(correct ~ category + (1 | subID),
-               data=data_old, family=binomial(link = 'logit'), control=glmerControl(optCtrl=list(maxfun=50000)))
-modelOld5 <- glmer(correct ~ category + (1 + moral_decision | subID),
-               data=data_old, family=binomial(link = 'logit'), control=glmerControl(optCtrl=list(maxfun=50000)))
-modelOld6 <- glmer(correct ~ category + (1 + moral_decision + category | subID),
-               data=data_old, family=binomial(link = 'logit'), control=glmerControl(optCtrl=list(maxfun=50000)))
-modelOld7 <- glmer(correct ~ category + (1 + moral_decision * category | subID),
-               data=data_old, family=binomial(link = 'logit'), control=glmerControl())
-anova(modelOld4, modelOld5, modelOld2, modelOld6, modelOld7)
+# predicting accuracy using category
+modelAccuracy <- glmer(correct ~ category + old + (1 + category | subID),
+                 data=data, family=binomial(link = 'logit'), control=glmerControl(optCtrl=list(maxfun=50000)))
+summary(modelAccuracy)
+accuracyOdds <- exp(fixef(modelAccuracy))
+accuracyContrasts <- emmeans(modelAccuracy, pairwise ~ category)
 
 # plot
-data_old <- data_old %>% 
-            group_by(subID, category, moral_decision) %>%
-            mutate(propCorrect = mean(correct, na.rm = TRUE))
-  
-modelOld1 %>% emmeans(~ category * moral_decision, type='response') %>% as.data.frame %>%
-  ggplot(aes(x=moral_decision, y=prob)) +
+data <- data %>% group_by(subID, category, old) %>% mutate(propCorrect = mean(correct)) # so that violin plots can reflect participant response densities
+modelAccuracy %>% emmeans(~ category * old, type='response') %>% as.data.frame %>%
+  ggplot(aes(x=category, y=prob)) +
   geom_pointrange(aes(ymax=asymp.LCL, ymin=asymp.UCL), alpha=1, fatten=5, color='black') +
-  facet_wrap(~category, nrow=2) +
-  geom_violin(aes(x=moral_decision, y=propCorrect, color=category, fill=category), data=data_old, alpha=0.4, scale='count') +
-  ggtitle('Hits for old vignettes (n=30)') + xlab('Moral Decision (not morally wrong-extremely morally wrong)')
-
+  facet_wrap(~old, nrow=2) +
+  geom_violin(aes(x=category, y=propCorrect, color=category, fill=category), data=data, alpha=0.2, scale='count') +
+  ggtitle('Memory accuracy (hits & correct rejections)') + ylab('Estimated marginal means') + theme(legend.position = 'none')
 
 ```
 
