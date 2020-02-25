@@ -11,11 +11,11 @@ This is a project testing memory for vignettes of moral transgressions.
 
 # Design
 
-Participants (n = 28) incidentally encoded 120 vignettes, 15 from each of the different foundations articulated by Moral Foundations Theory (cite), by reading and vividly imagining the vignette for 6 seconds and then making a moral judgement. 
+Participants (n = 30) incidentally encoded 120 vignettes, 15 from each of the different foundations articulated by Moral Foundations Theory (cite), by reading and vividly imagining the vignette for 6 seconds and then making a moral judgement (not morally wrong-extremely morally wrong; 1-4). 
 
-During recognition, participants were cued with each vignette presented during study + 7-8 lures per foundation. Each vignette had up to 4 words removed, and participants were asked to select which word or words completed the vignette as they studied it as well as their confidence in their response. 
+During recognition, participants were cued with each vignette presented during study + 7-8 lures per foundation. Each vignette had up to 4 words removed, and participants were asked to select which word or words completed the vignette as they studied it as well as their confidence in their response (not confident-extremely confident; 1-4). 
 
-Encoding took place in the scanner but retrieval did not. We plan to conduct a PLS analysis on the neural data, but are getting started with analyzing behavior first. 
+Encoding took place in the scanner but retrieval did not. After retrieval, participants completed a number of surveys: moral foundations questionnaire (MFQ), 
 
 ```{r load packages, message=FALSE, warning=FALSE, include=FALSE}
 library(knitr)
