@@ -30,6 +30,8 @@ library(emmeans)
 library(tidyselect)
 library(dplyr)
 library(ordinal)
+library(mixor)
+library(brms)
 se <- function(x) sqrt(var(x)/length(x))
 `%notin%` <- Negate(`%in%`)
 ```
@@ -306,16 +308,57 @@ secs_ret <- subset(secs, subID %in% ret_all$subID) %>% filter(!is.nan(SocialCons
 
 # Analyses: Linear Mixed Models
 ## Moral Judgments
-```{r, fig.width=8, fig.height=5}
+```{r, fig.width=5, fig.height=5}
 
 # look at spreads
 hist(as.numeric(data$moral_decision))
 hist(data$encoding_RT)
-data$moral_decision <- as.factor(data$moral_decision)
+data$moral_decision <- as.integer(data$moral_decision)
+data_old <- subset(data, old == '1' & moral_decision != 'NaN')
+data_old$category <-  factor(data_old$category, levels = c('Care-Emo', 'Care-Phys', 'Fairness', 'Loyalty', 'Authority', 'Purity', 'Liberty', 'Social Norms'))
+foundation_means <- data_old %>% as.integer(moral_decision) %>% group_by(category, subID) %>% summarise(mean = mean(moral_decision)) 
 
-modelMoral <- clmm(moral_decision ~ category + (1 + category | subID), data = data, Hess = TRUE)
+ggplot(data_old, aes(x=moral_decision, color=category, fill=category)) +
+  geom_bar() + 
+  facet_wrap(~category, nrow=2) + 
+  ggtitle('Distribution of Moral Judgments') +
+  xlab('1=not morally wrong, 4=extremely morally wrong')
+
+ggplot(foundation_means, aes(x=category, y=mean, color=category, fill=category)) +
+  geom_violin(scale='count', alpha=0.5) +
+  stat_summary(fun.data = mean_se, fun.args = list(mult = 1.96), geom='pointrange', color='black', fatten=5) +
+  ggtitle('Mean moral judgment per category')
+
+ggplot(foundation_means, aes(x=category, y=mean, color=category, fill=category)) +
+  stat_summary(fun.y = mean, geom='bar') +
+  stat_summary(fun.data=mean_se, fun.args = list(mult=1.96), geom='errorbar', color='black', size=0.5, width=0.5) +
+  coord_flip() +
+  ggtitle('Visual comparison to Clifford et al. (2015)')
+
+modelMoral <- brm(moral_decision ~ category + (1 + category | subID) + (1 | vigfile), 
+                  family=cumulative(link="logit", threshold="flexible"), data=data_old, cores=4, file='mftMoralDecision')
+summary(modelMoral)
+conditional_effects(modelMoral)
+conditional_effects(modelMoral, categorical=TRUE)
+
+modelMoral <- mixor(moral_decision ~ category, data = data_old, id=subID, link='logit', KG = 1)
 summary(modelMoral)
 
+# test for meeting assumption of proportional odds
+modelMoral.clm <- clm(moral_decision ~ category + subID, data = data_old)
+nominal_test(modelMoral.clm)
+scale_test(modelMoral.clm)
+
+modelMoral %>% emmeans(~ category, type='response') %>% as.data.frame %>%
+  ggplot(aes(x=category, y=prob)) +
+  geom_pointrange(aes(ymax=asymp.LCL, ymin=asymp.UCL), alpha=1, fatten=5, color='black') +
+  facet_wrap(~old, nrow=2) +
+  geom_violin(aes(x=category, y=propCorrect, color=category, fill=category), data=data, alpha=0.2, scale='count') +
+  ggtitle('Memory accuracy (hits & correct rejections)') + ylab('Estimated marginal means') + theme(legend.position = 'none')
+
+
+modelMoral2 <- clmm(moral_decision ~ category + (1 | vigfile), data = data_old, Hess = TRUE)
+summary(modelMoral2)
 
 
 ```
@@ -339,7 +382,6 @@ data$confresp <- as.factor(as.numeric(data$confresp))
 data$encoding_RT <- as.numeric(data$encoding_RT)
 data$retrieval_RT <- as.numeric(data$retrieval_RT)
 data$confRT <- as.numeric(data$confRT)
-data_old <- subset(data, old == '1' & moral_decision != 'NaN')
 data_new <- subset(data, old == 0)
 data_old$moral_decision <- as.factor(as.numeric(data_old$moral_decision))
 
