@@ -368,51 +368,54 @@ emmeans(modelMoral, ~ category) %>% as.data.frame() %>%
   geom_pointrange(aes(ymin=asymp.LCL, ymax=asymp.UCL), alpha=1, fatten=5, color='black') +
   ggtitle('Model estimates: moral judgment') 
 
+```
+
+### Reaction time
+```{r}
+
+```
+
+## Memory
+### Accuracy (hits & correct rejections)
+```{r, fig.width=15, fig.height=8}
+
+# generalized linear mixed effect model (outcome is binary)
+modelMemory <- glmer(correct ~ category + old + (1 + category | subID),
+                 data=data, family=binomial(link = 'logit'), control=glmerControl(optCtrl=list(maxfun=50000)))
+summary(modelMemory)
+
+# plot
+data <- data %>% group_by(subID, category, old) %>% mutate(propCorrect = mean(correct)) # so that violin plots can reflect participant response densities
+modelMemory %>% emmeans(~ category * old, type='response') %>% as.data.frame %>%
+  ggplot(aes(x=category, y=prob)) +
+  facet_wrap(~old, nrow=2) +
+  geom_violin(aes(x=category, y=propCorrect, color=superordinate, fill=superordinate), data=data, alpha=0.7, scale='count') +
+  geom_pointrange(aes(ymax=asymp.LCL, ymin=asymp.UCL), alpha=1, fatten=5, color='black') +
+  ggtitle('Memory accuracy (hits & correct rejections)') 
+
+# predicting accuracy using category
+accuracyOdds <- exp(fixef(modelAccuracy))
+accuracyContrasts <- emmeans(modelAccuracy, pairwise ~ category)
+
+
+```
+
+### Reaction Time
+```{r}
+
 data_old <- data_old %>%
   filter(retrieval_RT > 0.02) %>%
   mutate(log_retrieval_RT=log(retrieval_RT))
 modelRetRT <- lmer(log_retrieval_RT ~ category + (1 | subID) + (1 | vigfile), data=data_old)
 
-modelRetRT2 <- glmer(retrieval_RT ~ category + (1 | subID) + (1 | vigfile), data=data_old, family = Gamma(link='identity'))
+modelRetRT2 <- glmer(retrieval_RT ~ category + (1 | subID) + (1 | vigfile), data=data_old, family = Gamma(link='identity'), start=list(rho=0))
 
-modelRetRT3 <- glmer(retrieval_RT ~ category + (1 | subID) + (1 | vigfile), data=data_old, family = inverse.gaussian(link = 'identity'))
+modelRetRT3 <- glmer(retrieval_RT ~ category + (1 | subID) + (1 | vigfile), data=data_old, family = inverse.gaussian(link = 'identity'), start=list(rho=0))
+
 
 ```
 
-
-## Memory Accuracy: GLMM
-```{r, fig.width=15, fig.height=8}
-
-data$high_conf[data$confresp == 1 | data$confresp == 2] = 0
-data$high_conf[data$confresp == 3 | data$confresp == 4] = 1
-data$confresp <- as.factor(as.numeric(data$confresp))
-data$encoding_RT <- as.numeric(data$encoding_RT)
-data$retrieval_RT <- as.numeric(data$retrieval_RT)
-data$confRT <- as.numeric(data$confRT)
-data_new <- subset(data, old == 0)
-data_old$moral_decision <- as.factor(as.numeric(data_old$moral_decision))
-
-
-# predicting accuracy using category
-modelAccuracy <- glmer(correct ~ category + old + (1 + category | subID),
-                 data=data, family=binomial(link = 'logit'), control=glmerControl(optCtrl=list(maxfun=50000)))
-summary(modelAccuracy)
-accuracyOdds <- exp(fixef(modelAccuracy))
-accuracyContrasts <- emmeans(modelAccuracy, pairwise ~ category)
-
-# plot
-data <- data %>% group_by(subID, category, old) %>% mutate(propCorrect = mean(correct)) # so that violin plots can reflect participant response densities
-modelAccuracy %>% emmeans(~ category * old, type='response') %>% as.data.frame %>%
-  ggplot(aes(x=category, y=prob)) +
-  geom_pointrange(aes(ymax=asymp.LCL, ymin=asymp.UCL), alpha=1, fatten=5, color='black') +
-  facet_wrap(~old, nrow=2) +
-  geom_violin(aes(x=category, y=propCorrect, color=category, fill=category), data=data, alpha=0.2, scale='count') +
-  ggtitle('Memory accuracy (hits & correct rejections)') + ylab('Estimated marginal means') + theme(legend.position = 'none')
-
-```
-
-
-# Memory Confidence
+### Confidence
 ```{r, fig.width=8, fig.height=4}
 
 
