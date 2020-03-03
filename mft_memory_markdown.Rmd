@@ -39,6 +39,7 @@ library(sjPlot)
 library(RColorBrewer)
 se <- function(x) sqrt(var(x)/length(x))
 `%notin%` <- Negate(`%in%`)
+emm_options(lmerTest.limit = 5000)
 ```
 
 # Load in data
@@ -96,8 +97,8 @@ ret_all$resp <- sapply(ret_all$resp, function(s) as.numeric(substr(s, 1, 2))) #g
 ret_all$confresp <- sapply(ret_all$confresp, function(s) as.numeric(substr(s, 1, 2))) #get rid of symbols
 ret_all <- as.data.frame(sapply(ret_all, function(x) gsub("^\t* *\"* *| *\"* *\t*$", "", x)), stringsAsFactors = FALSE) #get rid of quotation marks & any white space
 ret_all <- left_join(ret_all, key) #make column with category for each cue
-ret_all$old <- as.integer(substr(ret_all$category, 1,4) != 'Lure') #add old/new status of each item
-ret_all <- as.data.frame(sapply(ret_all, function(x) gsub("Lure-", "", x)), stringsAsFactors = FALSE) #get rid of 'Lure-' prefix
+ret_all$old <- as.numeric(substr(ret_all$category, 1,4) != 'Lure') #add old/new status of each item
+ret_all$category <- sapply(ret_all$category, function(x) gsub("Lure-", "", x)) #get rid of 'Lure-' prefix
 ret_all$vigfile[ret_all$vigfile == ''] = NA
 names(ret_all)[8]<-"retrieval_RT"
 
@@ -116,7 +117,7 @@ data <- merge(ret, encoding_behav, by=c('subID', 'vigfile'), all.x = TRUE) # con
 #sort(as.numeric(levels(as.factor(all_surveys$subID))))
 dataN = length(levels(as.factor(data$subID)))
 dataSubs = sort(as.numeric(levels(as.factor(data$subID))))
-qualtricsSubs = sort(as.numeric(levels(as.factor(all_surveys$subID))))
+#qualtricsSubs = sort(as.numeric(levels(as.factor(all_surveys$subID))))
 
 # homogenize variable names
 data$category[data$category == "SN"] <- "Social-Norms"
@@ -177,11 +178,16 @@ data$correct <- as.numeric((!is.na(data$text_response) & data$text_response == d
 # convert RTs & moral judgment to numeric
 RT_cols <- c(9,11,15)
 data[, RT_cols] <- data %>% select(ends_with('RT')) %>% sapply(as.numeric)
-data <- data %>% filter(retrieval_RT != 0)
-data <- data %>% filter(confRT != 0)
-data$moral_decision <- as.numeric(data$moral_decision)
-data$confresp <- as.numeric(data$confresp)
-data_old <- subset(data, old == '1')
+data <- data %>% filter(retrieval_RT > 0.25) %>%
+  filter(confRT > 0.25) %>%
+  mutate(moral_decision=as.numeric(moral_decision),
+         confresp=as.numeric(confresp),
+         category=factor(category, levels=c('Social Norms', 'Liberty', 
+                                               'Authority', 'Loyalty', 'Purity', 
+                                               'Care-Emo', 'Care-Phys', 'Fairness')),
+         old=factor(old, levels = c('1', '0')))
+
+data_old <- subset(data, old == '1', retrieval_RT > 0.25)
 
 # make column for calculating corrected recognition
 #data$SDT[data$old == 1 & data$correct == 1] = 'hit'
@@ -192,6 +198,235 @@ data_old <- subset(data, old == '1')
 # make column for coding high vs. low confidence
 #data$high_conf[data$confresp == 1 | data$confresp == 2] = 0
 #data$high_conf[data$confresp == 3 | data$confresp == 4] = 1
+
+```
+
+# Analyses: Linear Mixed Models
+## Moral Judgments
+```{r, fig.width=5, fig.height=5}
+
+# look at spread of moral judgement
+ggplot(data_old, aes(x=moral_decision, color=category, fill=category)) +
+  geom_bar() + 
+  facet_wrap(~category, nrow=2) + 
+  ggtitle('Distribution of Moral Judgments') +
+  xlab('1=not morally wrong, 4=extremely morally wrong')
+
+# make plot comparing to moral responses observed in Clifford et al
+category_means <- data_old %>% 
+  mutate(category=factor(category, levels = c('Care-Emo', 'Care-Phys', 'Fairness', 
+                                              'Loyalty', 'Authority', 'Purity', 'Liberty', 'Social Norms'))) %>% 
+  group_by(category, subID) %>% summarise(mean = mean(as.integer(moral_decision))) 
+ggplot(category_means, aes(x=category, y=mean, color=category, fill=category)) +
+  stat_summary(fun.y = mean, geom='bar') +
+  stat_summary(fun.data=mean_se, fun.args = list(mult=1.96), geom='errorbar', color='black', size=0.5, width=0.5) +
+  coord_flip() +
+  ggtitle('Visual comparison to Clifford et al. (2015)')
+
+
+# linear mixed effect model
+modelMoral <- lmer(moral_decision ~ category + (1 | subID) + (1|vigfile), data = data_old, control=lmerControl(optCtrl = list(maxeval=5000))) 
+summary(modelMoral)
+##sjt.lmer(modelMoral)
+
+# plot estimated marginal means
+emmeans(modelMoral, ~ category) %>% as.data.frame() %>% 
+  ggplot(aes(x=category, y=emmean)) + ylim(1,4) + ylab('Estimated marginal mean') +
+  geom_violin(data=data_old, mapping=aes(y=moral_decision, fill=superordinate), alpha=0.7, bw=0.45) + 
+  geom_pointrange(aes(ymin=lower.CL, ymax=upper.CL), alpha=1, fatten=5, color='black') +
+  ggtitle('Model estimates: moral judgment')
+
+superordinateContrasts <- list(LibertyVsSocial=c(-1, 1, 0, 0, 0, 0, 0, 0),
+                BindingVsSocial=c(-1, 0, 1/3, 1/3, 1/3, 0, 0, 0),
+                IndividualizingVsSocial=c(-1, 0, 0, 0, 0, 1/3, 1/3, 1/3),
+                LibertyVsBinding=c(0, -1, 1/3, 1/3, 1/3, 0, 0, 0),
+                LibertyVsIndividualizing=c(0, -1, 0, 0, 0, 1/3, 1/3, 1/3),
+                BindingVsIndividualizing=c(0, 0, -1/3, -1/3, -1/3, 1/3, 1/3, 1/3))
+
+# superordinate contrasts
+emmeans(modelMoral, ~ category) %>%
+  contrast(superordinateContrasts, adjust='bonferroni')
+
+```
+
+### Reaction time
+```{r}
+
+# visualize
+hist(data_old$encoding_RT, breaks = 100)
+# test for normality
+shapiro.test(data_old$encoding_RT) # failed :(
+# log transform
+data_old <- data_old %>% mutate(log_moral_RT = log(encoding_RT))
+hist(data_old$log_moral_RT, breaks = 100)
+shapiro.test(data_old$log_moral_RT)
+
+modelMoralRT <- lmer(encoding_RT ~ category + (1 | subID) + (1 | vigfile), data=data_old)
+summary(modelMoralRT)
+
+# plot
+modelMoralRT %>% emmeans(~ category) %>% as.data.frame() %>% 
+  ggplot(aes(x=category, y=emmean)) +
+  geom_violin(data=data_old, mapping=aes(y=encoding_RT, fill = superordinate, color=superordinate), alpha=0.7) +
+  geom_pointrange(aes(ymax=upper.CL, ymin=lower.CL), alpha=1, fatten=3, color = 'black', size=1) +
+  ylab('Reaction time (seconds)') +
+  ggtitle('Moral judgment reaction time (model estimates + raw data)') 
+
+modelMoralRT %>% emmeans(~ category) %>% as.data.frame() %>% 
+  ggplot(aes(x=category, y=emmean)) +
+  geom_pointrange(aes(ymax=upper.CL, ymin=lower.CL, color=category), alpha=1, fatten=8) +
+  ylab('Reaction time (seconds)') +
+  ggtitle('Moral judgment reaction time (model estimates only)') 
+
+```
+
+## Memory
+### Accuracy (hits & correct rejections)
+```{r, fig.width=15, fig.height=8}
+
+# generalized linear mixed effect model (outcome is binary)
+modelMemory <- glmer(correct ~ category + old + (1 + category | subID),
+                 data=data, family=binomial(link = 'logit'), control=glmerControl(optCtrl=list(maxfun=50000)))
+summary(modelMemory)
+
+# plotting prep
+data <- data %>% group_by(subID, category, old) %>% mutate(propCorrect = mean(correct)) # so that violin plots can reflect participant response densities
+memLabels <- c('0' = "New", '1' = 'Old') # labels for faceting 
+
+# plot
+modelMemory %>% emmeans(~ category * old, type='response') %>% as.data.frame %>%
+  mutate(fct_relevel(category, c('Authority', 'Loyalty', 'Purity', 'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty', 'Social Norms'))) %>%
+  ggplot(aes(x=category, y=prob)) +
+  facet_grid(.~old, labeller = labeller(old=memLabels)) +
+  geom_violin(aes(x=category, y=propCorrect, color=superordinate, fill=superordinate), data=data, alpha=0.7, scale='count') +
+  geom_pointrange(aes(ymax=asymp.LCL, ymin=asymp.UCL), alpha=1, fatten=5, color='black') +
+  theme(strip.text.x = element_text(size=10, face='bold')) +
+  ylab('Estimated probability of correct response') +
+  ggtitle('Memory accuracy (hits & correct rejections)') 
+
+# superordinate contrasts
+emmeans(modelMemory, ~ category) %>%
+  contrast(superordinateContrasts, adjust='bonferroni')
+
+```
+
+### Reaction Time
+```{r}
+
+data_old$category <- factor(data_old$category, levels = c('Social Norms', 'Authority', 'Loyalty', 'Purity', 
+                                    'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty'))
+
+data <- data %>%
+  filter(retrieval_RT > 0.02) %>%
+  mutate(log_retrieval_RT=log(retrieval_RT))
+
+# analyze
+modelRetRT <- lmer(log_retrieval_RT ~ category * correct * old + (1 | subID) + (1 | vigfile), data=data)
+summary(modelRetRT)
+
+# plot
+modelRetRT %>% emmeans(~ category * correct * old) %>% as.data.frame() %>% 
+  ggplot(aes(x=category, y=exp(emmean))) +
+  facet_grid(. ~ old, labeller = (old=as_labeller(memLabels))) +
+  geom_pointrange(aes(ymax=exp(asymp.LCL), ymin=exp(asymp.UCL), color=correct), alpha=1, fatten=5, position=position_dodge(0.5))+
+  scale_color_manual(values = c("deepskyblue4", "goldenrod1")) +
+  theme(strip.text.x = element_text(size=10, face='bold'), strip.text.y = element_text(size=10, face='bold')) +
+  ylab('Reaction time (seconds)') +
+  ggtitle('Retrieval reaction time') 
+
+```
+
+### Confidence
+```{r, fig.width=8, fig.height=4}
+
+data$correct <- as.factor(data$correct)
+confLabels <- c('1' = 'Correct', '0' = 'Incorrect')
+data <- data %>% group_by(subID, category, old, correct) %>% mutate(averageConf = mean(confresp))
+data$category <- factor(data$category, levels = c('Social Norms', 'Authority', 'Loyalty', 'Purity', 
+                                    'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty'))
+
+# explore spread
+ggplot(data, aes(x=confresp, fill=category)) +
+  geom_bar() + 
+  facet_grid(old~category, labeller = labeller(old=memLabels)) + 
+  ggtitle('Distribution of Confidence judgments in each category') +
+  xlab('1=not confident at all, 4=extremely confident')
+
+ggplot(data, aes(x=confresp, color=category, fill=category)) +
+  geom_bar() + 
+  facet_grid(correct~category, labeller = labeller(correct=confLabels)) + 
+  ggtitle('Distribution of Confidence Judgments by Accuracy') +
+  xlab('1=not confident at all, 4=extremely confident')
+
+# run model
+modelConfidence <- lmer(confresp ~ category + old + correct + (1 + category | subID), data=data,
+                        control=lmerControl(optCtrl = list(maxeval=5000)))
+summary(modelConfidence)
+
+# plot
+modelConfidence %>% emmeans(~ category * old * correct, type='response') %>% as.data.frame %>%
+  mutate(fct_relevel(category, c('Authority', 'Loyalty', 'Purity', 'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty', 'Social Norms'))) %>%
+  ggplot(aes(x=category, y=emmean)) +
+  facet_wrap(. ~ old, labeller = (old=as_labeller(memLabels))) +
+  geom_violin(aes(x=category, y=averageConf, fill=superordinate, group=interaction(category,correct)), data=data, alpha=0.7, scale='count', bw=0.4, position = position_dodge(1)) +
+  geom_pointrange(aes(ymax=asymp.LCL, ymin=asymp.UCL, color=correct), alpha=1, fatten=3, position=position_dodge(1)) + scale_color_manual(values = c("white", "black")) +
+  theme(strip.text.x = element_text(size=10, face='bold'), strip.text.y = element_text(size=10, face='bold')) +
+  ylab('Estimated mean confidence') +
+  ggtitle('Memory confidence') 
+
+```
+
+####Reaction Time
+```{r}
+
+# visualize spread
+hist(data$confRT)
+data <- data %>% 
+  filter(confRT > 0.01) %>%
+  mutate(log_conf_RT=log(confRT))
+
+
+
+
+```
+
+``` {r}
+## some handy commands
+# exp(fixef(modelOld1)): transforms model output from log likelihood to odds ratio
+# anova(modelOld1, modelOld2): use for model comparisons [**don't look at the output of either model; use the results of this comparison to guide your result-seeking**]
+# emmeans(modelNew, pairwise ~ category): gives you marginal means for each level of the fixed effect factor & pairwise comparisons among levels of the factor
+# emmeans(modelNew, 'category', type='response'): gives you probabilities for each level of the fixed effect factor
+# emmeans(modelOld1, pairwise ~ category, lmer.df = "satterthwaite"): gives you probabilities for each fixed effect and odds ratios + p-values for pairwise comparisons among levels of the fixed effect factor
+
+# ggplot(category_means, aes(x=category, y=mean, color=category, fill=category)) +
+#   geom_violin(scale='count', alpha=0.5) +
+#   stat_summary(fun.data = mean_se, fun.args = list(mult = 1.96), geom='pointrange', color='black', fatten=5) +
+#   ggtitle('Mean moral judgment per category')
+
+# test for meeting assumption of proportional odds
+# data_old$category <-  factor(data_old$category, levels = c('Social Norms', 'Care-Emo', 'Care-Phys', 'Fairness', 'Loyalty', 'Authority', 'Purity', 'Liberty')) # re-level category so that Social Norms is the intercept
+# modelMoral.clm <- clm(moral_decision ~ category + subID, data = data_old)
+# nominal_test(modelMoral.clm)
+# scale_test(modelMoral.clm) # failed both tests (highly significant, p < 2.2e-16)
+
+# partial proportional odds using vcrpart -- didn't fit
+# modelMoral.olmm <- olmm(as.factor(moral_decision) ~ ce(category) + re(1 + category | subID), data = data_old, 
+#                         family = cumulative(link = 'logit'))
+
+# partial proportional odds using mixor -- didn't fit
+# modelMoral.mix <- mixor(moral_decision ~ category, data = data_old, id = subID, KG=1, link = 'logit')
+
+# Bayesian Generalized Linear Multivariate Multilevel Model (probably not gonna use but keeping the code here just in case)
+# modelMoral <- brm(moral_decision ~ category + (1 + category | subID) + (1 | vigfile), 
+#                   family=cumulative(link="logit", threshold="flexible"), data=data_old, cores=4, file='mftMoralDecision')
+# summary(modelMoral)
+# conditional_effects(modelMoral)
+# conditional_effects(modelMoral, categorical=TRUE)
+
+
+# modelRetRT2 <- glmer(retrieval_RT ~ category + (1 | subID) + (1 | vigfile), data=data_old, family = Gamma(link='logit'))
+# 
+# modelRetRT3 <- glmer(retrieval_RT ~ category + (1 | subID) + (1 | vigfile), data=data_old, family = inverse.gaussian(link = 'logit'), start=list(rho=0.5))
 
 ```
 
@@ -338,203 +573,5 @@ data_old <- subset(data, old == '1')
 # data$socially_conservative[data$SocialConservatism < 50] = 0
 # data$fiscally_conservative[data$EconomicConservatism > 50] = 1
 # data$fiscally_conservative[data$EconomicConservatism < 50] = 0
-
-```
-
-# Analyses: Linear Mixed Models
-## Moral Judgments
-```{r, fig.width=5, fig.height=5}
-
-# look at spread of moral judgement
-ggplot(data_old, aes(x=moral_decision, color=category, fill=category)) +
-  geom_bar() + 
-  facet_wrap(~category, nrow=2) + 
-  ggtitle('Distribution of Moral Judgments') +
-  xlab('1=not morally wrong, 4=extremely morally wrong')
-
-# make plot comparing to moral responses observed in Clifford et al
-data_old$category <-  factor(data_old$category, levels = c('Care-Emo', 'Care-Phys', 'Fairness', 'Loyalty', 'Authority', 'Purity', 'Liberty', 'Social Norms'))
-category_means <- data_old %>% group_by(category, subID) %>% summarise(mean = mean(as.integer(moral_decision))) 
-ggplot(category_means, aes(x=category, y=mean, color=category, fill=category)) +
-  stat_summary(fun.y = mean, geom='bar') +
-  stat_summary(fun.data=mean_se, fun.args = list(mult=1.96), geom='errorbar', color='black', size=0.5, width=0.5) +
-  coord_flip() +
-  ggtitle('Visual comparison to Clifford et al. (2015)')
-
-
-# linear mixed effect model
-modelMoral <- lmer(moral_decision ~ category + (1 | subID) + (1|vigfile), data = data_old, control=lmerControl(optCtrl = list(maxeval=5000))) 
-summary(modelMoral)
-sjt.lmer(modelMoral)
-
-# plot estimated marginal means
-emmeans(modelMoral, ~ category) %>% as.data.frame() %>% 
-  mutate(fct_relevel(category, c('Authority', 'Loyalty', 'Purity', 'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty', 'Social Norms'))) %>%
-  ggplot(aes(x=category, y=emmean)) + ylim(1,4) + ylab('Estimated marginal mean') +
-  geom_violin(data=data_old, mapping=aes(y=moral_decision, fill=superordinate), alpha=0.7, bw=0.45) + 
-  geom_pointrange(aes(ymin=asymp.LCL, ymax=asymp.UCL), alpha=1, fatten=5, color='black') +
-  ggtitle('Model estimates: moral judgment') 
-
-```
-
-### Reaction time
-```{r}
-
-# visualize
-hist(data_old$encoding_RT)
-data_old <- data_old %>% filter(encoding_RT > 0.01)
-
-modelMoralRT <- lmer(encoding_RT ~ category + (1 | subID) + (1 | vigfile), data=data_old)
-summary(modelMoralRT)
-
-# plot
-modelMoralRT %>% emmeans(~ category) %>% as.data.frame() %>% 
-  ggplot(aes(x=category, y=emmean)) +
-  geom_violin(data=data_old, mapping=aes(y=encoding_RT, fill = category, color=category), alpha=0.7) +
-  geom_pointrange(aes(ymax=asymp.LCL, ymin=asymp.UCL), alpha=1, fatten=3, color = 'black', size=1) +
-  ylab('Reaction time (seconds)') +
-  ggtitle('Moral judgment reaction time (model estimates + raw data)') 
-
-modelMoralRT %>% emmeans(~ category) %>% as.data.frame() %>% 
-  ggplot(aes(x=category, y=emmean)) +
-  geom_pointrange(aes(ymax=asymp.LCL, ymin=asymp.UCL, color=category), alpha=1, fatten=8) +
-  ylab('Reaction time (seconds)') +
-  ggtitle('Moral judgment reaction time (model estimates only)') 
-
-```
-
-## Memory
-### Accuracy (hits & correct rejections)
-```{r, fig.width=15, fig.height=8}
-
-# generalized linear mixed effect model (outcome is binary)
-modelMemory <- glmer(correct ~ category + old + (1 + category | subID),
-                 data=data, family=binomial(link = 'logit'), control=glmerControl(optCtrl=list(maxfun=50000)))
-summary(modelMemory)
-
-# plotting prep
-data <- data %>% group_by(subID, category, old) %>% mutate(propCorrect = mean(correct)) # so that violin plots can reflect participant response densities
-memLabels <- c('0' = "New", '1' = 'Old') # labels for faceting 
-
-modelMemory %>% emmeans(~ category * old, type='response') %>% as.data.frame %>%
-  mutate(fct_relevel(category, c('Authority', 'Loyalty', 'Purity', 'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty', 'Social Norms'))) %>%
-  ggplot(aes(x=category, y=prob)) +
-  facet_grid(.~old, labeller = labeller(old=memLabels)) +
-  geom_violin(aes(x=category, y=propCorrect, color=superordinate, fill=superordinate), data=data, alpha=0.7, scale='count') +
-  geom_pointrange(aes(ymax=asymp.LCL, ymin=asymp.UCL), alpha=1, fatten=5, color='black') +
-  theme(strip.text.x = element_text(size=10, face='bold')) +
-  ylab('Estimated probability of correct response') +
-  ggtitle('Memory accuracy (hits & correct rejections)') 
-
-# predicting accuracy using category
-accuracyOdds <- exp(fixef(modelAccuracy))
-accuracyContrasts <- emmeans(modelAccuracy, pairwise ~ category)
-
-
-```
-
-### Reaction Time
-```{r}
-
-data_old$category <- factor(data_old$category, levels = c('Social Norms', 'Authority', 'Loyalty', 'Purity', 
-                                    'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty'))
-
-data <- data %>%
-  filter(retrieval_RT > 0.02) %>%
-  mutate(log_retrieval_RT=log(retrieval_RT))
-
-# analyze
-modelRetRT <- lmer(log_retrieval_RT ~ category * correct * old + (1 | subID) + (1 | vigfile), data=data)
-summary(modelRetRT)
-
-# plot
-modelRetRT %>% emmeans(~ category * correct * old) %>% as.data.frame() %>% 
-  ggplot(aes(x=category, y=exp(emmean))) +
-  facet_grid(. ~ old, labeller = (old=as_labeller(memLabels))) +
-  geom_pointrange(aes(ymax=exp(asymp.LCL), ymin=exp(asymp.UCL), color=correct), alpha=1, fatten=5, position=position_dodge(0.5))+
-  scale_color_manual(values = c("deepskyblue4", "goldenrod1")) +
-  theme(strip.text.x = element_text(size=10, face='bold'), strip.text.y = element_text(size=10, face='bold')) +
-  ylab('Reaction time (seconds)') +
-  ggtitle('Retrieval reaction time') 
-
-```
-
-### Confidence
-```{r, fig.width=8, fig.height=4}
-
-data$correct <- as.factor(data$correct)
-confLabels <- c('1' = 'Correct', '0' = 'Incorrect')
-data <- data %>% group_by(subID, category, old, correct) %>% mutate(averageConf = mean(confresp))
-data$category <- factor(data$category, levels = c('Social Norms', 'Authority', 'Loyalty', 'Purity', 
-                                    'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty'))
-
-# explore spread
-ggplot(data, aes(x=confresp, fill=category)) +
-  geom_bar() + 
-  facet_grid(old~category, labeller = labeller(old=memLabels)) + 
-  ggtitle('Distribution of Confidence judgments in each category') +
-  xlab('1=not confident at all, 4=extremely confident')
-
-ggplot(data, aes(x=confresp, color=category, fill=category)) +
-  geom_bar() + 
-  facet_grid(correct~category, labeller = labeller(correct=confLabels)) + 
-  ggtitle('Distribution of Confidence Judgments by Accuracy') +
-  xlab('1=not confident at all, 4=extremely confident')
-
-# run model
-modelConfidence <- lmer(confresp ~ category + old + correct + (1 + category | subID), data=data,
-                        control=lmerControl(optCtrl = list(maxeval=5000)))
-summary(modelConfidence)
-
-# plot
-modelConfidence %>% emmeans(~ category * old * correct, type='response') %>% as.data.frame %>%
-  mutate(fct_relevel(category, c('Authority', 'Loyalty', 'Purity', 'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty', 'Social Norms'))) %>%
-  ggplot(aes(x=category, y=emmean)) +
-  facet_wrap(. ~ old, labeller = (old=as_labeller(memLabels))) +
-  geom_violin(aes(x=category, y=averageConf, fill=superordinate, group=interaction(category,correct)), data=data, alpha=0.7, scale='count', bw=0.4, position = position_dodge(1)) +
-  geom_pointrange(aes(ymax=asymp.LCL, ymin=asymp.UCL, color=correct), alpha=1, fatten=3, position=position_dodge(1)) + scale_color_manual(values = c("white", "black")) +
-  theme(strip.text.x = element_text(size=10, face='bold'), strip.text.y = element_text(size=10, face='bold')) +
-  ylab('Estimated mean confidence') +
-  ggtitle('Memory confidence') 
-
-```
-
-``` {r}
-## some handy commands
-# exp(fixef(modelOld1)): transforms model output from log likelihood to odds ratio
-# anova(modelOld1, modelOld2): use for model comparisons [**don't look at the output of either model; use the results of this comparison to guide your result-seeking**]
-# emmeans(modelNew, pairwise ~ category): gives you marginal means for each level of the fixed effect factor & pairwise comparisons among levels of the factor
-# emmeans(modelNew, 'category', type='response'): gives you probabilities for each level of the fixed effect factor
-# emmeans(modelOld1, pairwise ~ category, lmer.df = "satterthwaite"): gives you probabilities for each fixed effect and odds ratios + p-values for pairwise comparisons among levels of the fixed effect factor
-
-# ggplot(category_means, aes(x=category, y=mean, color=category, fill=category)) +
-#   geom_violin(scale='count', alpha=0.5) +
-#   stat_summary(fun.data = mean_se, fun.args = list(mult = 1.96), geom='pointrange', color='black', fatten=5) +
-#   ggtitle('Mean moral judgment per category')
-
-# test for meeting assumption of proportional odds
-# data_old$category <-  factor(data_old$category, levels = c('Social Norms', 'Care-Emo', 'Care-Phys', 'Fairness', 'Loyalty', 'Authority', 'Purity', 'Liberty')) # re-level category so that Social Norms is the intercept
-# modelMoral.clm <- clm(moral_decision ~ category + subID, data = data_old)
-# nominal_test(modelMoral.clm)
-# scale_test(modelMoral.clm) # failed both tests (highly significant, p < 2.2e-16)
-
-# partial proportional odds using vcrpart -- didn't fit
-# modelMoral.olmm <- olmm(as.factor(moral_decision) ~ ce(category) + re(1 + category | subID), data = data_old, 
-#                         family = cumulative(link = 'logit'))
-
-# partial proportional odds using mixor -- didn't fit
-# modelMoral.mix <- mixor(moral_decision ~ category, data = data_old, id = subID, KG=1, link = 'logit')
-
-# Bayesian Generalized Linear Multivariate Multilevel Model (probably not gonna use but keeping the code here just in case)
-# modelMoral <- brm(moral_decision ~ category + (1 + category | subID) + (1 | vigfile), 
-#                   family=cumulative(link="logit", threshold="flexible"), data=data_old, cores=4, file='mftMoralDecision')
-# summary(modelMoral)
-# conditional_effects(modelMoral)
-# conditional_effects(modelMoral, categorical=TRUE)
-
-
-# modelRetRT2 <- glmer(retrieval_RT ~ category + (1 | subID) + (1 | vigfile), data=data_old, family = Gamma(link='logit'))
-# 
-# modelRetRT3 <- glmer(retrieval_RT ~ category + (1 | subID) + (1 | vigfile), data=data_old, family = inverse.gaussian(link = 'logit'), start=list(rho=0.5))
 
 ```
