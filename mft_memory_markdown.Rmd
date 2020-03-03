@@ -34,6 +34,8 @@ library(mixor)
 library(vcrpart)
 library(brms)
 library(pracma)
+library(forcats)
+library(sjPlot)
 se <- function(x) sqrt(var(x)/length(x))
 `%notin%` <- Negate(`%in%`)
 ```
@@ -174,7 +176,10 @@ data$correct <- as.numeric((!is.na(data$text_response) & data$text_response == d
 # convert RTs & moral judgment to numeric
 RT_cols <- c(9,11,15)
 data[, RT_cols] <- data %>% select(ends_with('RT')) %>% sapply(as.numeric)
+data <- data %>% filter(retrieval_RT != 0)
+data <- data %>% filter(confRT != 0)
 data$moral_decision <- as.numeric(data$moral_decision)
+data$confresp <- as.numeric(data$confresp)
 data_old <- subset(data, old == '1')
 
 # make column for calculating corrected recognition
@@ -340,7 +345,6 @@ data_old <- subset(data, old == '1')
 ```{r, fig.width=5, fig.height=5}
 
 # look at spread of moral judgement
-hist(data$moral_decision, xlim = c(1,5))
 ggplot(data_old, aes(x=moral_decision, color=category, fill=category)) +
   geom_bar() + 
   facet_wrap(~category, nrow=2) + 
@@ -358,11 +362,13 @@ ggplot(category_means, aes(x=category, y=mean, color=category, fill=category)) +
 
 
 # linear mixed effect model
-modelMoral <- lmer(moral_decision ~ category + (1 | subID) + (1|vigfile), data = data_old, control=lmerControl(optCtrl = list(maxeval=5000)))
+modelMoral <- lmer(moral_decision ~ category + (1 | subID) + (1|vigfile), data = data_old, control=lmerControl(optCtrl = list(maxeval=5000))) 
 summary(modelMoral)
+sjt.lmer(modelMoral)
 
 # plot estimated marginal means
 emmeans(modelMoral, ~ category) %>% as.data.frame() %>% 
+  mutate(fct_relevel(category, c('Authority', 'Loyalty', 'Purity', 'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty', 'Social Norms'))) %>%
   ggplot(aes(x=category, y=emmean)) + ylim(1,4) + ylab('Estimated marginal mean') +
   geom_violin(data=data_old, mapping=aes(y=moral_decision, fill=superordinate), alpha=0.7, bw=0.45) + 
   geom_pointrange(aes(ymin=asymp.LCL, ymax=asymp.UCL), alpha=1, fatten=5, color='black') +
@@ -384,13 +390,18 @@ modelMemory <- glmer(correct ~ category + old + (1 + category | subID),
                  data=data, family=binomial(link = 'logit'), control=glmerControl(optCtrl=list(maxfun=50000)))
 summary(modelMemory)
 
-# plot
+# plotting prep
 data <- data %>% group_by(subID, category, old) %>% mutate(propCorrect = mean(correct)) # so that violin plots can reflect participant response densities
+memLabels <- c('0' = "New", '1' = 'Old') # labels for faceting 
+
 modelMemory %>% emmeans(~ category * old, type='response') %>% as.data.frame %>%
+  mutate(fct_relevel(category, c('Authority', 'Loyalty', 'Purity', 'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty', 'Social Norms'))) %>%
   ggplot(aes(x=category, y=prob)) +
-  facet_wrap(~old, nrow=2) +
+  facet_grid(.~old, labeller = labeller(old=memLabels)) +
   geom_violin(aes(x=category, y=propCorrect, color=superordinate, fill=superordinate), data=data, alpha=0.7, scale='count') +
   geom_pointrange(aes(ymax=asymp.LCL, ymin=asymp.UCL), alpha=1, fatten=5, color='black') +
+  theme(strip.text.x = element_text(size=10, face='bold')) +
+  ylab('Estimated probability of correct response') +
   ggtitle('Memory accuracy (hits & correct rejections)') 
 
 # predicting accuracy using category
@@ -408,9 +419,9 @@ data_old <- data_old %>%
   mutate(log_retrieval_RT=log(retrieval_RT))
 modelRetRT <- lmer(log_retrieval_RT ~ category + (1 | subID) + (1 | vigfile), data=data_old)
 
-modelRetRT2 <- glmer(retrieval_RT ~ category + (1 | subID) + (1 | vigfile), data=data_old, family = Gamma(link='identity'), start=list(rho=0))
+modelRetRT2 <- glmer(retrieval_RT ~ category + (1 | subID) + (1 | vigfile), data=data_old, family = Gamma(link='logit'))
 
-modelRetRT3 <- glmer(retrieval_RT ~ category + (1 | subID) + (1 | vigfile), data=data_old, family = inverse.gaussian(link = 'identity'), start=list(rho=0))
+modelRetRT3 <- glmer(retrieval_RT ~ category + (1 | subID) + (1 | vigfile), data=data_old, family = inverse.gaussian(link = 'logit'), start=list(rho=0.5))
 
 
 ```
@@ -418,6 +429,38 @@ modelRetRT3 <- glmer(retrieval_RT ~ category + (1 | subID) + (1 | vigfile), data
 ### Confidence
 ```{r, fig.width=8, fig.height=4}
 
+data$correct <- as.factor(data$correct)
+confLabels <- c('1' = 'Correct', '0' = 'Incorrect')
+data <- data %>% group_by(subID, category, old, correct) %>% mutate(averageConf = mean(confresp))
+
+# explore spread
+ggplot(data, aes(x=confresp, color=category, fill=category)) +
+  geom_bar() + 
+  facet_grid(old~category, labeller = labeller(old=memLabels)) + 
+  ggtitle('Distribution of Confidence Judgments by Old/New') +
+  xlab('1=not confident at all, 4=extremely confident')
+
+ggplot(data, aes(x=confresp, color=category, fill=category)) +
+  geom_bar() + 
+  facet_grid(correct~category, labeller = labeller(correct=confLabels)) + 
+  ggtitle('Distribution of Confidence Judgments by Accuracy') +
+  xlab('1=not confident at all, 4=extremely confident')
+
+# run model
+modelConfidence <- lmer(confresp ~ category + old + correct + (1 + category | subID), data=data,
+                        control=lmerControl(optCtrl = list(maxeval=5000)))
+summary(modelConfidence)
+
+# plot
+modelConfidence %>% emmeans(~ category * old * correct, type='response') %>% as.data.frame %>%
+  mutate(fct_relevel(category, c('Authority', 'Loyalty', 'Purity', 'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty', 'Social Norms'))) %>%
+  ggplot(aes(x=category, y=emmean)) +
+  facet_grid(correct~old, labeller = labeller(correct=as_labeller(confLabels), old=as_labeller(memLabels))) +
+  geom_violin(aes(x=category, y=averageConf, color=superordinate, fill=superordinate), data=data, alpha=0.7, scale='count', bw=0.35) +
+  geom_pointrange(aes(ymax=asymp.LCL, ymin=asymp.UCL), alpha=1, fatten=2, color='black') +
+  theme(strip.text.x = element_text(size=10, face='bold')) +
+  ylab('Estimated mean confidence') +
+  ggtitle('Memory confidence') 
 
 ```
 
