@@ -36,6 +36,7 @@ library(brms)
 library(pracma)
 library(forcats)
 library(sjPlot)
+library(RColorBrewer)
 se <- function(x) sqrt(var(x)/length(x))
 `%notin%` <- Negate(`%in%`)
 ```
@@ -379,6 +380,27 @@ emmeans(modelMoral, ~ category) %>% as.data.frame() %>%
 ### Reaction time
 ```{r}
 
+# visualize
+hist(data_old$encoding_RT)
+data_old <- data_old %>% filter(encoding_RT > 0.01)
+
+modelMoralRT <- lmer(encoding_RT ~ category + (1 | subID) + (1 | vigfile), data=data_old)
+summary(modelMoralRT)
+
+# plot
+modelMoralRT %>% emmeans(~ category) %>% as.data.frame() %>% 
+  ggplot(aes(x=category, y=emmean)) +
+  geom_violin(data=data_old, mapping=aes(y=encoding_RT, fill = category, color=category), alpha=0.7) +
+  geom_pointrange(aes(ymax=asymp.LCL, ymin=asymp.UCL), alpha=1, fatten=3, color = 'black', size=1) +
+  ylab('Reaction time (seconds)') +
+  ggtitle('Moral judgment reaction time (model estimates + raw data)') 
+
+modelMoralRT %>% emmeans(~ category) %>% as.data.frame() %>% 
+  ggplot(aes(x=category, y=emmean)) +
+  geom_pointrange(aes(ymax=asymp.LCL, ymin=asymp.UCL, color=category), alpha=1, fatten=8) +
+  ylab('Reaction time (seconds)') +
+  ggtitle('Moral judgment reaction time (model estimates only)') 
+
 ```
 
 ## Memory
@@ -414,15 +436,26 @@ accuracyContrasts <- emmeans(modelAccuracy, pairwise ~ category)
 ### Reaction Time
 ```{r}
 
-data_old <- data_old %>%
+data_old$category <- factor(data_old$category, levels = c('Social Norms', 'Authority', 'Loyalty', 'Purity', 
+                                    'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty'))
+
+data <- data %>%
   filter(retrieval_RT > 0.02) %>%
   mutate(log_retrieval_RT=log(retrieval_RT))
-modelRetRT <- lmer(log_retrieval_RT ~ category + (1 | subID) + (1 | vigfile), data=data_old)
 
-modelRetRT2 <- glmer(retrieval_RT ~ category + (1 | subID) + (1 | vigfile), data=data_old, family = Gamma(link='logit'))
+# analyze
+modelRetRT <- lmer(log_retrieval_RT ~ category * correct * old + (1 | subID) + (1 | vigfile), data=data)
+summary(modelRetRT)
 
-modelRetRT3 <- glmer(retrieval_RT ~ category + (1 | subID) + (1 | vigfile), data=data_old, family = inverse.gaussian(link = 'logit'), start=list(rho=0.5))
-
+# plot
+modelRetRT %>% emmeans(~ category * correct * old) %>% as.data.frame() %>% 
+  ggplot(aes(x=category, y=exp(emmean))) +
+  facet_grid(. ~ old, labeller = (old=as_labeller(memLabels))) +
+  geom_pointrange(aes(ymax=exp(asymp.LCL), ymin=exp(asymp.UCL), color=correct), alpha=1, fatten=5, position=position_dodge(0.5))+
+  scale_color_manual(values = c("deepskyblue4", "goldenrod1")) +
+  theme(strip.text.x = element_text(size=10, face='bold'), strip.text.y = element_text(size=10, face='bold')) +
+  ylab('Reaction time (seconds)') +
+  ggtitle('Retrieval reaction time') 
 
 ```
 
@@ -432,12 +465,14 @@ modelRetRT3 <- glmer(retrieval_RT ~ category + (1 | subID) + (1 | vigfile), data
 data$correct <- as.factor(data$correct)
 confLabels <- c('1' = 'Correct', '0' = 'Incorrect')
 data <- data %>% group_by(subID, category, old, correct) %>% mutate(averageConf = mean(confresp))
+data$category <- factor(data$category, levels = c('Social Norms', 'Authority', 'Loyalty', 'Purity', 
+                                    'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty'))
 
 # explore spread
-ggplot(data, aes(x=confresp, color=category, fill=category)) +
+ggplot(data, aes(x=confresp, fill=category)) +
   geom_bar() + 
   facet_grid(old~category, labeller = labeller(old=memLabels)) + 
-  ggtitle('Distribution of Confidence Judgments by Old/New') +
+  ggtitle('Distribution of Confidence judgments in each category') +
   xlab('1=not confident at all, 4=extremely confident')
 
 ggplot(data, aes(x=confresp, color=category, fill=category)) +
@@ -455,10 +490,10 @@ summary(modelConfidence)
 modelConfidence %>% emmeans(~ category * old * correct, type='response') %>% as.data.frame %>%
   mutate(fct_relevel(category, c('Authority', 'Loyalty', 'Purity', 'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty', 'Social Norms'))) %>%
   ggplot(aes(x=category, y=emmean)) +
-  facet_grid(correct~old, labeller = labeller(correct=as_labeller(confLabels), old=as_labeller(memLabels))) +
-  geom_violin(aes(x=category, y=averageConf, color=superordinate, fill=superordinate), data=data, alpha=0.7, scale='count', bw=0.35) +
-  geom_pointrange(aes(ymax=asymp.LCL, ymin=asymp.UCL), alpha=1, fatten=2, color='black') +
-  theme(strip.text.x = element_text(size=10, face='bold')) +
+  facet_wrap(. ~ old, labeller = (old=as_labeller(memLabels))) +
+  geom_violin(aes(x=category, y=averageConf, fill=superordinate, group=interaction(category,correct)), data=data, alpha=0.7, scale='count', bw=0.4, position = position_dodge(1)) +
+  geom_pointrange(aes(ymax=asymp.LCL, ymin=asymp.UCL, color=correct), alpha=1, fatten=3, position=position_dodge(1)) + scale_color_manual(values = c("white", "black")) +
+  theme(strip.text.x = element_text(size=10, face='bold'), strip.text.y = element_text(size=10, face='bold')) +
   ylab('Estimated mean confidence') +
   ggtitle('Memory confidence') 
 
@@ -496,5 +531,10 @@ modelConfidence %>% emmeans(~ category * old * correct, type='response') %>% as.
 # summary(modelMoral)
 # conditional_effects(modelMoral)
 # conditional_effects(modelMoral, categorical=TRUE)
+
+
+# modelRetRT2 <- glmer(retrieval_RT ~ category + (1 | subID) + (1 | vigfile), data=data_old, family = Gamma(link='logit'))
+# 
+# modelRetRT3 <- glmer(retrieval_RT ~ category + (1 | subID) + (1 | vigfile), data=data_old, family = inverse.gaussian(link = 'logit'), start=list(rho=0.5))
 
 ```
