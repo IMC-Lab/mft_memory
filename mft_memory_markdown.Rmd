@@ -35,11 +35,11 @@ library(vcrpart)
 library(brms)
 library(pracma)
 library(forcats)
-library(sjPlot)
+#library(sjPlot)
 library(RColorBrewer)
 library(nortest)
 library(devtools)
-library(paletti)
+#library(paletti)
 library(showtext)
 se <- function(x) sqrt(var(x)/length(x))
 `%notin%` <- Negate(`%in%`)
@@ -201,7 +201,7 @@ MFT_color <- get_scale_color(get_pal(colors))
 font_add_google('Lato', 'Lato')
 font_add_google('Roboto', 'Roboto')
 showtext_auto()
-quartz()
+
 ```
 
 # Analyses: Linear Mixed Models
@@ -230,7 +230,6 @@ ggplot(category_means, aes(x=category, y=mean, color=category, fill=category)) +
 # linear mixed effect model
 modelMoral <- lmer(moral_decision ~ category + (1 | subID) + (1|vigfile), data = data_old, control=lmerControl(optCtrl = list(maxeval=5000))) 
 summary(modelMoral)
-##sjt.lmer(modelMoral)
 
 # plot estimated marginal means
 modelMoral_df <- as.data.frame(emmeans(modelMoral, ~ category))
@@ -240,7 +239,7 @@ ggplot(modelMoral_df, aes(x=category, y=emmean)) +
   labs(x = 'Foundation', y='Estimated marginal mean', fill='Foundation') +
   geom_violin(data=data_old, mapping=aes(y=moral_decision, fill=category), alpha=0.85, bw=0.4) + 
   geom_pointrange(aes(ymin=lower.CL, ymax=upper.CL), alpha=1, fatten=5, color='black') +
-  MFT_fill() + MFT_color() +
+  #MFT_fill() + MFT_color() +
   theme_pubr(legend = 'none', base_family = 'Lato') +
   theme(axis.title.x = element_text(size = 14),
         axis.title.y = element_text(size=14),
@@ -412,6 +411,23 @@ emmeans(modelMemory, ~ category) %>%
   contrast(superordinateContrasts, adjust='bonferroni')
 
 ```
+
+# Subsequent memory behavioral PLS
+```{r}
+
+envars <- names(encodingFull) %in% c('vignum', 'vigtext', 'trialstart_raw', 'trialstart_zeroed', 'trialdur', 
+                                     'ITI_start_raw', 'ITI_start_jittered', 'ITI_accuracy')
+encoding_behav_all <- encodingFull[!envars]
+encoding_behav_all <- filter(encoding_behav_all, vigfile != 99999)
+encodingEarly <- filter(encodingEarly, vigfile != ' vignette')
+#get rid of '.jpg' suffix
+encoding_behav_all <- as.data.frame(sapply(encoding_behav_all, function(x) gsub(".jpg", "", x)), stringsAsFactors = FALSE) 
+
+
+
+
+```
+
 
 ### Reaction Time
 ```{r}
