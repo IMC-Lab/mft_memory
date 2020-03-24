@@ -39,7 +39,7 @@ library(forcats)
 library(RColorBrewer)
 library(nortest)
 library(devtools)
-#library(paletti)
+library(paletti)
 library(showtext)
 se <- function(x) sqrt(var(x)/length(x))
 `%notin%` <- Negate(`%in%`)
@@ -52,8 +52,6 @@ emm_options(pbkrtest.limit = 4000)
 # load encoding data
 encodingfiles = list.files('data/encoding', full.names = TRUE, pattern = '.csv', recursive = FALSE)
 encodingFull = do.call(rbind, lapply(encodingfiles, function(x){read.csv(x, header = TRUE, stringsAsFactors = FALSE)}))
-earlyencodingfiles = list.files('data/encoding/old', full.names = TRUE, pattern = '.csv', recursive = FALSE)
-encodingEarly = do.call(rbind, lapply(earlyencodingfiles, function(x){read.csv(x, header = TRUE, stringsAsFactors = FALSE)}))
 
 # load retrieval data
 retfiles = list.files('data/retrieval', full.names = TRUE, pattern = '.csv', recursive = FALSE)
@@ -73,24 +71,14 @@ key <- read.csv('data/key.csv', stringsAsFactors = FALSE)
 
 # tidy encoding
 envars <- names(encodingFull) %in% c('run','pres_order','vignum','trialstart_raw','trialstart_zeroed','trialstart_TR','trialdur','intended_jitter','ITI_start_raw','ITI_start_zeroed','ITI_start_TR','ITI_duration','ITI_accuracy', 'foundation', 'vigtext') 
-encoding_behav_all <- encodingFull[!envars]
-encoding_behav_all <- filter(encoding_behav_all, vigfile != 99999)
-encodingEarly <- filter(encodingEarly, vigfile != ' vignette')
+encoding_behav <- encodingFull[!envars]
+encoding_behav <- filter(encoding_behav_all, vigfile != 99999)
 #get rid of '.jpg' suffix
-encoding_behav_all <- as.data.frame(sapply(encoding_behav_all, function(x) gsub(".jpg", "", x)), stringsAsFactors = FALSE) 
-encodingEarly <-as.data.frame(sapply(encodingEarly, function(x) gsub(".JPG", "", x)), stringsAsFactors = FALSE)
-encodingEarly <- select(encodingEarly, -trialstart)
-#homogenize column names
-names(encoding_behav_all)[4]<-"encoding_RT"
-names(encodingEarly)[4]<-"encoding_RT"
+encoding_behav <- as.data.frame(sapply(encoding_behav, function(x) gsub(".jpg", "", x)), stringsAsFactors = FALSE) 
+names(encoding_behav)[4]<-"encoding_RT"
 #get rid of symbols, quotation marks, & any white space
-encodingEarly$moral_decision <- sapply(encodingEarly$moral_decision, function(s) as.numeric(substr(s, 1, 2))) #gets rid of symbols
-encoding_behav_all$moral_decision <- as.numeric(encoding_behav_all$moral_decision)
-encodingEarly <- as.data.frame(sapply(encodingEarly, function(x) gsub("^\t* *\"* *| *\"* *\t*$", "", x)), stringsAsFactors = FALSE) 
-encoding_behav_all <- as.data.frame(sapply(encoding_behav_all, function(x) gsub("^\t* *\"* *| *\"* *\t*$", "", x)), stringsAsFactors = FALSE) 
-encoding_behav_all <- full_join(encoding_behav_all, encodingEarly, by = c('subID', 'vigfile', 'moral_decision', 'encoding_RT'))
-## leaves us with 3 different encoding files: encodingFull (all data from participants from whom I have scanner info), encodingEarly (data from first 3 participants),
-## encoding_behav_all (behavioral data from all participants)
+encoding_behav$moral_decision <- as.numeric(encoding_behav$moral_decision)
+encoding_behav <- as.data.frame(sapply(encoding_behav, function(x) gsub("^\t* *\"* *| *\"* *\t*$", "", x)), stringsAsFactors = FALSE) 
 
 # tidy key
 key <- as.data.frame(sapply(key, function(x) gsub("^\t* *\"* *| *\"* *\t*$", "", x)), stringsAsFactors = FALSE)
@@ -108,15 +96,15 @@ ret_all$vigfile[ret_all$vigfile == ''] = NA
 names(ret_all)[8]<-"retrieval_RT"
 
 # determine which subjects I have all data for
-sort(as.numeric(levels(as.factor(encoding_behav_all$subID))))
+sort(as.numeric(levels(as.factor(encoding_behav$subID))))
 sort(as.numeric(levels(as.factor(ret_all$subID)))) 
 ## missing encoding data for sub 35
 ## missing retrieval data for sub 36
 
 # one big happy dataframe
-encoding_behav <- subset(encoding_behav_all, encoding_behav_all$subID %in% ret_all$subID) # subset of encoding files that have corresponding retrieval files
-ret <- subset(ret_all, ret_all$subID %in% encoding_behav$subID) # subset of retrieval files that have corresponding encoding files
-data <- merge(ret, encoding_behav, by=c('subID', 'vigfile'), all.x = TRUE) # congolomerate of these 
+encoding <- subset(encoding_behav, encoding_behav$subID %in% ret_all$subID) # subset of encoding files that have corresponding retrieval files
+retrieval <- subset(ret_all, ret_all$subID %in% encoding_behav$subID) # subset of retrieval files that have corresponding encoding files
+data <- merge(retrieval, encoding, by=c('subID', 'vigfile'), all.x = TRUE) # congolomerate of these 
 #sort(as.numeric(levels(as.factor(encoding_behav$subID))))
 #sort(as.numeric(levels(as.factor(data$subID))))
 #sort(as.numeric(levels(as.factor(all_surveys$subID))))
@@ -155,7 +143,7 @@ for (n in data$resp) {
   }
 } 
 
-# make column for superordinate category
+# make function for assigning superordinate category
 superordinateCategory <- function(c) {
   return(ifelse(c == 'Care-Emo', 'Individualizing',
          ifelse(c == 'Care-Phys', 'Individualizing',
@@ -180,8 +168,7 @@ data <- data %>% filter(retrieval_RT > 0.25) %>%
          confresp=as.numeric(confresp),
          category=factor(category, levels=c('Social Norms', 
                                                'Authority', 'Loyalty', 'Purity', 
-                                                'Liberty', 
-                                               'Care-Emo', 'Care-Phys', 'Fairness')),
+                                               'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty')),
          old=factor(old, levels = c('1', '0')))
 
 data_old <- subset(data, old == '1', retrieval_RT > 0.25)
@@ -192,14 +179,17 @@ data_old <- subset(data, old == '1', retrieval_RT > 0.25)
 # make custom color palette
 ## shoutout https://edwinth.github.io/blog/paletti/ for the elegant paletti method of doing this
 ## https://learnui.design/tools/data-color-picker.html used for generating the gradients, but I heavily tweaked the default output
-colors <- c('#c179f7', '#f59692', '#e65e60', '#cc2943','#7CAE00', '#bfd2f2', '#86b1e4', '#2b8cd6')
+colors <- c('#c179f7', '#f59692', '#e65e60', '#cc2943', '#bfd2f2', '#86b1e4', '#2b8cd6', '#7CAE00')
 viz_palette(colors)
+mem_colors <- c('#c179f7', '#f59692', '#e65e60', '#cc2943', '#bfd2f2', '#86b1e4', '#2b8cd6', '#7CAE00',
+                '#c179f7', '#f59692', '#e65e60', '#cc2943', '#bfd2f2', '#86b1e4', '#2b8cd6', '#7CAE00')
+viz_palette(mem_colors)
 MFT_fill  <- get_scale_fill(get_pal(colors))
 MFT_color <- get_scale_color(get_pal(colors))
+MFT_memfill <- get_scale_fill(get_pal(mem_colors))
 
 # import font I'm using on my poster
 font_add_google('Lato', 'Lato')
-font_add_google('Roboto', 'Roboto')
 showtext_auto()
 
 ```
@@ -239,8 +229,8 @@ ggplot(modelMoral_df, aes(x=category, y=emmean)) +
   labs(x = 'Foundation', y='Estimated marginal mean', fill='Foundation') +
   geom_violin(data=data_old, mapping=aes(y=moral_decision, fill=category), alpha=0.85, bw=0.4) + 
   geom_pointrange(aes(ymin=lower.CL, ymax=upper.CL), alpha=1, fatten=5, color='black') +
-  #MFT_fill() + MFT_color() +
-  theme_pubr(legend = 'none', base_family = 'Lato') +
+  MFT_fill() + MFT_color() +
+  theme_pubr(legend = 'none') +
   theme(axis.title.x = element_text(size = 14),
         axis.title.y = element_text(size=14),
         title = element_text(size=16)) +
@@ -248,12 +238,12 @@ ggplot(modelMoral_df, aes(x=category, y=emmean)) +
 
 ggsave('figures/moral_judgments.png', dpi=1200)
 
-superordinateContrasts <- list(LibertyVsSocial=c(-1, 1, 0, 0, 0, 0, 0, 0),
-                BindingVsSocial=c(-1, 0, 1/3, 1/3, 1/3, 0, 0, 0),
-                IndividualizingVsSocial=c(-1, 0, 0, 0, 0, 1/3, 1/3, 1/3),
-                LibertyVsBinding=c(0, -1, 1/3, 1/3, 1/3, 0, 0, 0),
-                LibertyVsIndividualizing=c(0, -1, 0, 0, 0, 1/3, 1/3, 1/3),
-                BindingVsIndividualizing=c(0, 0, -1/3, -1/3, -1/3, 1/3, 1/3, 1/3))
+superordinateContrasts <- list(LibertyVsSocial=c(-1, 0, 0, 0, 0, 0, 0, 1),
+                BindingVsSocial=c(-1, 1/3, 1/3, 1/3, 0, 0, 0,0),
+                IndividualizingVsSocial=c(-1, 0, 0, 0, 1/3, 1/3, 1/3, 0),
+                LibertyVsBinding=c(0, -1/3, -1/3, -1/3, 0, 0, 0, 1),
+                LibertyVsIndividualizing=c(0, 0, 0, 0, -1/3, -1/3, -1/3, 1),
+                IndividualizingVsBinding=c(0, 0, -1/3, -1/3, -1/3, 1/3, 1/3, 1/3))
 
 # superordinate contrasts
 moralContrasts <- emmeans(modelMoral, ~ category) %>% contrast(superordinateContrasts, adjust='bonferroni')
@@ -262,12 +252,13 @@ moralContrasts <- emmeans(modelMoral, ~ category) %>% contrast(superordinateCont
 
 ### PLS results
 ```{r}
-
-mean_brain_scores <- read.csv('data/mean_brain_scores.csv')
+matlab_categories <- c('Authority', 'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty', 
+                       'Loyalty', 'Purity', 'Social Norms')
+mean_brain_scores <- read.csv('data/PLS/brain_scores.csv')
 mean_brain_scores$category <- matlab_categories
 mean_brain_scores$superordinate <- superordinateCategory(mean_brain_scores$category)
-upper_CIs <- read.csv('data/upper_CIs.csv')
-lower_CIs <- read.csv('data/lower_CIs.csv')
+upper_CIs <- read.csv('data/PLS/upper_CIs.csv')
+lower_CIs <- read.csv('data/PLS/lower_CIs.csv')
 colnames(upper_CIs) <- paste0('upper_', colnames(upper_CIs))
 colnames(lower_CIs) <- paste0('lower_', colnames(lower_CIs))
 mean_centered_results_LV1 <- select(mean_brain_scores, category, superordinate, LV1)
@@ -275,8 +266,8 @@ mean_centered_results_LV1$upper <- upper_CIs$upper_LV1
 mean_centered_results_LV1$lower <- lower_CIs$lower_LV1
 mean_centered_results_LV1$category <- factor(mean_centered_results_LV1$category, 
                                              levels=c('Social Norms',
-                                               'Authority', 'Loyalty', 'Purity', 'Liberty', 
-                                               'Care-Emo', 'Care-Phys', 'Fairness'))
+                                               'Authority', 'Loyalty', 'Purity',
+                                               'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty'))
 
 ggplot(data = mean_centered_results_LV1, 
        aes(x=category, y=LV1, fill=category, color=category)) +
@@ -286,21 +277,23 @@ ggplot(data = mean_centered_results_LV1,
   geom_point(color='black', size=1) +
   geom_errorbar(aes(ymax = upper, ymin = lower), color='black', size=0.5, width=0.25) +
   MFT_fill() + MFT_color() +
-  theme_pubr(legend = 'none', base_family = 'Lato') +
+  theme_pubr(legend = 'none') +
   theme(axis.title.x = element_text(size = 14),
         axis.title.y = element_text(size=14),
         title = element_text(size=16)) +
-  ggtitle('LV1: 25.81% crossblock variance, p < 0.004')
+  ggtitle('LV1: 24.4% crossblock variance, p < 0.006')
 
 ggsave('figures/LV1.png', dpi = 1200)
+
+
 
 mean_centered_results_LV2 <- select(mean_brain_scores, category, superordinate, LV2)
 mean_centered_results_LV2$upper <- upper_CIs$upper_LV2
 mean_centered_results_LV2$lower <- lower_CIs$lower_LV2
 mean_centered_results_LV2$category <- factor(mean_centered_results_LV2$category, 
                                              levels=c('Social Norms', 
-                                               'Authority', 'Loyalty', 'Purity', 'Liberty', 
-                                               'Care-Emo', 'Care-Phys', 'Fairness'))
+                                               'Authority', 'Loyalty', 'Purity', 
+                                               'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty'))
 
 ggplot(data = mean_centered_results_LV2, 
        aes(x=category, y=LV2, color=category, fill=category)) +
@@ -310,24 +303,38 @@ ggplot(data = mean_centered_results_LV2,
   geom_point(color='black', size=1) +
   geom_errorbar(aes(ymax = upper, ymin = lower), color='black', size=0.5, width=0.25) +
   MFT_fill() + MFT_color() +
-  theme_pubr(legend = 'none', base_family = 'Lato') +
+  theme_pubr(legend = 'none') +
   theme(axis.title.x = element_text(size = 14),
         axis.title.y = element_text(size=14),
         title = element_text(size=16)) +
-  ggtitle('LV2: 18.21% crossblock variance, p < 0.042')
+  ggtitle('LV2: 18.13% crossblock variance, p < 0.030')
 
 ggsave('figures/LV2.png', dpi = 1200)
+
+ggplot(data = mean_centered_results_LV2, 
+       aes(x=category, y=LV2, color=category, fill=category)) +
+  geom_hline(aes(yintercept = 0), size = 0.5) +
+  ylab('Brain scores') + xlab('Foundation') +
+  geom_col(color='black') + 
+  geom_point(color='black', size=1) +
+  geom_errorbar(aes(ymax = upper, ymin = lower), color='black', size=0.5, width=0.25) +
+  MFT_fill() + MFT_color() +
+  theme_pubr(legend = 'none') +
+  theme(axis.title.x = element_text(size = 8),
+        axis.title.y = element_text(size=8),
+        axis.text = element_text(size=8),
+        title = element_text(size=9)) +
+  ggtitle('LV2: 18.13% crossblock variance, p < 0.030')
+ggsave('figures/LV2_small.png', width=6, height = 3)
 
 ```
 
 ### Temporal Brain Scores
 ```{r, fig.width=5, fig.height=5}
-LV1 <- read.csv('data/brainscores_LV1.csv')
-LV2 <- read.csv('data/brainscores_LV2.csv')
+LV1 <- read.csv('data/PLS/temporal_brainscores_LV1_all.csv')
+LV2 <- read.csv('data/PLS/temporal_brainscores_LV2_all.csv')
 LV1$subID <- rep(dataSubs, each = 8)
 LV2$subID <- rep(dataSubs, each = 8)
-matlab_categories <- c('Authority', 'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty', 
-                       'Loyalty', 'Purity', 'Social Norms')
 LV1$category <- matlab_categories
 LV2$category <- matlab_categories
 
@@ -340,22 +347,22 @@ summary(modelLV1)
 modelLV1 %>% emmeans(~ lag * category) %>% as.data.frame() %>%
   mutate(superordinate = superordinateCategory(category),
          category = factor(category, levels = c('Social Norms', 'Authority', 'Loyalty', 'Purity',
-                             'Liberty', 'Care-Emo', 'Care-Phys', 'Fairness'))) %>%
+                             'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty'))) %>%
   ggplot(aes(x=lag, y=emmean, group=category, color=category, fill=category))  + 
   scale_x_discrete(expand = c(0, 0, 0, 0.05)) +
   geom_hline(aes(yintercept = 0), size=1) +
   geom_line(size=1) + 
   geom_point(aes(fill=category, color=category, shape = category), size=3) +
-  scale_shape_manual(values = c(4,15,16,17,3,0,1,2)) +
+  scale_shape_manual(values = c(4,15,16,17,0,1,2, 3)) +
   MFT_fill() + MFT_color() +
-  theme_pubr(legend = 'right', base_family = 'Lato') +
+  theme_pubr(legend = 'right') +
   theme(axis.title.x = element_text(size = 14),
         axis.title.y = element_text(size=14),
         title = element_text(size=16)) +
   labs(y = 'Brain score', x= 'TR=2s', color='Foundation', fill='Foundation', shape='Foundation')
   ggtitle('Temporal brain scores: LV1')
+ggsave('figures/brainscores_LV1.png', dpi = 1200, width = 7, height = 7)
 
-ggsave('figures/brainscores_LV1.png', dpi = 1200, width = 10, height = 10)
 
 modelLV2 <- lmer(score ~ lag * category + (1 | subID), data = LV2)
 summary(modelLV2)
@@ -363,22 +370,22 @@ summary(modelLV2)
 modelLV2 %>% emmeans(~ lag * category) %>% as.data.frame() %>% 
   mutate(superordinate = superordinateCategory(category),
          category = factor(category, levels = c('Social Norms', 'Authority', 'Loyalty', 'Purity',
-                             'Liberty', 'Care-Emo', 'Care-Phys', 'Fairness'))) %>%
+                              'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty'))) %>%
   ggplot(aes(x=lag, y=emmean, group=category, color=category, fill=category)) + 
   scale_x_discrete(expand = c(0, 0, 0, 0.05)) +
   geom_hline(aes(yintercept = 0), size=1) +
   geom_line(size=1) + 
   geom_point(aes(color=category, shape = category), size=3) +
-  scale_shape_manual(values = c(4,15,16,17,3,0,1,2)) +
+  scale_shape_manual(values = c(4,15,16,17,0,1,2,3)) +
   MFT_fill() + MFT_color() +
-  theme_pubr(legend = 'right', base_family = 'Lato') +
+  theme_pubr(legend = 'right') +
   theme(axis.title.x = element_text(size = 14),
         axis.title.y = element_text(size=14),
         title = element_text(size=16)) +
   labs(y = 'Brain score', x= 'TR=2s', color='Foundation', fill='Foundation', shape='Foundation') +
   ggtitle('Temporal brain scores: LV2')
+ggsave('figures/brainscores_LV2.png', dpi = 1200, width = 7, height = 7)
 
-ggsave('figures/brainscores_LV2.png', dpi = 300, width = 10, height = 10)
 ```
 
 ## Memory
@@ -396,15 +403,18 @@ memLabels <- c('0' = "New", '1' = 'Old') # labels for faceting
 
 # plot
 modelMemory %>% emmeans(~ category * old, type='response') %>% as.data.frame %>%
-  ggplot(aes(x=category, y=prob)) +
-  facet_grid(.~old, labeller = labeller(old=memLabels)) +
-  geom_violin(aes(x=category, y=propCorrect, color=superordinate, fill=superordinate), data=data, alpha=0.7, scale='count', bw=.1) +
-  geom_pointrange(aes(ymax=asymp.LCL, ymin=asymp.UCL), alpha=1, fatten=1, color='black') +
-  theme(strip.text.x = element_text(size=10, face='bold')) +
-  ylab('Estimated probability of correct response') +
+  ggplot(aes(x=category, y=prob, fill=interaction(category,old))) +
+  geom_violin(aes(x=category, y=propCorrect), data=data, alpha=1, scale='count', bw=.1) +
+  geom_pointrange(aes(y=prob, ymax=asymp.LCL, ymin=asymp.UCL, shape=old), 
+                  position = position_dodge(0.9), color='black', fatten=4) +
+  scale_shape_manual(values = c(16,21), labels = c('Old', 'New')) +
+  MFT_memfill() +
+  theme_pubr(legend = 'right') +
+  guides(fill=FALSE, shape=guide_legend(title=NULL)) +
+  labs(x = 'Foundation', y = 'Estimate probability of correct response', color = 'Old/New Status') +
   ggtitle('Memory accuracy (hits & correct rejections)') 
 
-ggsave('memory_accuracy.png', dpi = 600)
+ggsave('figures/memory_accuracy.png', dpi = 1200)
 
 # superordinate contrasts
 emmeans(modelMemory, ~ category) %>%
