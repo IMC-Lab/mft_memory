@@ -425,17 +425,89 @@ emmeans(modelMemory, ~ category) %>%
 # Subsequent memory behavioral PLS
 ```{r}
 
-envars <- names(encodingFull) %in% c('vignum', 'vigtext', 'trialstart_raw', 'trialstart_zeroed', 'trialdur', 
-                                     'ITI_start_raw', 'ITI_start_jittered', 'ITI_accuracy')
-encoding_behav_all <- encodingFull[!envars]
-encoding_behav_all <- filter(encoding_behav_all, vigfile != 99999)
-encodingEarly <- filter(encodingEarly, vigfile != ' vignette')
-#get rid of '.jpg' suffix
-encoding_behav_all <- as.data.frame(sapply(encoding_behav_all, function(x) gsub(".jpg", "", x)), stringsAsFactors = FALSE) 
+# make dataframe with accuracy per subject, per condition, ordered in the same way that MATLAB is ordered 
+make_behav_pls <- data_old %>% group_by(subID, category) %>% summarise(propCorrect = mean(correct)) %>%
+  ungroup %>%
+  mutate(subID = as.numeric(subID),
+         category = factor(category, levels = matlab_categories)) %>%
+  arrange(category, subID)
 
+write.table(x=make_behav_pls$propCorrect, file = '../prop_correct.txt', sep = '\n', row.names = FALSE, col.names = FALSE)
 
+make_behav_pls_all <- data %>% group_by(subID, category) %>% summarise(propCorrect = mean(correct)) %>%
+  ungroup %>%
+  mutate(subID = as.numeric(subID),
+         category = factor(category, levels = matlab_categories)) %>%
+  arrange(subID, category)
 
+write.table(x=make_behav_pls$propCorrect, file = '../prop_correct_all.txt', sep = '\n', row.names = FALSE, col.names = FALSE)
 
+# load in MATLAB results
+behav_mean_corr <- read.csv('data/PLS/behavioral/pls_behav_means.csv')
+behav_mean_corr$category <- matlab_categories
+behav_mean_corr$superordinate <- superordinateCategory(behav_mean_corr$category)
+behav_lower <- read.csv('data/PLS/behavioral/pls_behav_lower.csv')
+behav_upper <- read.csv('data/PLS/behavioral/pls_behav_upper.csv')
+colnames(behav_lower) <- paste0('lower_', colnames(behav_lower))
+colnames(behav_upper) <- paste0('upper_', colnames(behav_upper))
+
+# plot behavioral PLS pattern for LV1
+behav_pls_LV1 <- behav_mean_corr %>% select(LV1, category, superordinate)
+behav_pls_LV1$lower <- behav_lower$lower_LV1
+behav_pls_LV1$upper <- behav_upper$upper_LV1
+behav_pls_LV1$category <- factor(behav_pls_LV1$category, 
+                                              levels=c('Social Norms',
+                                               'Authority', 'Loyalty', 'Purity',
+                                               'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty'))
+ggplot(data = behav_pls_LV1, 
+       aes(x=category, y=LV1, fill=category, color=category)) +
+  geom_hline(aes(yintercept = 0), size = 0.5) +
+  ylab('Correlation between hits & brain scores') + xlab('Foundation') +
+  geom_col(color='black') + 
+  geom_point(color='black', size=1) +
+  geom_errorbar(aes(ymax = upper, ymin = lower), color='black', size=0.5, width=0.25) +
+  MFT_fill() + MFT_color() +
+  theme_pubr(legend = 'none') +
+  theme(axis.title.x = element_text(size = 14),
+        axis.title.y = element_text(size=14),
+        title = element_text(size=16)) +
+  ggtitle('Behavioral LV1: 39.23% crossblock variance, p < 0.000')
+ggsave('figures/behavioral_LV1.png', dpi=500)
+
+# and for LV2
+behav_pls_LV2 <- behav_mean_corr %>% select(LV2, category, superordinate)
+behav_pls_LV2$lower <- behav_lower$lower_LV2
+behav_pls_LV2$upper <- behav_upper$upper_LV2
+behav_pls_LV2$category <- factor(behav_pls_LV2$category, 
+                                              levels=c('Social Norms',
+                                               'Authority', 'Loyalty', 'Purity',
+                                               'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty'))
+ggplot(data = behav_pls_LV2, 
+       aes(x=category, y=LV2, fill=category, color=category)) +
+  geom_hline(aes(yintercept = 0), size = 0.5) +
+  ylab('Correlation between hits & brain scores') + xlab('Foundation') +
+  geom_col(color='black') + 
+  geom_point(color='black', size=1) +
+  geom_errorbar(aes(ymax = upper, ymin = lower), color='black', size=0.5, width=0.25) +
+  MFT_fill() + MFT_color() +
+  theme_pubr(legend = 'none') +
+  theme(axis.title.x = element_text(size = 14),
+        axis.title.y = element_text(size=14),
+        title = element_text(size=16)) +
+  ggtitle('Behavioral LV2: 17.06% crossblock variance, p < 0.035')
+ggsave('figures/behavioral_LV2.png', dpi=500)
+
+# behav_brain_scores <- read.csv('data/PLS/behavioral/individual_brain_scores.csv')
+# behav_brain_scores$subID <- rep(dataSubs, each = 8)
+# behav_brain_scores$category <- matlab_categories
+# behav_brain_scores <- behav_brain_scores %>% select(LV1, subID, category)
+# names(behav_brain_scores)[1] <- 'brain_score' 
+# behav_brain_scores$propCorrect <- make_behav_pls$propCorrect
+# behav_brain_scores_corr <- behav_brain_scores %>% group_by(category) %>% summarise(corr = cor(propCorrect, brain_score))
+# 
+# behav_corrs <- read.csv('data/PLS/behavioral/individual_corrs.csv')
+# behav_corrs$category <- matlab_categories
+# behav_corrs <- behav_corrs %>% group_by(category) %>% summarise(mean=mean(LV1))
 ```
 
 
