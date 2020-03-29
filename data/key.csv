@@ -132,7 +132,7 @@ careemo17,"""You see a brother kicking his sister's __ that took many hours to b
 careemo18,"""You see a teenage girl at __ mocking a man's stuttering speech.""",Lure-Care-Emo,"""the local mall""","""the local mall""","""a café""","""the post office"""
 careemo19,"""You see a woman insulting a severely obese man who is sitting in the __.""",Lure-Care-Emo,"""park""","""park""","""doctor's office""","""airport"""
 careemo20,"""You see a woman laughing out loud about a young man's __.""",Lure-Care-Emo,"""receding hairline""","""receding hairline""","""graying hair""","""bald spot"""
-careemo21,"""You see a woman squeezing a baby's __ hard because it will not stop crying.""",Lure-Care-Emo,"""arm""","""foot""","""shoulder""","""arm"""
+careemo21,"""You see a woman squeezing a baby's __ hard because it will not stop crying.""",Lure-Care-Phys,"""arm""","""foot""","""shoulder""","""arm"""
 careemo22,"""You see a woman telling a group of homeless people on the __ to go find jobs.""",Lure-Care-Emo,"""subway""","""curb""","""street""","""subway"""
 careemo23,"""You see a young boy teasing another boy because his father recently __.""",Lure-Care-Emo,"""passed away""","""divorced his mother""","""was deployed overseas""","""passed away"""
 careemo24,"""You see boys making fun of a girl's tattered clothes as she __.""",Lure-Care-Emo,"""boards the bus""","""sits at her desk""","""enters the lunchroom""","""boards the bus"""
