@@ -1,5 +1,5 @@
 ---
-title: "MFT Memory"
+title: "A Functional Neuroimaging Investigation of Moral Foundations Theory"
 output:
   html_document:
     df_print: paged
@@ -7,16 +7,12 @@ editor_options:
   chunk_output_type: console
 ---
 
-This is a project testing memory for vignettes of moral transgressions. 
-
 # Design
+Participants (n = 27) incidentally encoded 120 vignettes, 15 from each of the different foundations postulated by Moral Foundations Theory (Haidt and Joseph, 2007; Graham et al., 2012) and 15 depicting transgressions of amoral social norms. This took place inside the scanner, where they had 6 seconds to make a moral judgment about each  (1-4: not morally wrong-extremely morally wrong). 
 
-Participants (n = 30) incidentally encoded 120 vignettes, 15 from each of the different foundations articulated by Moral Foundations Theory (cite), by reading and vividly imagining the vignette for 6 seconds and then making a moral judgement (not morally wrong-extremely morally wrong; 1-4). 
+The memory test took place outside of the scanner. Participants were cued with each vignette presented during study + 8 lures per foundation (including social norms, only 7 lures were presented for Purity). Each vignette had up to 4 words removed, and participants were asked to select which word or words completed the vignette as well as their confidence in their response (not confident-extremely confident; 1-4). 
 
-During recognition, participants were cued with each vignette presented during study + 7-8 lures per foundation. Each vignette had up to 4 words removed, and participants were asked to select which word or words completed the vignette as they studied it as well as their confidence in their response (not confident-extremely confident; 1-4). 
-
-Encoding took place in the scanner but retrieval did not. After retrieval, participants completed a number of surveys: moral foundations questionnaire (MFQ), 
-
+After the memory test, participants completed a host of questionnaires: the Moral Foundations Questionnaire, the Social and Economic Conservatism Scale, the Disgust Scale-Revised, the Interpersonal Reactivity Index, and ranked their emotional responses to the vignettes (5 different emotions/vignette). 
 ```{r load packages, message=FALSE, warning=FALSE, include=FALSE}
 library(knitr)
 library(ggplot2)
@@ -44,7 +40,7 @@ library(showtext)
 se <- function(x) sqrt(var(x)/length(x))
 `%notin%` <- Negate(`%in%`)
 emm_options(lmerTest.limit = 5000)
-emm_options(pbkrtest.limit = 4000)
+emm_options(pbkrtest.limit = 5000)
 ```
 
 # Load in data
@@ -72,7 +68,7 @@ key <- read.csv('data/key.csv', stringsAsFactors = FALSE)
 # tidy encoding
 envars <- names(encodingFull) %in% c('run','pres_order','vignum','trialstart_raw','trialstart_zeroed','trialstart_TR','trialdur','intended_jitter','ITI_start_raw','ITI_start_zeroed','ITI_start_TR','ITI_duration','ITI_accuracy', 'foundation', 'vigtext') 
 encoding_behav <- encodingFull[!envars]
-encoding_behav <- filter(encoding_behav_all, vigfile != 99999)
+encoding_behav <- filter(encoding_behav, vigfile != 99999)
 #get rid of '.jpg' suffix
 encoding_behav <- as.data.frame(sapply(encoding_behav, function(x) gsub(".jpg", "", x)), stringsAsFactors = FALSE) 
 names(encoding_behav)[4]<-"encoding_RT"
@@ -159,6 +155,11 @@ data$superordinate = (superordinateCategory(data$category))
 data$correct <- as.numeric((!is.na(data$text_response) & data$text_response == data$correct_answer) |
   (is.na(data$text_response) & data$old == 0))
 
+plotting_categories <- c('Social Norms', 
+                         'Authority', 'Loyalty', 'Purity', 
+                         'Care-Emo', 'Care-Phys', 'Fairness', 
+                         'Liberty')
+
 # convert RTs & moral judgment to numeric
 RT_cols <- c(9,11,15)
 data[, RT_cols] <- data %>% select(ends_with('RT')) %>% sapply(as.numeric)
@@ -166,20 +167,19 @@ data <- data %>% filter(retrieval_RT > 0.25) %>%
   filter(confRT > 0.25) %>%
   mutate(moral_decision=as.numeric(moral_decision),
          confresp=as.numeric(confresp),
-         category=factor(category, levels=c('Social Norms', 
-                                               'Authority', 'Loyalty', 'Purity', 
-                                               'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty')),
+         category=factor(category, levels=plotting_categories),
          old=factor(old, levels = c('1', '0')))
 
 data_old <- subset(data, old == '1', retrieval_RT > 0.25)
 ```
 
 # prep for making fancy plots
-```{r}
+```{r, include=FALSE}
 # make custom color palette
 ## shoutout https://edwinth.github.io/blog/paletti/ for the elegant paletti method of doing this
 ## https://learnui.design/tools/data-color-picker.html used for generating the gradients, but I heavily tweaked the default output
 colors <- c('#c179f7', '#f59692', '#e65e60', '#cc2943', '#bfd2f2', '#86b1e4', '#2b8cd6', '#7CAE00')
+colors <- c('#c179f7', '#c40233', '#E60026','#ea3c53', '#2b8cd6', '#86b1e4','#bfd2f2','#7CAE00')
 viz_palette(colors)
 mem_colors <- c('#c179f7', '#f59692', '#e65e60', '#cc2943', '#bfd2f2', '#86b1e4', '#2b8cd6', '#7CAE00',
                 '#c179f7', '#f59692', '#e65e60', '#cc2943', '#bfd2f2', '#86b1e4', '#2b8cd6', '#7CAE00')
@@ -187,6 +187,7 @@ viz_palette(mem_colors)
 MFT_fill  <- get_scale_fill(get_pal(colors))
 MFT_color <- get_scale_color(get_pal(colors))
 MFT_memfill <- get_scale_fill(get_pal(mem_colors))
+MFT_memcol <- get_scale_color(get_pal(mem_colors))
 
 # import font I'm using on my poster
 font_add_google('Lato', 'Lato')
@@ -254,20 +255,18 @@ moralContrasts <- emmeans(modelMoral, ~ category) %>% contrast(superordinateCont
 ```{r}
 matlab_categories <- c('Authority', 'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty', 
                        'Loyalty', 'Purity', 'Social Norms')
-mean_brain_scores <- read.csv('data/PLS/brain_scores.csv')
+mean_brain_scores <- read.csv('data/PLS/mean-centered/brain_scores.csv')
 mean_brain_scores$category <- matlab_categories
 mean_brain_scores$superordinate <- superordinateCategory(mean_brain_scores$category)
-upper_CIs <- read.csv('data/PLS/upper_CIs.csv')
-lower_CIs <- read.csv('data/PLS/lower_CIs.csv')
+upper_CIs <- read.csv('data/PLS/mean-centered/upper_CIs.csv')
+lower_CIs <- read.csv('data/PLS/mean-centered/lower_CIs.csv')
 colnames(upper_CIs) <- paste0('upper_', colnames(upper_CIs))
 colnames(lower_CIs) <- paste0('lower_', colnames(lower_CIs))
 mean_centered_results_LV1 <- select(mean_brain_scores, category, superordinate, LV1)
 mean_centered_results_LV1$upper <- upper_CIs$upper_LV1
 mean_centered_results_LV1$lower <- lower_CIs$lower_LV1
 mean_centered_results_LV1$category <- factor(mean_centered_results_LV1$category, 
-                                             levels=c('Social Norms',
-                                               'Authority', 'Loyalty', 'Purity',
-                                               'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty'))
+                                             levels=plotting_categories)
 
 ggplot(data = mean_centered_results_LV1, 
        aes(x=category, y=LV1, fill=category, color=category)) +
@@ -282,18 +281,13 @@ ggplot(data = mean_centered_results_LV1,
         axis.title.y = element_text(size=14),
         title = element_text(size=16)) +
   ggtitle('LV1: 24.4% crossblock variance, p < 0.006')
-
 ggsave('figures/LV1.png', dpi = 1200)
-
-
 
 mean_centered_results_LV2 <- select(mean_brain_scores, category, superordinate, LV2)
 mean_centered_results_LV2$upper <- upper_CIs$upper_LV2
 mean_centered_results_LV2$lower <- lower_CIs$lower_LV2
 mean_centered_results_LV2$category <- factor(mean_centered_results_LV2$category, 
-                                             levels=c('Social Norms', 
-                                               'Authority', 'Loyalty', 'Purity', 
-                                               'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty'))
+                                             levels=plotting_categories)
 
 ggplot(data = mean_centered_results_LV2, 
        aes(x=category, y=LV2, color=category, fill=category)) +
@@ -308,7 +302,6 @@ ggplot(data = mean_centered_results_LV2,
         axis.title.y = element_text(size=14),
         title = element_text(size=16)) +
   ggtitle('LV2: 18.13% crossblock variance, p < 0.030')
-
 ggsave('figures/LV2.png', dpi = 1200)
 
 ggplot(data = mean_centered_results_LV2, 
@@ -331,8 +324,8 @@ ggsave('figures/LV2_small.png', width=6, height = 3)
 
 ### Temporal Brain Scores
 ```{r, fig.width=5, fig.height=5}
-LV1 <- read.csv('data/PLS/temporal_brainscores_LV1_all.csv')
-LV2 <- read.csv('data/PLS/temporal_brainscores_LV2_all.csv')
+LV1 <- read.csv('data/PLS/mean-centered/temporal_brainscores_LV1_all.csv')
+LV2 <- read.csv('data/PLS/mean-centered/temporal_brainscores_LV2_all.csv')
 LV1$subID <- rep(dataSubs, each = 8)
 LV2$subID <- rep(dataSubs, each = 8)
 LV1$category <- matlab_categories
@@ -346,8 +339,7 @@ summary(modelLV1)
 
 modelLV1 %>% emmeans(~ lag * category) %>% as.data.frame() %>%
   mutate(superordinate = superordinateCategory(category),
-         category = factor(category, levels = c('Social Norms', 'Authority', 'Loyalty', 'Purity',
-                             'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty'))) %>%
+         category = factor(category, levels = plotting_categories)) %>%
   ggplot(aes(x=lag, y=emmean, group=category, color=category, fill=category))  + 
   scale_x_discrete(expand = c(0, 0, 0, 0.05)) +
   geom_hline(aes(yintercept = 0), size=1) +
@@ -369,8 +361,7 @@ summary(modelLV2)
 
 modelLV2 %>% emmeans(~ lag * category) %>% as.data.frame() %>% 
   mutate(superordinate = superordinateCategory(category),
-         category = factor(category, levels = c('Social Norms', 'Authority', 'Loyalty', 'Purity',
-                              'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty'))) %>%
+         category = factor(category, levels = plotting_categories)) %>%
   ggplot(aes(x=lag, y=emmean, group=category, color=category, fill=category)) + 
   scale_x_discrete(expand = c(0, 0, 0, 0.05)) +
   geom_hline(aes(yintercept = 0), size=1) +
@@ -385,6 +376,48 @@ modelLV2 %>% emmeans(~ lag * category) %>% as.data.frame() %>%
   labs(y = 'Brain score', x= 'TR=2s', color='Foundation', fill='Foundation', shape='Foundation') +
   ggtitle('Temporal brain scores: LV2')
 ggsave('figures/brainscores_LV2.png', dpi = 1200, width = 7, height = 7)
+
+```
+
+# Non-rotated PLS
+```{r}
+# load in data
+nr_means <- read.csv('data/PLS/non-rotated/NR_means.csv')
+nr_upper <- read.csv('data/PLS/non-rotated/NR_upper.csv')
+nr_lower <- read.csv('data/PLS/non-rotated/NR_lower.csv')
+colnames(nr_upper) <- paste0('upper_', colnames(nr_upper))
+colnames(nr_lower) <- paste0('lower_', colnames(nr_lower))
+nr_means$category <- matlab_categories
+nr_means$category <- factor(nr_means$category, levels = plotting_categories)
+
+# make dataframes for plotting each LV
+nr_LV1 <- select(nr_means, LV1, category)
+nr_LV1$upper <- nr_upper$upper_LV1
+nr_LV1$lower <- nr_lower$lower_LV1
+
+nr_LV2 <- select(nr_means, LV2, category)
+nr_LV2$upper <- nr_upper$upper_LV2
+nr_LV2$lower <- nr_lower$lower_LV2
+
+nr_LV3 <- select(nr_means, LV3, category)
+nr_LV3$upper <- nr_upper$upper_LV3
+nr_LV3$lower <- nr_lower$lower_LV3
+
+# plot each LV
+ggplot(data = nr_LV1, 
+       aes(x=category, y=LV1, color=category, fill=category)) +
+  geom_hline(aes(yintercept = 0), size = 0.5) +
+  ylab('Brain scores') + xlab('Foundation') +
+  geom_col(color='black') + 
+  geom_point(color='black', size=1) +
+  geom_errorbar(aes(ymax = upper, ymin = lower), color='black', size=0.5, width=0.25) +
+  MFT_fill() + MFT_color() +
+  theme_pubr(legend = 'none') +
+  theme(axis.title.x = element_text(size = 12),
+        axis.title.y = element_text(size=12),
+        axis.text = element_text(size=12),
+        title = element_text(size=14)) +
+  ggtitle('LV1: 24.49% crossblock variance, p < 0.305')
 
 ```
 
@@ -456,9 +489,7 @@ behav_pls_LV1 <- behav_mean_corr %>% select(LV1, category, superordinate)
 behav_pls_LV1$lower <- behav_lower$lower_LV1
 behav_pls_LV1$upper <- behav_upper$upper_LV1
 behav_pls_LV1$category <- factor(behav_pls_LV1$category, 
-                                              levels=c('Social Norms',
-                                               'Authority', 'Loyalty', 'Purity',
-                                               'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty'))
+                                              levels=plotting_categories)
 ggplot(data = behav_pls_LV1, 
        aes(x=category, y=LV1, fill=category, color=category)) +
   geom_hline(aes(yintercept = 0), size = 0.5) +
@@ -479,9 +510,7 @@ behav_pls_LV2 <- behav_mean_corr %>% select(LV2, category, superordinate)
 behav_pls_LV2$lower <- behav_lower$lower_LV2
 behav_pls_LV2$upper <- behav_upper$upper_LV2
 behav_pls_LV2$category <- factor(behav_pls_LV2$category, 
-                                              levels=c('Social Norms',
-                                               'Authority', 'Loyalty', 'Purity',
-                                               'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty'))
+                                              levels=plotting_categories)
 ggplot(data = behav_pls_LV2, 
        aes(x=category, y=LV2, fill=category, color=category)) +
   geom_hline(aes(yintercept = 0), size = 0.5) +
@@ -510,48 +539,17 @@ ggsave('figures/behavioral_LV2.png', dpi=500)
 # behav_corrs <- behav_corrs %>% group_by(category) %>% summarise(mean=mean(LV1))
 ```
 
-
-### Reaction Time
-```{r}
-
-data_old$category <- factor(data_old$category, levels = c('Social Norms', 'Authority', 'Loyalty', 'Purity', 
-                                    'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty'))
-
-data <- data %>%
-  filter(retrieval_RT > 0.02) %>%
-  mutate(log_retrieval_RT=log(retrieval_RT))
-hist(data$log_retrieval_RT, breaks = 100)
-ks.test(data$log_retrieval_RT)
-
-# analyze
-modelRetRT <- lmer(log_retrieval_RT ~ category * correct * old + (1 | subID) + (1 | vigfile), data=data)
-summary(modelRetRT)
-
-# plot
-modelRetRT %>% emmeans(~ category * correct * old) %>% as.data.frame() %>% 
-  ggplot(aes(x=category, y=exp(emmean))) +
-  facet_grid(. ~ old, labeller = (old=as_labeller(memLabels))) +
-  geom_pointrange(aes(ymax=exp(asymp.LCL), ymin=exp(asymp.UCL), color=correct), alpha=1, fatten=5, position=position_dodge(0.5))+
-  scale_color_manual(values = c("deepskyblue4", "goldenrod1")) +
-  theme(strip.text.x = element_text(size=10, face='bold'), strip.text.y = element_text(size=10, face='bold')) +
-  ylab('Reaction time (seconds)') +
-  ggtitle('Retrieval reaction time') 
-
-```
-
 ### Confidence
 ```{r, fig.width=8, fig.height=4}
 
-data$correct <- as.factor(data$correct)
+data$correct <- factor(data$correct, levels = c('1','0'))
 confLabels <- c('1' = 'Correct', '0' = 'Incorrect')
-data <- data %>% group_by(subID, category, old, correct) %>% mutate(averageConf = mean(confresp))
-data$category <- factor(data$category, levels = c('Social Norms', 'Authority', 'Loyalty', 'Purity', 
-                                    'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty'))
+memLabels <- c('1' = 'Old', '0' = 'New')
 
 # explore spread
 ggplot(data, aes(x=confresp, fill=category)) +
   geom_bar() + 
-  facet_grid(old~category, labeller = labeller(old=memLabels)) + 
+  facet_grid(old~category, labeller = labeller(old=confLabels)) + 
   ggtitle('Distribution of Confidence judgments in each category') +
   xlab('1=not confident at all, 4=extremely confident')
 
@@ -562,69 +560,118 @@ ggplot(data, aes(x=confresp, color=category, fill=category)) +
   xlab('1=not confident at all, 4=extremely confident')
 
 # run model
-modelConfidence <- lmer(confresp ~ category + old * correct + (1 + category | subID), data=data,
+modelConfidence <- lmer(confresp ~ category * old * correct + (1 | subID), data=data,
                         control=lmerControl(optCtrl = list(maxeval=5000)))
 summary(modelConfidence)
 
 # plot
-modelConfidence %>% emmeans(~ category * old * correct, type='response') %>% as.data.frame %>%
-  ggplot(aes(x=category, y=emmean)) +
-  facet_wrap(. ~ old, labeller = (old=as_labeller(memLabels))) +
-  geom_violin(aes(x=category, y=averageConf, fill=superordinate, group=interaction(category,correct)), data=data, alpha=0.7, scale='count', bw=0.4, position = position_dodge(1)) +
-  geom_pointrange(aes(ymax=asymp.LCL, ymin=asymp.UCL, color=correct), alpha=1, fatten=3, position=position_dodge(1)) + 
-  scale_color_manual(values = c('white', "black"), labels = c('incorrect', 'correct')) +
-  theme(strip.text.x = element_text(size=10, face='bold'), strip.text.y = element_text(size=10, face='bold')) +
-  ylab('Estimated mean confidence') +
+modelConfidence_df <- modelConfidence %>% emmeans(~ category * old * correct, type='response') %>% as.data.frame
+  
+ggplot(modelConfidence_df, aes(x=category, y=emmean, fill=category)) +
+  facet_wrap(. ~ correct, labeller = (correct=as_labeller(confLabels))) +
+  #geom_violin(aes(x=category, y=confresp), data=data, scale='count', bw=0.35, alpha=0.5) +
+  geom_jitter(aes(x=category, y=confresp, color=category), data=data, alpha=0.5, height = 0.5, width = 0.35) +
+  geom_pointrange(aes(ymax=upper.CL, ymin=lower.CL, shape=old), size=0.8, position=position_dodge(0.7)) + 
+  scale_shape_manual(values = c(16,1), labels = c('Old', 'New')) +
+  MFT_color() + MFT_fill() +
+  theme_pubr(legend = 'right') +
+  guides(fill=FALSE, shape=guide_legend(title=NULL)) +
+  theme(strip.text.x = element_text(size=14, face='bold'), 
+        strip.background = element_rect(color = 'white'),
+        axis.text.x = element_text(size = 10)) +
+  labs(y = 'Estimated mean confidence', x = 'Foundation', color = 'Foundation') +
   ggtitle('Memory confidence') 
+ggsave('figures/memory_confidence.png', dpi = 400)
 
-ggsave('memory_confidence.png', dpi = 600)
+ggplot(modelConfidence_df, aes(x=category, y=emmean)) +
+  facet_wrap(. ~ correct, labeller = (correct=as_labeller(confLabels))) +
+  geom_violin(aes(x=category, y=confresp, fill=interaction(category,old)), data=data, scale='count', bw=0.35, alpha=0.8, position = position_dodge(0.7)) +
+  geom_pointrange(aes(ymax=upper.CL, ymin=lower.CL, shape=old), size=0.8, position=position_dodge(0.7)) + 
+  scale_shape_manual(values = c(16,1), labels = c('Old', 'New')) +
+  MFT_memfill() +
+  theme_pubr(legend = 'right') +
+  guides(fill=FALSE, shape=guide_legend(title=NULL)) +
+  theme(strip.text.x = element_text(size=14, face='bold'), 
+        strip.background = element_rect(color = 'white'),
+        axis.text.x = element_text(size = 10)) +
+  labs(y = 'Estimated mean confidence', x = 'Foundation', color = 'Foundation') +
+  ggtitle('Memory confidence')
+ggsave('figures/memory_confidence_violins.png', dpi = 400)
 
 emmeans(modelConfidence, ~ category) %>%
   contrast(superordinateContrasts, adjust='bonferroni')
+```
+
+### Reaction Time
+```{r}
+# 
+# data_old$category <- factor(data_old$category, levels = c('Social Norms', 'Authority', 'Loyalty', 'Purity', 
+#                                     'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty'))
+# 
+# data <- data %>%
+#   filter(retrieval_RT > 0.02) %>%
+#   mutate(log_retrieval_RT=log(retrieval_RT))
+# hist(data$log_retrieval_RT, breaks = 100)
+# ks.test(data$log_retrieval_RT)
+# 
+# # analyze
+# modelRetRT <- lmer(log_retrieval_RT ~ category * correct * old + (1 | subID) + (1 | vigfile), data=data)
+# summary(modelRetRT)
+# 
+# # plot
+# modelRetRT %>% emmeans(~ category * correct * old) %>% as.data.frame() %>% 
+#   ggplot(aes(x=category, y=exp(emmean))) +
+#   facet_grid(. ~ old, labeller = (old=as_labeller(memLabels))) +
+#   geom_pointrange(aes(ymax=exp(asymp.LCL), ymin=exp(asymp.UCL), color=correct), alpha=1, fatten=5, position=position_dodge(0.5))+
+#   scale_color_manual(values = c("deepskyblue4", "goldenrod1")) +
+#   theme(strip.text.x = element_text(size=10, face='bold'), strip.text.y = element_text(size=10, face='bold')) +
+#   ylab('Reaction time (seconds)') +
+#   ggtitle('Retrieval reaction time') 
 
 ```
+
 
 ### Confidence reaction Time
 ```{r}
 
 # visualize spread
-hist(data$confRT)
-data <- data %>% 
-  filter(confRT > 0.01) %>%
-  mutate(log_conf_RT=log(confRT))
-
-
+# hist(data$confRT)
+# data <- data %>% 
+#   filter(confRT > 0.01) %>%
+#   mutate(log_conf_RT=log(confRT))
+# 
+# 
 
 
 ```
 ### Encoding reaction time
 ```{r}
 
-# visualize
-hist(data_old$encoding_RT, breaks = 100)
-# test for normality
-shapiro.test(data_old$encoding_RT) # failed :(
-# log transform
-data_old <- data_old %>% mutate(log_moral_RT = log(encoding_RT))
-hist(data_old$log_moral_RT, breaks = 100)
-shapiro.test(data_old$log_moral_RT)
-
-modelMoralRT <- lmer(encoding_RT ~ category + (1 | subID) + (1 | vigfile), data=data_old)
-summary(modelMoralRT)
-
-# plot
-modelMoralRT %>% emmeans(~ category) %>% as.data.frame() %>% 
-  ggplot(aes(x=category, y=emmean)) +
-  geom_violin(data=data_old, mapping=aes(y=encoding_RT, fill = superordinate, color=superordinate), alpha=0.7) +
-  geom_pointrange(aes(ymax=upper.CL, ymin=lower.CL), alpha=1, fatten=3, color = 'black', size=1) +
-  ylab('Reaction time (seconds)') +
-  ggtitle('Moral judgment reaction time (model estimates + raw data)') 
-
-modelMoralRT %>% emmeans(~ category) %>% as.data.frame() %>% 
-  ggplot(aes(x=category, y=emmean)) +
-  geom_pointrange(aes(ymax=upper.CL, ymin=lower.CL, color=category), alpha=1, fatten=8) +
-  ylab('Reaction time (seconds)') +
-  ggtitle('Moral judgment reaction time (model estimates only)') 
+# # visualize
+# hist(data_old$encoding_RT, breaks = 100)
+# # test for normality
+# shapiro.test(data_old$encoding_RT) # failed :(
+# # log transform
+# data_old <- data_old %>% mutate(log_moral_RT = log(encoding_RT))
+# hist(data_old$log_moral_RT, breaks = 100)
+# shapiro.test(data_old$log_moral_RT)
+# 
+# modelMoralRT <- lmer(encoding_RT ~ category + (1 | subID) + (1 | vigfile), data=data_old)
+# summary(modelMoralRT)
+# 
+# # plot
+# modelMoralRT %>% emmeans(~ category) %>% as.data.frame() %>% 
+#   ggplot(aes(x=category, y=emmean)) +
+#   geom_violin(data=data_old, mapping=aes(y=encoding_RT, fill = superordinate, color=superordinate), alpha=0.7) +
+#   geom_pointrange(aes(ymax=upper.CL, ymin=lower.CL), alpha=1, fatten=3, color = 'black', size=1) +
+#   ylab('Reaction time (seconds)') +
+#   ggtitle('Moral judgment reaction time (model estimates + raw data)') 
+# 
+# modelMoralRT %>% emmeans(~ category) %>% as.data.frame() %>% 
+#   ggplot(aes(x=category, y=emmean)) +
+#   geom_pointrange(aes(ymax=upper.CL, ymin=lower.CL, color=category), alpha=1, fatten=8) +
+#   ylab('Reaction time (seconds)') +
+#   ggtitle('Moral judgment reaction time (model estimates only)') 
 
 ```
 
