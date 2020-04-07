@@ -1,0 +1,107 @@
+Clu#,Lag,X,Y,Z,X(mm),Y(mm),Z(mm),BSR,Appro.P,Clu_Size(voxels),Record Number,X coor,Y coor,Z coor,Level 1,Level 2,Level 3,Level 4,Level 5,Range (mm)
+------------------------------------------------------------------------------------------------,,,,,,,,,,,,,,,,,,,,
+1,1,60,91,54,28,54,34,5.4952,0,67,1,28,54,29,Right Cerebrum,Frontal Lobe,Superior Frontal Gyrus,Gray Matter,Brodmann area 9,0
+2,1,51,46,59,10,-36,44,5.1518,0,15,2,10,-33,42,Right Cerebrum,Parietal Lobe,Sub-Gyral,Gray Matter,Brodmann area 31,2
+3,1,56,67,65,20,6,56,5.0213,0,18,3,20,8,51,Right Cerebrum,Frontal Lobe,Medial Frontal Gyrus,Gray Matter,Brodmann area 6,1
+4,1,41,58,50,-10,-12,26,4.7531,0,25,4,-10,-10,24,Left Cerebrum,Sub-lobar,Caudate,Gray Matter,Caudate Body,3
+5,1,39,50,77,-14,-28,80,4.6441,0,25,5,-14,-23,75,No Gray Matter found,,,,,
+6,1,17,45,49,-58,-38,24,4.4662,0,14,6,-57,-36,24,Left Cerebrum,Parietal Lobe,Inferior Parietal Lobule,Gray Matter,Brodmann area 40,2
+7,1,38,60,62,-16,-8,50,4.3661,0,46,7,-16,-5,46,Left Cerebrum,Limbic Lobe,Cingulate Gyrus,Gray Matter,Brodmann area 24,0
+8,1,33,86,47,-26,44,20,4.3617,0,32,8,-26,44,16,Left Cerebrum,Frontal Lobe,Superior Frontal Gyrus,Gray Matter,Brodmann area 10,3
+9,1,72,39,56,52,-50,38,4.2896,0,125,9,51,-47,37,Right Cerebrum,Parietal Lobe,Inferior Parietal Lobule,Gray Matter,Brodmann area 40,2
+10,1,54,66,57,16,4,40,4.163,0,10,10,16,6,37,Right Cerebrum,Limbic Lobe,Cingulate Gyrus,Gray Matter,Brodmann area 32,1
+11,1,31,64,44,-30,0,14,4.0516,0.0001,22,11,-30,1,13,Left Cerebrum,Sub-lobar,Claustrum,Gray Matter,*,0
+12,1,73,35,32,54,-58,-10,3.9462,0.0001,11,12,53,-57,-6,Right Cerebrum,Occipital Lobe,Inferior Temporal Gyrus,Gray Matter,Brodmann area 37,0
+13,1,52,48,75,12,-32,76,3.8437,0.0001,23,13,12,-28,71,Right Cerebrum,Frontal Lobe,Precentral Gyrus,Gray Matter,Brodmann area 4,4
+14,1,32,20,45,-28,-88,16,3.4577,0.0005,17,14,-28,-85,19,Left Cerebrum,Occipital Lobe,Middle Occipital Gyrus,Gray Matter,Brodmann area 19,0
+15,1,48,50,34,4,-28,-6,-5.0638,0,60,15,4,-27,-4,Right Brainstem,Midbrain,*,Gray Matter,Red Nucleus,4
+16,1,41,50,36,-10,-28,-2,-4.1458,0,53,16,-10,-27,0,Left Cerebrum,Sub-lobar,Thalamus,Gray Matter,*,0
+17,1,62,65,36,32,2,-2,-3.611,0.0003,10,17,32,2,-2,Right Cerebrum,Sub-lobar,Claustrum,Gray Matter,*,1
+,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,
+18,2,65,91,49,38,54,24,5.4692,0,122,18,38,53,19,Right Cerebrum,Frontal Lobe,Middle Frontal Gyrus,Gray Matter,Brodmann area 10,1
+19,2,26,50,46,-40,-28,18,5.3789,0,488,19,-40,-26,18,Left Cerebrum,Sub-lobar,Insula,Gray Matter,Brodmann area 13,0
+20,2,61,52,45,30,-24,16,5.0281,0,259,20,30,-23,16,Right Cerebrum,Sub-lobar,Insula,Gray Matter,Brodmann area 13,1
+21,2,54,74,61,16,20,48,4.9524,0,23,21,16,22,43,Right Cerebrum,Frontal Lobe,Sub-Gyral,Gray Matter,Brodmann area 8,4
+22,2,71,38,58,50,-52,42,4.9417,0,356,22,50,-48,41,Right Cerebrum,Parietal Lobe,Inferior Parietal Lobule,Gray Matter,Brodmann area 40,1
+23,2,33,34,37,-26,-60,0,4.7399,0,93,23,-26,-58,3,Left Cerebrum,Occipital Lobe,Lingual Gyrus,Gray Matter,Brodmann area 19,1
+24,2,28,92,43,-36,56,12,4.6783,0,118,24,-36,55,8,Left Cerebrum,Frontal Lobe,Middle Frontal Gyrus,Gray Matter,Brodmann area 10,2
+25,2,35,29,35,-22,-70,-4,4.6437,0,61,25,-22,-68,0,Left Cerebrum,Occipital Lobe,Lingual Gyrus,Gray Matter,Brodmann area 19,0
+26,2,39,23,52,-14,-82,30,4.5346,0,137,26,-14,-78,32,Left Cerebrum,Occipital Lobe,Cuneus,Gray Matter,Brodmann area 19,0
+27,2,56,68,38,20,8,2,4.5289,0,13,27,20,8,1,Right Cerebrum,Sub-lobar,Lentiform Nucleus,Gray Matter,Putamen,0
+28,2,38,60,60,-16,-8,46,4.5188,0,88,28,-16,-6,43,Left Cerebrum,Limbic Lobe,Cingulate Gyrus,Gray Matter,Brodmann area 24,1
+29,2,58,62,59,24,-4,44,4.4748,0,26,29,24,-2,41,Right Cerebrum,Frontal Lobe,Middle Frontal Gyrus,Gray Matter,Brodmann area 6,2
+30,2,22,53,37,-48,-22,0,4.3594,0,49,30,-48,-21,1,Left Cerebrum,Temporal Lobe,Superior Temporal Gyrus,Gray Matter,*,1
+31,2,62,78,63,32,28,52,4.3582,0,25,31,32,30,46,Right Cerebrum,Frontal Lobe,Middle Frontal Gyrus,Gray Matter,Brodmann area 8,2
+32,2,42,32,54,-8,-64,34,4.3257,0,61,32,-8,-60,34,Left Cerebrum,Parietal Lobe,Precuneus,Gray Matter,Brodmann area 7,1
+33,2,25,32,60,-42,-64,46,4.2935,0,137,33,-42,-60,45,Left Cerebrum,Parietal Lobe,Inferior Parietal Lobule,Gray Matter,Brodmann area 40,1
+34,2,58,37,34,24,-54,-6,4.2685,0,16,34,24,-53,-2,Right Cerebrum,Limbic Lobe,Parahippocampal Gyrus,Gray Matter,Brodmann area 19,1
+35,2,41,74,35,-10,20,-4,4.2393,0,21,35,-10,19,-4,Left Cerebrum,Sub-lobar,Caudate,Gray Matter,Caudate Head,0
+36,2,49,33,69,6,-62,64,4.2103,0,18,36,6,-57,62,Right Cerebrum,Parietal Lobe,Precuneus,Gray Matter,Brodmann area 7,0
+37,2,43,42,54,-6,-44,34,4.187,0,136,37,-6,-41,33,Left Cerebrum,Limbic Lobe,Cingulate Gyrus,Gray Matter,Brodmann area 31,1
+38,2,64,60,51,36,-8,28,4.1492,0,20,38,36,-6,26,Right Cerebrum,Frontal Lobe,Precentral Gyrus,Gray Matter,Brodmann area 6,4
+39,2,45,51,52,-2,-26,30,4.1463,0,79,39,-2,-24,29,Left Cerebrum,Limbic Lobe,Cingulate Gyrus,Gray Matter,Brodmann area 23,0
+40,2,36,76,43,-20,24,12,4.1247,0,25,40,-20,24,10,Left Cerebrum,Sub-lobar,Claustrum,Gray Matter,*,4
+41,2,49,40,49,6,-48,24,4.1147,0,22,41,6,-45,24,Right Cerebrum,Limbic Lobe,Posterior Cingulate,Gray Matter,Brodmann area 23,1
+42,2,55,67,57,18,6,40,4.0427,0.0001,16,42,18,8,36,Right Cerebrum,Limbic Lobe,Cingulate Gyrus,Gray Matter,Brodmann area 32,2
+43,2,50,50,74,8,-28,74,4.0192,0.0001,43,43,8,-24,69,Right Cerebrum,Frontal Lobe,Medial Frontal Gyrus,Gray Matter,Brodmann area 6,2
+44,2,44,90,61,-4,52,48,3.9665,0.0001,14,44,-4,53,42,Left Cerebrum,Frontal Lobe,Medial Frontal Gyrus,Gray Matter,Brodmann area 8,2
+45,2,36,36,53,-20,-56,32,3.9616,0.0001,24,45,-20,-53,32,Left Cerebrum,Limbic Lobe,Cingulate Gyrus,Gray Matter,Brodmann area 31,5
+46,2,38,53,52,-16,-22,30,3.9376,0.0001,17,46,-16,-20,29,Left Cerebrum,Sub-lobar,Caudate,Gray Matter,Caudate Body,4
+47,2,37,85,63,-18,42,52,3.8274,0.0001,12,47,-18,43,46,Left Cerebrum,Frontal Lobe,Superior Frontal Gyrus,Gray Matter,Brodmann area 8,1
+48,2,20,63,30,-52,-2,-14,3.8198,0.0001,26,48,-51,-3,-12,Left Cerebrum,Temporal Lobe,Middle Temporal Gyrus,Gray Matter,Brodmann area 21,3
+49,2,52,23,54,12,-82,34,3.7907,0.0002,16,49,12,-78,35,Right Cerebrum,Occipital Lobe,Cuneus,Gray Matter,Brodmann area 19,0
+50,2,53,47,60,14,-34,46,3.7762,0.0002,15,50,14,-31,44,Right Cerebrum,Limbic Lobe,Cingulate Gyrus,Gray Matter,Brodmann area 31,2
+51,2,61,24,48,30,-80,22,3.7596,0.0002,23,51,30,-76,24,Right Cerebrum,Occipital Lobe,Middle Occipital Gyrus,Gray Matter,Brodmann area 19,3
+52,2,44,94,53,-4,60,32,3.7069,0.0002,51,52,-4,60,26,Left Cerebrum,Frontal Lobe,Superior Frontal Gyrus,Gray Matter,Brodmann area 10,1
+53,2,32,42,52,-28,-44,30,3.6523,0.0003,15,53,-28,-41,30,No Gray Matter found,,,,,
+54,2,63,84,51,34,40,28,3.525,0.0004,11,54,34,40,24,Right Cerebrum,Frontal Lobe,Middle Frontal Gyrus,Gray Matter,Brodmann area 10,2
+55,2,33,28,47,-26,-72,20,3.4962,0.0005,11,55,-26,-69,22,Left Cerebrum,Occipital Lobe,Precuneus,Gray Matter,Brodmann area 31,3
+56,2,33,86,46,-26,44,18,3.4404,0.0006,16,56,-26,43,14,Left Cerebrum,Frontal Lobe,Superior Frontal Gyrus,Gray Matter,Brodmann area 10,4
+57,2,62,61,40,32,-6,6,3.4153,0.0006,11,57,32,-6,6,Right Cerebrum,Sub-lobar,Lentiform Nucleus,Gray Matter,Putamen,1
+,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,
+58,3,47,40,51,2,-48,28,7.0532,0,2184,58,2,-45,28,Right Cerebrum,Limbic Lobe,Cingulate Gyrus,Gray Matter,Brodmann area 31,1
+59,3,57,62,58,22,-4,42,5.9601,0,163,59,22,-2,39,Right Cerebrum,Frontal Lobe,Middle Frontal Gyrus,Gray Matter,Brodmann area 6,4
+60,3,55,75,57,18,22,40,5.4397,0,242,60,18,23,36,Right Cerebrum,Frontal Lobe,Cingulate Gyrus,Gray Matter,Brodmann area 32,1
+61,3,38,63,56,-16,-2,38,5.2767,0,191,61,-16,0,35,Left Cerebrum,Limbic Lobe,Cingulate Gyrus,Gray Matter,Brodmann area 24,3
+62,3,33,41,55,-26,-46,36,4.9233,0,45,62,-26,-43,35,No Gray Matter found,,,,,
+63,3,16,55,33,-60,-18,-8,4.8431,0,122,63,-59,-18,-6,Left Cerebrum,Temporal Lobe,Middle Temporal Gyrus,Gray Matter,Brodmann area 21,1
+64,3,25,31,59,-42,-66,44,4.7861,0,298,64,-42,-62,44,Left Cerebrum,Parietal Lobe,Inferior Parietal Lobule,Gray Matter,Brodmann area 40,0
+65,3,36,28,36,-20,-72,-2,4.48,0,148,65,-20,-70,2,Left Cerebrum,Occipital Lobe,Lingual Gyrus,Gray Matter,*,1
+66,3,51,32,69,10,-64,64,4.4627,0,28,66,10,-59,62,Right Cerebrum,Parietal Lobe,Precuneus,Gray Matter,Brodmann area 7,0
+67,3,63,48,50,34,-32,26,4.382,0,137,67,34,-30,25,Right Cerebrum,Sub-lobar,Insula,Gray Matter,Brodmann area 13,4
+68,3,36,48,68,-20,-32,62,4.3727,0,58,68,-20,-28,59,Left Cerebrum,Parietal Lobe,Postcentral Gyrus,Gray Matter,Brodmann area 3,0
+69,3,65,37,68,38,-54,62,4.2779,0,197,69,38,-49,60,Right Cerebrum,Parietal Lobe,Superior Parietal Lobule,Gray Matter,Brodmann area 7,2
+70,3,29,51,48,-34,-26,22,4.2105,0,138,70,-34,-24,21,Left Cerebrum,Sub-lobar,Insula,Gray Matter,Brodmann area 13,1
+71,3,34,76,45,-24,24,16,3.9333,0.0001,22,71,-24,24,14,Left Cerebrum,Sub-lobar,Claustrum,Gray Matter,*,5
+72,3,25,53,41,-42,-22,8,3.9247,0.0001,26,72,-42,-21,8,Left Cerebrum,Temporal Lobe,Superior Temporal Gyrus,Gray Matter,Brodmann area 13,0
+73,3,54,74,49,16,20,24,3.8932,0.0001,44,73,16,20,21,Right Cerebrum,Limbic Lobe,Anterior Cingulate,Gray Matter,Brodmann area 32,3
+74,3,56,62,51,20,-4,28,3.8847,0.0001,70,74,20,-3,26,Right Cerebrum,Sub-lobar,Caudate,Gray Matter,Caudate Body,3
+75,3,38,52,52,-16,-24,30,3.8175,0.0001,21,75,-16,-22,29,Left Cerebrum,Sub-lobar,Caudate,Gray Matter,Caudate Body,4
+76,3,36,39,32,-20,-50,-10,3.7689,0.0002,11,76,-20,-49,-6,Left Cerebrum,Limbic Lobe,Parahippocampal Gyrus,Gray Matter,Brodmann area 19,1
+77,3,50,48,75,8,-32,76,3.7595,0.0002,27,77,8,-28,71,Right Cerebrum,Frontal Lobe,Medial Frontal Gyrus,Gray Matter,Brodmann area 6,6
+78,3,56,27,62,20,-74,50,3.7515,0.0002,24,78,20,-69,50,Right Cerebrum,Parietal Lobe,Precuneus,Gray Matter,Brodmann area 7,1
+79,3,37,68,49,-18,8,24,3.6744,0.0002,17,79,-18,9,22,Left Cerebrum,Sub-lobar,Caudate,Gray Matter,Caudate Body,3
+80,3,31,30,33,-30,-68,-8,3.6681,0.0002,10,80,-30,-66,-3,Left Cerebrum,Occipital Lobe,Lingual Gyrus,Gray Matter,Brodmann area 19,3
+81,3,71,36,56,50,-56,38,3.6132,0.0003,25,81,50,-53,38,Right Cerebrum,Parietal Lobe,Inferior Parietal Lobule,Gray Matter,Brodmann area 40,1
+82,3,37,69,55,-18,10,36,3.5308,0.0004,14,82,-18,11,33,Left Cerebrum,Limbic Lobe,Cingulate Gyrus,Gray Matter,Brodmann area 32,2
+83,3,25,81,44,-42,34,14,-6.9774,0,369,83,-42,34,11,Left Cerebrum,Frontal Lobe,Inferior Frontal Gyrus,Gray Matter,Brodmann area 46,2
+84,3,70,80,43,48,32,12,-6.7721,0,251,84,48,32,9,Right Cerebrum,Frontal Lobe,Inferior Frontal Gyrus,Gray Matter,Brodmann area 46,1
+85,3,30,64,29,-32,0,-16,-6.7154,0,283,85,-32,-1,-13,Left Cerebrum,Limbic Lobe,Parahippocampal Gyrus,Gray Matter,Amygdala,2
+86,3,18,45,60,-56,-38,46,-5.4122,0,147,86,-55,-35,44,Left Cerebrum,Parietal Lobe,Inferior Parietal Lobule,Gray Matter,Brodmann area 40,0
+87,3,21,36,40,-50,-56,6,-5.2564,0,189,87,-50,-54,8,Left Cerebrum,Temporal Lobe,Superior Temporal Gyrus,Gray Matter,Brodmann area 39,2
+88,3,45,58,32,-2,-12,-10,-5.1162,0,40,88,-2,-12,-8,Left Brainstem,Midbrain,*,Gray Matter,Mammillary Body,0
+89,3,23,38,32,-46,-52,-10,-4.6995,0,29,89,-46,-51,-6,Left Cerebrum,Temporal Lobe,Sub-Gyral,Gray Matter,Brodmann area 37,3
+90,3,28,22,54,-36,-84,34,-4.5807,0,43,90,-36,-80,35,Left Cerebrum,Parietal Lobe,Precuneus,Gray Matter,Brodmann area 19,0
+91,3,37,61,30,-18,-6,-14,-4.3548,0,29,91,-18,-6,-11,Left Cerebrum,Limbic Lobe,Parahippocampal Gyrus,Gray Matter,Amygdala,0
+92,3,48,49,37,4,-30,0,-4.2956,0,34,92,4,-29,1,Right Cerebrum,Sub-lobar,Thalamus,Gray Matter,Pulvinar,3
+93,3,63,70,31,34,12,-12,-3.9685,0.0001,18,93,34,11,-11,Right Cerebrum,Frontal Lobe,Inferior Frontal Gyrus,Gray Matter,Brodmann area 13,0
+94,3,28,67,50,-36,6,26,-3.9209,0.0001,23,94,-36,7,24,Left Cerebrum,Frontal Lobe,Inferior Frontal Gyrus,Gray Matter,Brodmann area 9,2
+95,3,68,72,49,44,16,24,-3.8507,0.0001,12,95,44,17,21,Right Cerebrum,Frontal Lobe,Middle Frontal Gyrus,Gray Matter,Brodmann area 46,1
+96,3,38,33,21,-16,-62,-32,-3.8106,0.0001,16,96,-16,-61,-24,Left Cerebellum,Anterior Lobe,*,Gray Matter,Dentate,0
+,,,,,,,,,,,,,,,,,,,,
+------------------------------------------------------------------------------------------------,,,,,,,,,,,,,,,,,,,,
+Source: /Users/mak127-ccn/Desktop/MFT_PLS/4_TR_analysis/NR_without_SN.mat,,,,,,,,,,,,,,,,,,,,
+"LV Idx: 2, Pos.Thresh: 3.2000, Neg.Thresh: -3.2000, Min Size: 10(voxels)",,,,,,,,,,,,,,,,,,,,
+"Pos.Peak Thresh: 3.2000, Neg.Peak Thresh: -3.2000, Min Distance: 10.0mm",,,,,,,,,,,,,,,,,,,,
