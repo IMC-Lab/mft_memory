@@ -35,3 +35,6 @@ vignettes/*.pdf
 # Shiny token, see https://shiny.rstudio.com/articles/shinyapps.html
 rsconnect/
 *.driveupload
+
+# Images used only for the markdown
+/markdown_images
