@@ -37,4 +37,4 @@ rsconnect/
 *.driveupload
 
 # Images used only for the markdown
-/markdown_images
+/markdown_images/
