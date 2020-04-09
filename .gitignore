@@ -40,4 +40,5 @@ rsconnect/
 /markdown_images/
 
 # .DS_store objects
-*.DS_store
+.DS_store
+*/.DS_store
