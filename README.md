@@ -1,2 +1,2 @@
 # mft_memory
-This is a revival and closing out of a project that began in 2014. It is a functional neuroimaging investigations of the Moral Foundations Theory (MFT), assessing whether neural activity reflects the organizational principles put forth by MFT. There is also a behavioral component that measures the memorability of different foundations and how this is modulated by individual differences. 
+
