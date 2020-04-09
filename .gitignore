@@ -42,3 +42,7 @@ rsconnect/
 # .DS_store objects
 .DS_store
 */.DS_store
+
+# stuff for my poster
+/poster/
+/figures/poster/
