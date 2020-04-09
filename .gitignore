@@ -38,3 +38,6 @@ rsconnect/
 
 # Images used only for the markdown
 /markdown_images/
+
+# .DS_store objects
+*.DS_store
