@@ -37,7 +37,7 @@ library(devtools)
 library(paletti)
 library(showtext)
 library(patchwork)
-library(easystats)
+library(performance)
 library(eeptools)
 library(ggcorrplot)
 se <- function(x) sqrt(var(x)/length(x))
@@ -105,7 +105,7 @@ dataSubs = sort(as.numeric(levels(as.factor(data$subID))))
 #qualtricsSubs = sort(as.numeric(levels(as.factor(all_surveys$subID))))
 
 # participant demographics
-full_demographics <- read.csv('ppt_log.csv', stringsAsFactors = FALSE)
+full_demographics <- read.csv('data/ppt_log.csv', stringsAsFactors = FALSE)
 sex_distribution <- full_demographics %>% 
   filter(MFT_id %in% dataSubs) %>% 
   count(Sex)
@@ -193,7 +193,7 @@ data <- data %>% filter(retrieval_RT > 0.25) %>%
          category=factor(category, levels=plotting_categories),
          old=factor(old, levels = c('1', '0')))
 
-# prep for superordinate contrasts 
+# prep for contrasts 
 SuperordinateContrasts <- list(LibertyVsSocial=c(-1, 0, 0, 0, 0, 0, 0, 1),
                 BindingVsSocial=c(-1, 1/3, 1/3, 1/3, 0, 0, 0,0),
                 IndividualizingVsSocial=c(-1, 0, 0, 0, 1/3, 1/3, 1/3, 0),
@@ -444,14 +444,26 @@ confLabels <- c('1' = 'Correct', '0' = 'Incorrect')
 # linear mixed effect model
 modelMoral <- lmer(moral_decision ~ category + (1 | subID) + (1|vigfile), data = data_old, control=lmerControl(optCtrl = list(maxeval=5000))) 
 
-tab_model(modelMoral, show.stat = TRUE, string.stat = 't value', show.ngroups = TRUE, digits = 3, 
-          use.viewer = TRUE, file = 'paper figures/table_modelMoral.html',
-          dv.labels = 'moral judgment', string.pred = 'Factors', title = 'Table 1: Moral judgment model summary'
-          pred.labels = c('Intercept (Social Norms)', 'Authority', 'Loyalty', 'Purity', 'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty'))
+tab_model(modelMoral, 
+          file = 'figures/paper/table_modelMoral.html',  
+          digits = 3, 
+          show.ci = 0.95, show.stat = TRUE, show.p = TRUE, show.ngroups = TRUE, show.df = TRUE,
+          p.val = 'satterthwaite', 
+          strings = c(stat = 't value', ci = 'CI (95%)', pred = 'Factors'),
+          dv.labels = 'moral judgment', 
+          col.order = c('est','ci','df','stat','p'),
+          pred.labels = c('Intercept (Social Norms)', 
+                          'Authority', 'Loyalty', 'Purity', 'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty'),
+          title = 'Table 1: Moral judgment model summary')
 
-# plot estimated marginal means
+# contrasts
+emmeans(modelMoral, ~ category) %>% contrast(superordinateContrasts, adjust='bonferroni')
+emmeans(modelMoral, ~ category) %>% contrast(superordinateContrasts, adjust='bonferroni')
+
+emmeans(modelMoral, ~ category) %>% contrast(method = 'pairwise', by = 'category', adjust='bonferroni')
+
+# plot
 modelMoral_df <- as.data.frame(emmeans(modelMoral, ~ category))
-
 ggplot(modelMoral_df, aes(x=category, y=emmean)) +
   ylim(1,4) +
   labs(x = 'Foundation', y='Estimated marginal mean', fill='Foundation') +
@@ -465,11 +477,6 @@ ggplot(modelMoral_df, aes(x=category, y=emmean)) +
   ggtitle('Moral judgments')
 
 #ggsave('figures/moral_judgments.png', dpi=1200)
-
-# contrasts
-emmeans(modelMoral, ~ category) %>% contrast(superordinateContrasts, adjust='bonferroni')
-
-emmeans(modelMoral, ~ category) %>% contrast(newSuperordinateContrasts, adjust='bonferroni')
 ```
 
 ### Task PLS results: LV1 
