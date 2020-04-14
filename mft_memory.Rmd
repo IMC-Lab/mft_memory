@@ -1,18 +1,10 @@
 ---
 title: "A Functional Neuroimaging Investigation of Moral Foundations Theory"
-output:
-  html_document:
-    df_print: paged
+output: word_document
 editor_options: 
   chunk_output_type: console
 ---
 
-## Design
-Participants (n = 27) incidentally encoded 120 vignettes, 15 from each of the different foundations postulated by Moral Foundations Theory (Haidt and Joseph, 2007; Graham et al., 2012) and 15 depicting transgressions of amoral social norms. This took place inside the scanner, where they had 6 seconds to make a moral judgment about each  (1-4: not morally wrong-extremely morally wrong). 
-
-The memory test took place outside of the scanner. Participants were cued with each vignette presented during study + 8 lures per foundation (including social norms, only 7 lures were presented for Purity). Each vignette had up to 4 words removed, and participants were asked to select which word or words completed the vignette as well as their confidence in their response (not confident-extremely confident; 1-4). 
-
-After the memory test, participants completed a host of questionnaires: the Moral Foundations Questionnaire, the Social and Economic Conservatism Scale, the Disgust Scale-Revised, the Interpersonal Reactivity Index, and ranked their emotional responses to the vignettes (5 different emotions/vignette). 
 ```{r load packages, message=FALSE, warning=FALSE, include=FALSE}
 library(knitr)
 library(ggplot2)
@@ -40,6 +32,7 @@ library(patchwork)
 library(performance)
 library(eeptools)
 library(ggcorrplot)
+library(extrafont)
 se <- function(x) sqrt(var(x)/length(x))
 `%notin%` <- Negate(`%in%`)
 emm_options(lmerTest.limit = 5000)
@@ -124,6 +117,8 @@ data$category[data$category == "Pure"] <- "Purity"
 data$category[data$category == "Auth"] <- "Authority"
 data$category[data$category == "Fair"] <- "Fairness"
 data$category[data$category == "Social-Norms"] <- "Social Norms"
+data$category[data$category == "Care-Phys"] <- "Harm-Phys"
+data$category[data$category == "Care-Emo"] <- "Harm-Emo"
 
 # make text-based response column; new responses = NA
 data$text_response = ''
@@ -153,8 +148,8 @@ data$correct <- as.numeric((!is.na(data$text_response) & data$text_response == d
 
 # make function for assigning OG & new superordinate category
 superordinateCategory <- function(c) {
-  return(ifelse(c == 'Care-Emo', 'Individualizing',
-         ifelse(c == 'Care-Phys', 'Individualizing',
+  return(ifelse(c == 'Harm-Emo', 'Individualizing',
+         ifelse(c == 'Harm-Phys', 'Individualizing',
          ifelse(c == 'Fairness', 'Individualizing',
          ifelse(c == 'Loyalty', 'Binding',
          ifelse(c == 'Authority', 'Binding',
@@ -162,8 +157,8 @@ superordinateCategory <- function(c) {
 }
 
 superordinateNew <- function(c) {
-  return(ifelse(c == 'Care-Emo', 'Emotion',
-         ifelse(c == 'Care-Phys', 'Emotion',
+  return(ifelse(c == 'Harm-Emo', 'Emotion',
+         ifelse(c == 'Harm-Phys', 'Emotion',
          ifelse(c == 'Loyalty', 'Not Emotion',
          ifelse(c == 'Authority', 'Not Emotion',
          ifelse(c == 'Purity', 'Emotion', 
@@ -177,10 +172,10 @@ data$superordinate_new <- factor(data$superordinate_new, levels = c('Social Norm
 
 plotting_categories <- c('Social Norms', 
                          'Authority', 'Loyalty', 'Purity', 
-                         'Care-Emo', 'Care-Phys', 'Fairness', 
+                         'Harm-Emo', 'Harm-Phys', 'Fairness', 
                          'Liberty')
 
-matlab_categories <- c('Authority', 'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty', 
+matlab_categories <- c('Authority', 'Harm-Emo', 'Harm-Phys', 'Fairness', 'Liberty', 
                        'Loyalty', 'Purity', 'Social Norms')
 
 # convert RTs & moral judgment to numeric
@@ -222,6 +217,9 @@ new_superordinate <- function(levels) {
   return(NULL)
 }
 
+# make data_old
+data_old <- subset(data, old == '1' & encoding_RT > 0.25)
+
 ### prep for emotion & empathy comparison
 # Emotion responses
 emorate <- read.csv('data/qualtrics/emorate.csv', stringsAsFactors = FALSE)
@@ -240,8 +238,8 @@ emorate <- subset(emorate, subID != c('20', '35', '36'))
 
 assignCategory <- function(c) {
   return(ifelse(substr(c, 1,4) == 'auth', 'Authority', 
-         ifelse(substr(c, 1,7) == 'careemo', 'Care-Emo', 
-         ifelse(substr(c, 1,8) == 'carephys', 'Care-Phys', 
+         ifelse(substr(c, 1,7) == 'careemo', 'Harm-Emo', 
+         ifelse(substr(c, 1,8) == 'carephys', 'Harm-Phys', 
          ifelse(substr(c, 1,4) == 'fair', 'Fairness', 
          ifelse(substr(c, 1,3) == 'lib', 'Liberty', 
          ifelse(substr(c, 1,3) == 'loy', 'Loyalty',
@@ -265,14 +263,6 @@ emorate$category <- factor(emorate$category, levels = plotting_categories)
 #             contempuous = mean(contemptuous, na.rm = TRUE),
 #             amused = mean(amused, na.rm = TRUE))
 
-# plot
-ggplot(emorate, aes(x=category, y=emoresp, fill=category)) +
-  facet_wrap(vars(emotion), nrow = 3) +
-  #geom_dotplot(binaxis = 'y', binwidth = 1, stackdir = "center", method = 'histodot', binpositions = 'all', dotsize = 0.5) +
-  geom_violin(alpha = 0.7) +
-  MFT_fill() + MFT_color() +
-  stat_summary(fun.data = mean_se, geom='pointrange')
-
 # load & prep empathy dataframe
 all_surveys <- read.csv('data/qualtrics/all_surveys.csv', stringsAsFactors = FALSE)
 iri <- select(all_surveys, starts_with('sub'), starts_with('iri'))
@@ -289,7 +279,7 @@ iri[iri == 'D' ] <- 3
 iri[iri == 'E' ] <- 4
 iri[,2:29] <- as.numeric(unlist(iri[,2:29]))
 reverseScoredIRI <- c('3', '4', '7', '12', '13', '14', '15', '18', '19')
-iri[,reverseScoredIRI] <- reverse4(iri[,reverseScoredIRI])
+iri[,reverseScoredIRI] <- 4 - (iri[,reverseScoredIRI])
 #subscale coding
 perspective_taking <- c('3','8','11','15','21','25','28')
 fantasy <- c('1', '5', '7','12','16','23','26')
@@ -320,9 +310,9 @@ em_compare <- em_compare %>%
   na.omit()
 
 # visualize variable correlations
-emotion_scores <- na.omit(em_compare[,19:24])
-corr <- round(cor(emotion_scores), 1)
-ggcorrplot(corr, lab = TRUE)
+# emotion_scores <- na.omit(em_compare[,19:24])
+# corr <- round(cor(emotion_scores), 1)
+# ggcorrplot(corr, lab = TRUE)
 #ggsave('emo_corr_matrix.png')
 
 # make custom color palette
@@ -340,11 +330,9 @@ MFT_memfill <- get_scale_fill(get_pal(mem_colors))
 MFT_memcol <- get_scale_color(get_pal(mem_colors))
 
 # import font I'm using on my poster
+font_import(paths = NULL, recursive = TRUE, prompt = TRUE,pattern = NULL)
 font_add_google('Lato', 'Lato')
 showtext_auto()
-
-# make data_old
-data_old <- subset(data, old == '1' & encoding_RT > 0.25)
 
 # prep for PLS
 # task PLS 
@@ -415,7 +403,7 @@ confLabels <- c('1' = 'Correct', '0' = 'Incorrect')
 
 ## Results: Moral Judgments
 ### Behavior
-```{r Moral judgments: Behavior, message=FALSE, warning=FALSE}
+```{r Moral judgments: Behavior, message=FALSE, warning=FALSE, include=FALSE}
 
 # # look at spread of moral judgement
 # ggplot(data_old, aes(x=moral_decision, color=category, fill=category)) +
@@ -445,20 +433,20 @@ confLabels <- c('1' = 'Correct', '0' = 'Incorrect')
 modelMoral <- lmer(moral_decision ~ category + (1 | subID) + (1|vigfile), data = data_old, control=lmerControl(optCtrl = list(maxeval=5000))) 
 
 tab_model(modelMoral, 
-          file = 'figures/paper/table_modelMoral.html',  
+          #file = 'figures/paper/table_modelMoral.html',  
           digits = 3, 
           show.ci = 0.95, show.stat = TRUE, show.p = TRUE, show.ngroups = TRUE, show.df = TRUE,
           p.val = 'satterthwaite', 
-          strings = c(stat = 't value', ci = 'CI (95%)', pred = 'Factors'),
+          strings = c(stat = 't value', ci = 'CI (95%)', pred = 'Factors', p = 'p value'),
           dv.labels = 'moral judgment', 
-          col.order = c('est','ci','df','stat','p'),
+          col.order = c('est','ci','df.error','stat','p'),
           pred.labels = c('Intercept (Social Norms)', 
-                          'Authority', 'Loyalty', 'Purity', 'Care-Emo', 'Care-Phys', 'Fairness', 'Liberty'),
+                          'Authority', 'Loyalty', 'Purity', 'Harm-Emo', 'Harm-Phys', 'Fairness', 'Liberty'),
           title = 'Table 1: Moral judgment model summary')
 
 # contrasts
-emmeans(modelMoral, ~ category) %>% contrast(superordinateContrasts, adjust='bonferroni')
-emmeans(modelMoral, ~ category) %>% contrast(superordinateContrasts, adjust='bonferroni')
+emmeans(modelMoral, ~ category) %>% contrast(SuperordinateContrasts, adjust='bonferroni')
+emmeans(modelMoral, ~ category) %>% contrast(newSuperordinateContrasts, adjust='bonferroni')
 
 emmeans(modelMoral, ~ category) %>% contrast(method = 'pairwise', by = 'category', adjust='bonferroni')
 
@@ -480,8 +468,8 @@ ggplot(modelMoral_df, aes(x=category, y=emmean)) +
 ```
 
 ### Task PLS results: LV1 
-```{r}
-ggplot(data = mean_centered_results_LV1, 
+```{r make LV plots, include=FALSE}
+p1 <- ggplot(data = mean_centered_results_LV1, 
        aes(x=category, y=LV1, fill=category, color=category)) +
   geom_hline(aes(yintercept = 0), size = 0.5) +
   ylab('Brain scores') + xlab('Foundation') +
@@ -490,41 +478,33 @@ ggplot(data = mean_centered_results_LV1,
   geom_errorbar(aes(ymax = upper, ymin = lower), color='black', size=0.5, width=0.25) +
   MFT_fill() + MFT_color() +
   theme_pubr(legend = 'none') +
-  theme(axis.title.x = element_text(size = 14),
+  theme(axis.title.x = element_blank(),
         axis.title.y = element_text(size=14),
-        title = element_text(size=16)) +
-  ggtitle('LV1: 24.4% crossblock variance, p < 0.006')
-ggsave('figures/LV1.png', dpi = 1200)
+        plot.title = element_text(hjust = 0.5, size = 14)) +
+  ggtitle('LV1: 24.4% crossblock variance')
 
 modelLV1 <- lmer(score ~ lag * category + (1 | subID), data = LV1)
-summary(modelLV1)
 
-modelLV1 %>% emmeans(~ lag * category) %>% as.data.frame() %>%
+p2 <- modelLV1 %>% emmeans(~ lag * category) %>% as.data.frame() %>%
   mutate(superordinate = superordinateCategory(category),
          category = factor(category, levels = plotting_categories)) %>%
   ggplot(aes(x=lag, y=emmean, group=category, color=category, fill=category))  + 
-  scale_x_discrete(expand = c(0, 0, 0, 0.05)) +
+  scale_x_discrete(expand = c(0, 0, 0, 0.08)) +
   geom_hline(aes(yintercept = 0), size=1) +
   geom_line(size=1) + 
   geom_point(aes(fill=category, color=category, shape = category), size=3) +
   scale_shape_manual(values = c(4,15,16,17,0,1,2, 3)) +
   MFT_fill() + MFT_color() +
   theme_pubr(legend = 'right') +
-  theme(axis.title.x = element_text(size = 14),
-        axis.title.y = element_text(size=14),
-        title = element_text(size=16)) +
-  labs(y = 'Brain score', x= 'TR=2s', color='Foundation', fill='Foundation', shape='Foundation')
-  ggtitle('Temporal brain scores: LV1')
-#ggsave('figures/brainscores_LV1.png', dpi = 1200, width = 7, height = 7)
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(), 
+        plot.title = element_text(hjust = 0.5, size = 14)) +
+  labs(y = 'Brain score', x= 'TR=2s', color='Foundation', fill='Foundation', shape='Foundation') +
+  ggtitle('Temporal brain scores')
 
 
-```
-
-### Task PLS results: LV2
-```{r, fig.width=5, fig.height=5}
-
-ggplot(data = mean_centered_results_LV2, 
-       aes(x=category, y=LV2, color=category, fill=category)) +
+p3 <- ggplot(data = mean_centered_results_LV2, 
+       aes(x=category, y=LV2, fill=category, color=category)) +
   geom_hline(aes(yintercept = 0), size = 0.5) +
   ylab('Brain scores') + xlab('Foundation') +
   geom_col(color='black') + 
@@ -534,36 +514,40 @@ ggplot(data = mean_centered_results_LV2,
   theme_pubr(legend = 'none') +
   theme(axis.title.x = element_text(size = 14),
         axis.title.y = element_text(size=14),
-        title = element_text(size=16)) +
-  ggtitle('LV2: 18.13% crossblock variance, p < 0.030')
-ggsave('figures/LV2.png', dpi = 1200)
-
+        plot.title = element_text(hjust = 0.5, size = 14)) +
+  ggtitle('LV2: 18.13% crossblock variance')
 
 modelLV2 <- lmer(score ~ lag * category + (1 | subID), data = LV2)
-summary(modelLV2)
 
-modelLV2 %>% emmeans(~ lag * category) %>% as.data.frame() %>% 
+p4 <- modelLV2 %>% emmeans(~ lag * category) %>% as.data.frame() %>%
   mutate(superordinate = superordinateCategory(category),
          category = factor(category, levels = plotting_categories)) %>%
-  ggplot(aes(x=lag, y=emmean, group=category, color=category, fill=category)) + 
-  scale_x_discrete(expand = c(0, 0, 0, 0.05)) +
+  ggplot(aes(x=lag, y=emmean, group=category, color=category, fill=category))  + 
+  scale_x_discrete(expand = c(0, 0, 0, 0.08)) +
   geom_hline(aes(yintercept = 0), size=1) +
   geom_line(size=1) + 
-  geom_point(aes(color=category, shape = category), size=3) +
-  scale_shape_manual(values = c(4,15,16,17,0,1,2,3)) +
+  geom_point(aes(fill=category, color=category, shape = category), size=3) +
+  scale_shape_manual(values = c(4,15,16,17,0,1,2, 3)) +
   MFT_fill() + MFT_color() +
   theme_pubr(legend = 'right') +
   theme(axis.title.x = element_text(size = 14),
-        axis.title.y = element_text(size=14),
-        title = element_text(size=16)) +
-  labs(y = 'Brain score', x= 'TR=2s', color='Foundation', fill='Foundation', shape='Foundation') +
-  ggtitle('Temporal brain scores: LV2')
-#ggsave('figures/brainscores_LV2.png', dpi = 1200, width = 7, height = 7)
+        axis.title.y = element_blank(), 
+        plot.title = element_text(hjust = 0.5, size = 14)) +
+  labs(x= 'TR=2s', color='Foundation', fill='Foundation', shape='Foundation')
 
+
+p1 + p2 + p3 + p4 + 
+  plot_layout(widths = c(2, 1.3)) +
+  plot_layout(guides = 'collect') + 
+  plot_annotation(tag_levels = 'A', tag_suffix = '.') & 
+  theme(text = element_text(family = 'Times New Roman'), plot.tag = element_text(size = 11))
+  
+ggsave('figures/paper/plot_LVs.png', dpi = 600)
 ```
 
+
 # Non-rotated PLS
-```{r}
+```{r plot NR results, include=FALSE}
 # Analysis 1: individualizing vs. binding
 ggplot(data = nr_superordinate, 
        aes(x=category, y=V1, color=category, fill=category)) +
@@ -600,15 +584,18 @@ ggplot(data = nr_social,
 
 # Model comparisons
 ### different superordinate categories 
-```{r}
+```{r superordinate model comparisons, include=FALSE}
 superordinateNull <- lmer(moral_decision ~ 1 + (1|subID) + (1|vigfile), data = data_old, control=lmerControl(optCtrl = list(maxeval=5000))) 
 superordinateOG <- lmer(moral_decision ~ superordinate + (1|subID) + (1|vigfile), data = data_old, control=lmerControl(optCtrl = list(maxeval=5000))) 
 superordinateNew <- lmer(moral_decision ~ superordinate_new + (1|subID) + (1|vigfile), data = data_old, control=lmerControl(optCtrl = list(maxeval=5000))) 
+```
+
+```{r make table for sup comparison results}
 kable(compare_performance(superordinateNull, superordinateOG, superordinateNew, bayesfactor = FALSE))
 ```
 
 ### empathy & emotion model comparison
-```{r}
+```{r em model comparison, include=FALSE}
 # baseline: no fixed effects
 modelNull <- lmer(moral_decision ~ 1 + (1|subID) + (1|vigfile), data = em_compare) 
 
@@ -631,9 +618,13 @@ em_category <- lmer(moral_decision ~
                         category * PersonalDistressScore + 
                         category * EmpathicConcernScore + 
                         (1|subID) + (1|vigfile), data = em_compare)
+```
 
+```{r make em comparison table}
 kable(compare_performance(modelNull, modelMoral, em_everything, em_category, bayesfactor = FALSE, rank = TRUE))
+```
 
+```{r sum-code em_category, include = FALSE}
 em_category <- lmer(moral_decision ~ 
                         category * angry + 
                         category * amused + 
@@ -646,7 +637,7 @@ em_category <- lmer(moral_decision ~
                         (1|subID) + (1|vigfile), data = em_compare, contrasts = list(category=contr.sum))
 ```
 
-```{r plot em category trends, echo=FALSE, fig.width = 10, fig.height = 12, fig.align='center'}
+```{r plot em category trends, echo=FALSE, fig.width = 10, fig.height = 12, include=FALSE}
 anger <- as.data.frame(emtrends(em_category,  ~ category, 'angry')) %>% 
   ggplot(aes(x=category, y=angry.trend, color=category)) +
   ylim(-0.5, 0.75) +
@@ -759,7 +750,7 @@ EmpathicConcern <- as.data.frame(emtrends(em_category,  ~ category, 'EmpathicCon
 
 ## Memory
 ### Accuracy (hits & correct rejections)
-```{r, fig.width=20, fig.height=8}
+```{r, fig.width=20, fig.height=8, include=FALSE}
 
 # generalized linear mixed effect model (outcome is binary)
 modelMemory <- glmer(correct ~ category * old + (1 | subID),
@@ -838,7 +829,7 @@ kable(compare_performance(modelMemoryNull, modelMemory, em_memory, em_category_m
 ```
 
 ### Confidence
-```{r, fig.width=8, fig.height=4}
+```{r, fig.width=8, fig.height=4, include=FALSE}
 data$correct <- factor(data$correct, levels = c('1','0'))
 confLabels <- c('1' = 'Correct', '0' = 'Incorrect')
 memLabels <- c('1' = 'Old', '0' = 'New')
@@ -923,7 +914,7 @@ kable(compare_performance(modelConfidenceNull, modelConfidence, em_confidence, e
 ```
 
 ### Old code -- not used
-``` {r}
+```{r, include=FALSE}
 ## some handy commands
 # exp(fixef(modelOld1)): transforms model output from log likelihood to odds ratio
 # anova(modelOld1, modelOld2): use for model comparisons [**don't look at the output of either model; use the results of this comparison to guide your result-seeking**]
