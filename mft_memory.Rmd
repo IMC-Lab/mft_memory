@@ -310,10 +310,10 @@ em_compare <- em_compare %>%
   na.omit()
 
 # visualize variable correlations
-# emotion_scores <- na.omit(em_compare[,19:24])
-# corr <- round(cor(emotion_scores), 1)
+# emotion_scores <- na.omit(em_compare[,20:27])
+# corr <- cor(emotion_scores)
 # ggcorrplot(corr, lab = TRUE)
-#ggsave('emo_corr_matrix.png')
+# ggsave('emo_corr_matrix.png')
 
 # make custom color palette
 ## shoutout https://edwinth.github.io/blog/paletti/ for the elegant paletti method of doing this
@@ -480,6 +480,7 @@ p1 <- ggplot(data = mean_centered_results_LV1,
   theme_pubr(legend = 'none') +
   theme(axis.title.x = element_blank(),
         axis.title.y = element_text(size=14),
+        axis.text = element_text(size = 12),
         plot.title = element_text(hjust = 0.5, size = 14)) +
   ggtitle('LV1: 24.4% crossblock variance')
 
@@ -489,7 +490,7 @@ p2 <- modelLV1 %>% emmeans(~ lag * category) %>% as.data.frame() %>%
   mutate(superordinate = superordinateCategory(category),
          category = factor(category, levels = plotting_categories)) %>%
   ggplot(aes(x=lag, y=emmean, group=category, color=category, fill=category))  + 
-  scale_x_discrete(expand = c(0, 0, 0, 0.08)) +
+  scale_x_discrete(expand = c(0, 0, 0, 0.08), labels = c('TR1', 'TR2', 'TR3', 'TR4')) +
   geom_hline(aes(yintercept = 0), size=1) +
   geom_line(size=1) + 
   geom_point(aes(fill=category, color=category, shape = category), size=3) +
@@ -498,6 +499,7 @@ p2 <- modelLV1 %>% emmeans(~ lag * category) %>% as.data.frame() %>%
   theme_pubr(legend = 'right') +
   theme(axis.title.x = element_blank(),
         axis.title.y = element_blank(), 
+        axis.text = element_text(size = 12),
         plot.title = element_text(hjust = 0.5, size = 14)) +
   labs(y = 'Brain score', x= 'TR=2s', color='Foundation', fill='Foundation', shape='Foundation') +
   ggtitle('Temporal brain scores')
@@ -512,8 +514,9 @@ p3 <- ggplot(data = mean_centered_results_LV2,
   geom_errorbar(aes(ymax = upper, ymin = lower), color='black', size=0.5, width=0.25) +
   MFT_fill() + MFT_color() +
   theme_pubr(legend = 'none') +
-  theme(axis.title.x = element_text(size = 14),
+  theme(axis.title.x = element_blank(),
         axis.title.y = element_text(size=14),
+        axis.text = element_text(size = 12),
         plot.title = element_text(hjust = 0.5, size = 14)) +
   ggtitle('LV2: 18.13% crossblock variance')
 
@@ -523,26 +526,27 @@ p4 <- modelLV2 %>% emmeans(~ lag * category) %>% as.data.frame() %>%
   mutate(superordinate = superordinateCategory(category),
          category = factor(category, levels = plotting_categories)) %>%
   ggplot(aes(x=lag, y=emmean, group=category, color=category, fill=category))  + 
-  scale_x_discrete(expand = c(0, 0, 0, 0.08)) +
+  scale_x_discrete(expand = c(0, 0, 0, 0.08), labels = c('TR1', 'TR2', 'TR3', 'TR4')) +
   geom_hline(aes(yintercept = 0), size=1) +
   geom_line(size=1) + 
   geom_point(aes(fill=category, color=category, shape = category), size=3) +
   scale_shape_manual(values = c(4,15,16,17,0,1,2, 3)) +
   MFT_fill() + MFT_color() +
   theme_pubr(legend = 'right') +
-  theme(axis.title.x = element_text(size = 14),
+  theme(axis.title.x = element_blank(),
         axis.title.y = element_blank(), 
+        axis.text = element_text(size = 12),
         plot.title = element_text(hjust = 0.5, size = 14)) +
   labs(x= 'TR=2s', color='Foundation', fill='Foundation', shape='Foundation')
 
 
 p1 + p2 + p3 + p4 + 
-  plot_layout(widths = c(2, 1.3)) +
+  plot_layout(widths = c(2, 1)) +
   plot_layout(guides = 'collect') + 
   plot_annotation(tag_levels = 'A', tag_suffix = '.') & 
   theme(text = element_text(family = 'Times New Roman'), plot.tag = element_text(size = 11))
   
-ggsave('figures/paper/plot_LVs.png', dpi = 600)
+ggsave('figures/paper/plot_LVs.png', width = 13, dpi = 400)
 ```
 
 
@@ -591,21 +595,21 @@ superordinateNew <- lmer(moral_decision ~ superordinate_new + (1|subID) + (1|vig
 ```
 
 ```{r make table for sup comparison results}
-kable(compare_performance(superordinateNull, superordinateOG, superordinateNew, bayesfactor = FALSE))
+kable(compare_performance(superordinateNull, modelMoral, superordinateOG, superordinateNew, bayesfactor = FALSE, rank = TRUE))
 ```
 
 ### empathy & emotion model comparison
 ```{r em model comparison, include=FALSE}
 # baseline: no fixed effects
-modelNull <- lmer(moral_decision ~ 1 + (1|subID) + (1|vigfile), data = em_compare) 
+modelNull <- lmer(moral_decision ~ 1 + (1|subID) + (1|vigfile), data = em_compare, contrasts = list(category=contr.sum)) 
 
 # standard: category as fixed effect
-modelMoral <- lmer(moral_decision ~ category + (1|subID) + (1|vigfile), data = em_compare)
+modelMoral <- lmer(moral_decision ~ category + (1|subID) + (1|vigfile), data = em_compare, contrasts = list(category=contr.sum))
 
 # just emotion & empathy as fixed effects
 em_everything <- lmer(moral_decision ~ angry + sad + disgusted + afraid + contemptuous + amused +
                        PersonalDistressScore + EmpathicConcernScore +
-                        (1|subID) + (1|vigfile), data=em_compare)
+                        (1|subID) + (1|vigfile), data=em_compare, contrasts = list(category=contr.sum))
 
 # each em (emotion & empathy) measure interacts with category
 em_category <- lmer(moral_decision ~ 
@@ -617,7 +621,8 @@ em_category <- lmer(moral_decision ~
                         category * disgusted + 
                         category * PersonalDistressScore + 
                         category * EmpathicConcernScore + 
-                        (1|subID) + (1|vigfile), data = em_compare)
+                        (1|subID) + (1|vigfile), data = em_compare,
+                    contrasts = list(category=contr.sum))
 ```
 
 ```{r make em comparison table}
@@ -635,117 +640,137 @@ em_category <- lmer(moral_decision ~
                         category * PersonalDistressScore + 
                         category * EmpathicConcernScore + 
                         (1|subID) + (1|vigfile), data = em_compare, contrasts = list(category=contr.sum))
+
+tab_model(em_category,
+          file = 'Emotion&Empathy*Foundation.html',
+          digits = 3, 
+          title = 'Table A3: Emotion & Empathy*Foundation summary',
+          show.ci = 0.95, show.stat = TRUE, show.p = TRUE, show.ngroups = TRUE, show.df = TRUE,
+          p.val = 'satterthwaite', 
+          strings = c(stat = 't value', ci = 'CI (95%)', pred = 'Factors', p = 'p value'),
+          dv.labels = 'moral judgment', 
+          col.order = c('est','ci','df.error','stat','p'),
+          pred.labels = c('Intercept',
+                          'Social Norms', 'Authority', 'Loyalty', 'Purity', 'Care-Emo', 'Care-Phys', 'Fairness', 
+                          'Anger', 'Amusement', 'Sadness', 'Fear','Contempt','Disgust', 'Personal Distress', 'Empathic Concern',
+                          'Social Norms*Anger', 'Authority*Anger', 'Loyalty*Anger', 'Purity*Anger', 'Care-Emo*Anger', 'Care-Phys*Anger', 'Fairness*Anger',
+                          'Social Norms*Amusement','Authority*Amusement','Loyalty*Amusement','Purity*Amusement','Care-Emo*Amusement','Care-Phys*Amusement','Fairness*Amusement',
+                          'Social Norms*Sadness', 'Authority*Sadness', 'Loyalty*Sadness', 'Purity*Sadness', 'Care-Emo*Sadness', 'Care-Phys*Sadness', 'Fairness*Sadness',
+                          'Social Norms*Fear', 'Authority*Fear', 'Loyalty*Fear', 'Purity*Fear', 'Care-Emo*Fear', 'Care-Phys*Fear', 'Fairness*Fear',
+                          'Social Norms*Contempt', 'Authority*Contempt', 'Loyalty*Contempt', 'Purity*Contempt', 'Care-Emo*Contempt', 'Care-Phys*Contempt', 'Fairness*Contempt',
+                          'Social Norms*Disgust', 'Authority*Disgust', 'Loyalty*Disgust', 'Purity*Disgust', 'Care-Emo*Disgust', 'Care-Phys*Disgust', 'Fairness*Disgust',
+                          'Social Norms*Personal Distress','Authority*Personal Distress','Loyalty*Personal Distress','Purity*Personal Distress',
+                          'Care-Emo*Personal Distress','Care-Phys*Personal Distress','Fairness*Personal Distress',
+                          'Social Norms*Empathic Concern','Authority*Empathic Concern','Loyalty*Empathic Concern','Purity*Empathic Concern',
+                          'Care-Emo*Empathic Concern','Care-Phys*Empathic Concern','Fairness*Empathic Concern'))
 ```
 
 ```{r plot em category trends, echo=FALSE, fig.width = 10, fig.height = 12, include=FALSE}
-anger <- as.data.frame(emtrends(em_category,  ~ category, 'angry')) %>% 
-  ggplot(aes(x=category, y=angry.trend, color=category)) +
+anger <- as.data.frame(emtrends(em_category,  ~ category, 'angry'))
+amusement <- as.data.frame(emtrends(em_category,  ~ category, 'amused'))
+sadness <- as.data.frame(emtrends(em_category,  ~ category, 'sad'))
+fear <- as.data.frame(emtrends(em_category,  ~ category, 'afraid'))
+contempt <- as.data.frame(emtrends(em_category,  ~ category, 'contemptuous'))
+disgust <- as.data.frame(emtrends(em_category,  ~ category, 'disgusted'))
+PersonalDistress <- as.data.frame(emtrends(em_category,  ~ category, 'PersonalDistressScore'))
+EmpathicConcern <- as.data.frame(emtrends(em_category,  ~ category, 'EmpathicConcernScore'))
+```
+
+```{r plot em category trends}
+angerPlot <- ggplot(anger, aes(x=category, y=angry.trend, color=category)) +
   ylim(-0.5, 0.75) +
-  geom_hline(aes(yintercept = 0.11), size=0.75, linetype='dashed') +
-  geom_pointrange(aes(ymax=upper.CL, ymin=lower.CL), size = 1.25) +
+  geom_hline(aes(yintercept = 0.123), size=0.5) +
+  geom_pointrange(aes(ymax=upper.CL, ymin=lower.CL), fatten = 6) +
   MFT_color() +
   theme_pubr(legend = 'none') +
-  theme(axis.text.x = element_text(size=8),
-        axis.text.y = element_text(size = 10),
-        plot.title = element_text(size = 18, hjust = 0.5, face = 'bold'),
+  theme(axis.text = element_text(size=10),
+        plot.title = element_text(size = 14, hjust = 0.5, face = 'bold'),
         axis.title = element_blank()) + 
   ggtitle('Anger')
 
-amusement <- as.data.frame(emtrends(em_category,  ~ category, 'amused')) %>%
-  ggplot(aes(x=category, y=amused.trend, color=category)) +
+amusementPlot <- ggplot(amusement, aes(x=category, y=amused.trend, color=category)) +
   ylim(-0.5, 0.75) + 
-  geom_hline(aes(yintercept = -0.11), size=0.75, linetype='dashed') +
-  geom_pointrange(aes(ymax=upper.CL, ymin=lower.CL), size = 1.25) +
+  geom_hline(aes(yintercept = -0.100), size=0.5) +
+  geom_pointrange(aes(ymax=upper.CL, ymin=lower.CL), fatten = 6) +
   MFT_color() +
   theme_pubr(legend = 'none') +
-  theme(axis.text.x = element_text(size=8),
-        axis.text.y = element_text(size = 10),
-        plot.title = element_text(size = 18, hjust = 0.5, face = 'bold'),
+  theme(axis.text = element_text(size = 10),
+        plot.title = element_text(size = 14, hjust = 0.5, face = 'bold'),
         axis.title = element_blank()) +
   ggtitle('Amusement')
 
-sadness <- as.data.frame(emtrends(em_category,  ~ category, 'sad')) %>%
-  ggplot(aes(x=category, y=sad.trend, color=category)) +
+sadnessPlot <- ggplot(sadness, aes(x=category, y=sad.trend, color=category)) +
   ylim(-0.5, 0.75) +
-  geom_hline(aes(yintercept = 0.05), size=0.75, linetype='dashed') +
-  geom_pointrange(aes(ymax=upper.CL, ymin=lower.CL), size = 1.25) +
+  geom_hline(aes(yintercept = 0.044), size=0.5) +
+  geom_pointrange(aes(ymax=upper.CL, ymin=lower.CL), fatten = 6) +
   MFT_color() +
   theme_pubr(legend = 'none') +
-  theme(axis.text.x = element_text(size=8),
-        axis.text.y = element_text(size = 10),
-        plot.title = element_text(size = 18, hjust = 0.5, face = 'bold'),
+  theme(axis.text = element_text(size = 10),
+        plot.title = element_text(size = 14, hjust = 0.5, face = 'bold'),
         axis.title = element_blank()) +
   ggtitle('Sadness')
 
-fear <- as.data.frame(emtrends(em_category,  ~ category, 'afraid')) %>%
-  ggplot(aes(x=category, y=afraid.trend, color=category)) +
+fearPlot <- ggplot(fear, aes(x=category, y=afraid.trend, color=category)) +
   ylim(-0.5, 0.75) +
-  geom_hline(aes(yintercept = -0.01), size=0.75, linetype='dashed') +
-  geom_pointrange(aes(ymax=upper.CL, ymin=lower.CL), size = 1.25) +
+  geom_hline(aes(yintercept = -0.009), size=0.5) +
+  geom_pointrange(aes(ymax=upper.CL, ymin=lower.CL), fatten = 6) +
   MFT_color() +
   theme_pubr(legend = 'none') +
-  theme(axis.text.x = element_text(size=8),
-        axis.text.y = element_text(size = 10),
-        plot.title = element_text(size = 18, hjust = 0.5, face = 'bold'),
+  theme(axis.text = element_text(size = 10),
+        plot.title = element_text(size = 14, hjust = 0.5, face = 'bold'),
         axis.title = element_blank()) +
   ggtitle('Fear')
 
-contempt <- as.data.frame(emtrends(em_category,  ~ category, 'contemptuous')) %>%
-  ggplot(aes(x=category, y=contemptuous.trend, color=category)) +
+contemptPlot <- ggplot(contempt, aes(x=category, y=contemptuous.trend, color=category)) +
   ylim(-0.5, 0.75) +
-  geom_hline(aes(yintercept = 0.08), size=0.75, linetype='dashed') +
-  geom_pointrange(aes(ymax=upper.CL, ymin=lower.CL), size = 1.25) +
+  geom_hline(aes(yintercept = 0.074), size=0.5) +
+  geom_pointrange(aes(ymax=upper.CL, ymin=lower.CL), fatten = 6) +
   MFT_color() +
   theme_pubr(legend = 'none') +
-  theme(axis.text.x = element_text(size=8),
-        axis.text.y = element_text(size = 10),
-        plot.title = element_text(size = 18, hjust = 0.5, face = 'bold'),
+  theme(axis.text = element_text(size = 10),
+        plot.title = element_text(size = 14, hjust = 0.5, face = 'bold'),
         axis.title = element_blank()) +
   ggtitle('Contempt')
 
-disgust <- as.data.frame(emtrends(em_category,  ~ category, 'disgusted')) %>%
-  ggplot(aes(x=category, y=disgusted.trend, color=category)) +
+disgustPlot <- ggplot(disgust, aes(x=category, y=disgusted.trend, color=category)) +
   ylim(-0.5, 0.75) +
-  geom_hline(aes(yintercept = 0.15), size=0.75, linetype='dashed') +
-  geom_pointrange(aes(ymax=upper.CL, ymin=lower.CL), size = 1.25) +
+  geom_hline(aes(yintercept = 0.159), size=0.5) +
+  geom_pointrange(aes(ymax=upper.CL, ymin=lower.CL), fatten = 6) +
   MFT_color() +
   theme_pubr(legend = 'none') +
-  theme(axis.text.x = element_text(size=8),
-        axis.text.y = element_text(size = 10),
-        plot.title = element_text(size = 18, hjust = 0.5, face = 'bold'),
+  theme(axis.text = element_text(size = 10),
+        plot.title = element_text(size = 14, hjust = 0.5, face = 'bold'),
         axis.title = element_blank()) +
   ggtitle('Disgust')
 
-PersonalDistress <- as.data.frame(emtrends(em_category,  ~ category, 'PersonalDistressScore')) %>%
-  ggplot(aes(x=category, y=PersonalDistressScore.trend, color=category)) +
+personalDistressPlot <- ggplot(PersonalDistress, aes(x=category, y=PersonalDistressScore.trend, color=category)) +
   ylim(-0.5, 0.75) + 
-  geom_hline(aes(yintercept = 0.01), size=0.75, linetype='dashed') +
-  geom_pointrange(aes(ymax=upper.CL, ymin=lower.CL), size = 1.25) +
+  geom_hline(aes(yintercept = 0.025), size=0.5) +
+  geom_pointrange(aes(ymax=upper.CL, ymin=lower.CL), fatten = 6) +
   MFT_color() +
   theme_pubr(legend = 'none') +
-  theme(axis.text.x = element_text(size=8),
-        axis.text.y = element_text(size = 10),
-        plot.title = element_text(size = 18, hjust = 0.5, face = 'bold'),
+  theme(axis.text = element_text(size = 10),
+        plot.title = element_text(size = 14, hjust = 0.5, face = 'bold'),
         axis.title = element_blank()) +
   ggtitle('Personal Distress')
 
-EmpathicConcern <- as.data.frame(emtrends(em_category,  ~ category, 'EmpathicConcernScore')) %>%
-  ggplot(aes(x=category, y=EmpathicConcernScore.trend, color=category)) +
+empathicConcernPlot <- ggplot(EmpathicConcern, aes(x=category, y=EmpathicConcernScore.trend, color=category)) +
   ylim(-0.5, 0.75) + 
-  geom_hline(aes(yintercept = -0.03), size=0.75, linetype='dashed') +
-  geom_pointrange(aes(ymax=upper.CL, ymin=lower.CL), size = 1.25) +
+  geom_hline(aes(yintercept = 0.018), size=0.5) +
+  geom_pointrange(aes(ymax=upper.CL, ymin=lower.CL), fatten = 6) +
   MFT_color() +
   theme_pubr(legend = 'none') +
   labs(color = 'Foundation') +
-  theme(axis.text.x = element_text(size=8),
-        axis.text.y = element_text(size = 10),
-        plot.title = element_text(size = 18, hjust = 0.5, face = 'bold'),
-        axis.title = element_blank(),
-        legend.text = element_text(size = 14),
-        legend.title = element_text(size = 14)) +
+  theme(axis.text = element_text(size = 10),
+        plot.title = element_text(size = 14, hjust = 0.5, face = 'bold'),
+        axis.title = element_blank()) +
   ggtitle('Empathic Concern')
 
-(anger | amusement)/  (sadness | fear) / (contempt | disgust) / (PersonalDistress | EmpathicConcern) 
+((angerPlot | amusementPlot) /  (sadnessPlot | fearPlot) / (contemptPlot | disgustPlot) / (personalDistressPlot | empathicConcernPlot)) &
+  plot_annotation(tag_levels = 'A', tag_suffix = '.') & 
+  theme(text = element_text(family = 'Times New Roman'), plot.tag = element_text(size = 11))
+  
+ggsave('plot_emtrends.png', width = 13, height = 10, dpi = 400)
 ```
 
 ## Memory
@@ -911,6 +936,30 @@ em_category_confidence <- lmer(confresp ~
                  data=em_compare, control=lmerControl(optCtrl=list(maxfun=5000)))
 
 kable(compare_performance(modelConfidenceNull, modelConfidence, em_confidence, em_category_confidence, bayesfactor = FALSE, rank = TRUE))
+```
+
+# multiple voxel extraction
+```{r}
+insula_activity <- read.delim(file = '../MFT_PLS/4_TR_analysis/multiple voxel extraction/insula/insula_fMRIvoxeldata.txt', header = FALSE, sep = "")
+colnames(insula_activity) <- c('TR1','TR2','TR3','TR4')
+insula_activity$category <- rep(matlab_categories, each=27)
+insula_activity$subID <- dataSubs
+insula_activity <- pivot_longer(insula_activity, cols = c(TR1, TR2, TR3, TR4), names_to = 'TR', values_to = 'Intensity')
+insula_activity$category <- factor(insula_activity$category, levels = plotting_categories)
+insula_activity_means <- insula_activity %>% group_by(category, TR) %>%
+  summarise(Intensity = mean(Intensity))
+
+ggplot(insula_activity_means, aes(x=TR, y=Intensity, color=category, group = category)) +
+  scale_x_discrete(expand = c(0, 0, 0, 0.08)) +
+  geom_hline(aes(yintercept = 0), size=1) +
+  geom_line(size=1) + 
+  geom_point(aes(fill=category, color=category, shape = category), size=3) +
+  scale_shape_manual(values = c(4,15,16,17,0,1,2, 3)) +
+  MFT_color() + 
+  theme_pubr() +
+  ggtitle('Insula voxel response')
+
+
 ```
 
 ### Old code -- not used
