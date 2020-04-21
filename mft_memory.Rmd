@@ -630,19 +630,8 @@ kable(compare_performance(modelNull, modelMoral, em_everything, em_category, bay
 ```
 
 ```{r sum-code em_category, include = FALSE}
-em_category <- lmer(moral_decision ~ 
-                        category * angry + 
-                        category * amused + 
-                        category * sad + 
-                        category * afraid + 
-                        category * contemptuous + 
-                        category * disgusted + 
-                        category * PersonalDistressScore + 
-                        category * EmpathicConcernScore + 
-                        (1|subID) + (1|vigfile), data = em_compare, contrasts = list(category=contr.sum))
-
 tab_model(em_category,
-          file = 'Emotion&Empathy*Foundation.html',
+          #file = 'Emotion&Empathy*Foundation.html',
           digits = 3, 
           title = 'Table A3: Emotion & Empathy*Foundation summary',
           show.ci = 0.95, show.stat = TRUE, show.p = TRUE, show.ngroups = TRUE, show.df = TRUE,
@@ -665,112 +654,203 @@ tab_model(em_category,
                           'Care-Emo*Empathic Concern','Care-Phys*Empathic Concern','Fairness*Empathic Concern'))
 ```
 
-```{r plot em category trends, echo=FALSE, fig.width = 10, fig.height = 12, include=FALSE}
-anger <- as.data.frame(emtrends(em_category,  ~ category, 'angry'))
-amusement <- as.data.frame(emtrends(em_category,  ~ category, 'amused'))
-sadness <- as.data.frame(emtrends(em_category,  ~ category, 'sad'))
-fear <- as.data.frame(emtrends(em_category,  ~ category, 'afraid'))
-contempt <- as.data.frame(emtrends(em_category,  ~ category, 'contemptuous'))
-disgust <- as.data.frame(emtrends(em_category,  ~ category, 'disgusted'))
-PersonalDistress <- as.data.frame(emtrends(em_category,  ~ category, 'PersonalDistressScore'))
-EmpathicConcern <- as.data.frame(emtrends(em_category,  ~ category, 'EmpathicConcernScore'))
+
+```{r compute em lines}
+em_range <- function(emotion, precision=0.5) {
+  return(seq(min(em_compare[,emotion], na.rm=TRUE),
+             max(em_compare[,emotion], na.rm=TRUE),
+             precision))
+}
+
+# make dfs for plotting
+anger_trends <- as.data.frame(emmeans(em_category, ~ angry | category, at=list(angry=em_range('angry'))))
+anger_effect <- as.data.frame(emmeans(em_category, ~ angry, at=list(angry=em_range('angry'))))
+anger.emt <- emtrends(em_category, ~ category, 'angry')
+
+amusement_trends <- as.data.frame(emmeans(em_category, ~ amused | category, at=list(amused=em_range('amused'))))
+amusement_effect <- as.data.frame(emmeans(em_category, ~ amused, at=list(amused=em_range('amused'))))
+amusement.emt <- emtrends(em_category, ~ category, 'amused')
+
+sadness_trends <- as.data.frame(emmeans(em_category, ~ sad | category, at=list(sad=em_range('sad'))))
+sadness_effect <- as.data.frame(emmeans(em_category, ~ sad, at=list(sad=em_range('sad'))))
+sadness.emt <- emtrends(em_category, ~ category, 'sad')
+
+fear_trends <- as.data.frame(emmeans(em_category, ~ afraid | category, at=list(afraid=em_range('afraid'))))
+fear_effect <- as.data.frame(emmeans(em_category, ~ afraid, at=list(afraid=em_range('afraid'))))
+fear.emt <- emtrends(em_category, ~ category, 'afraid')
+
+contempt_trends <- as.data.frame(emmeans(em_category, ~ contemptuous | category, at=list(contemptuous=em_range('contemptuous'))))
+contempt_effect <- as.data.frame(emmeans(em_category, ~ contemptuous, at=list(contemptuous=em_range('contemptuous'))))
+contempt.emt <- emtrends(em_category, ~ category, 'contemptuous')
+
+disgust_trends <- as.data.frame(emmeans(em_category, ~ disgusted | category, at=list(disgusted=em_range('disgusted'))))
+disgust_effect <- as.data.frame(emmeans(em_category, ~ disgusted, at=list(disgusted=em_range('disgusted'))))
+disgust.emt <- emtrends(em_category, ~ category, 'disgusted')
+
+personalDistress_trends <- as.data.frame(emmeans(em_category, ~ PersonalDistressScore | category, at=list(PersonalDistressScore=em_range('PersonalDistressScore'))))
+personalDistress_effect <- as.data.frame(emmeans(em_category, ~ PersonalDistressScore, at=list(PersonalDistressScore=em_range('PersonalDistressScore'))))
+PD.emt <- emtrends(em_category, ~ category, 'PersonalDistressScore')
+
+empathicConcern_trends <- as.data.frame(emmeans(em_category, ~ EmpathicConcernScore | category, at=list(EmpathicConcernScore=em_range('EmpathicConcernScore'))))
+empathicConcern_effect <- as.data.frame(emmeans(em_category, ~ EmpathicConcernScore, at=list(EmpathicConcernScore=em_range('EmpathicConcernScore'))))
+EC.emt <- emtrends(em_category, ~ category, 'EmpathicConcernScore')
+
+
 ```
 
 ```{r plot em category trends}
-angerPlot <- ggplot(anger, aes(x=category, y=angry.trend, color=category)) +
-  ylim(-0.5, 0.75) +
-  geom_hline(aes(yintercept = 0.123), size=0.5) +
-  geom_pointrange(aes(ymax=upper.CL, ymin=lower.CL), fatten = 6) +
-  MFT_color() +
+ggplot(anger_trends, aes(x=angry, y=emmean,ymin=lower.CL, ymax=upper.CL)) +
+  geom_line(data = anger_effect) +
+  geom_ribbon(data = anger_effect, alpha = 0.2) +
+  geom_line(aes(color=category)) +
+  geom_ribbon(aes(fill=category), alpha=0.3) +
+  facet_grid(. ~ category) +
+  MFT_color() + MFT_fill() +
   theme_pubr(legend = 'none') +
+  labs(y='Moral judgment', x='Anger (scaled)', tag = 'A.', title = 'Anger') +
   theme(axis.text = element_text(size=10),
-        plot.title = element_text(size = 14, hjust = 0.5, face = 'bold'),
-        axis.title = element_blank()) + 
-  ggtitle('Anger')
+        plot.title = element_text(size = 16, hjust = 0.5, face = 'bold'),
+        strip.background = element_rect(color = 'black', fill='gray99', size = 0.25),
+        strip.text = element_text(face = 'bold', size = 12),
+        panel.border = element_rect(colour = 'black', fill = NA, size = 0.25),
+        axis.line = element_line(size = 0.25),
+        text = element_text(family = 'Times New Roman'))
+ggsave('figures/paper/plot_anger.png', dpi = 300, width = 13)
+contrast(anger.emt)
 
-amusementPlot <- ggplot(amusement, aes(x=category, y=amused.trend, color=category)) +
-  ylim(-0.5, 0.75) + 
-  geom_hline(aes(yintercept = -0.100), size=0.5) +
-  geom_pointrange(aes(ymax=upper.CL, ymin=lower.CL), fatten = 6) +
-  MFT_color() +
+ggplot(amusement_trends, aes(x=amused, y=emmean,ymin=lower.CL, ymax=upper.CL)) +
+  geom_line(data = amusement_effect) +
+  geom_ribbon(data = amusement_effect, alpha = 0.2) +
+  geom_line(aes(color=category)) +
+  geom_ribbon(aes(fill=category), alpha=0.3) +
+  facet_grid(. ~ category) +
+  MFT_color() + MFT_fill() +
   theme_pubr(legend = 'none') +
-  theme(axis.text = element_text(size = 10),
-        plot.title = element_text(size = 14, hjust = 0.5, face = 'bold'),
-        axis.title = element_blank()) +
-  ggtitle('Amusement')
+  labs(y='Moral judgment', x='Amusement (scaled)', tag = 'B.', title = 'Amusement') +
+  theme(axis.text = element_text(size=10),
+        plot.title = element_text(size = 16, hjust = 0.5, face = 'bold'),
+        strip.background = element_rect(color = 'black', fill='gray99', size = 0.25),
+        strip.text = element_text(face = 'bold', size = 12),
+        panel.border = element_rect(colour = 'black', fill = NA, size = 0.25),
+        axis.line = element_line(size = 0.25),
+        text = element_text(family = 'Times New Roman'))
+ggsave('figures/paper/plot_amusement.png', width=13, dpi = 300)
+contrast(amusement.emt)
 
-sadnessPlot <- ggplot(sadness, aes(x=category, y=sad.trend, color=category)) +
-  ylim(-0.5, 0.75) +
-  geom_hline(aes(yintercept = 0.044), size=0.5) +
-  geom_pointrange(aes(ymax=upper.CL, ymin=lower.CL), fatten = 6) +
-  MFT_color() +
+
+ggplot(sadness_trends, aes(x=sad, y=emmean,ymin=lower.CL, ymax=upper.CL)) +
+  geom_line(data = sadness_effect) +
+  geom_ribbon(data = sadness_effect, alpha = 0.2) +
+  geom_line(aes(color=category)) +
+  geom_ribbon(aes(fill=category), alpha=0.3) +
+  facet_grid(. ~ category) +
+  MFT_color() + MFT_fill() +
   theme_pubr(legend = 'none') +
-  theme(axis.text = element_text(size = 10),
-        plot.title = element_text(size = 14, hjust = 0.5, face = 'bold'),
-        axis.title = element_blank()) +
-  ggtitle('Sadness')
+  labs(y='Moral judgment', x='Sadness (scaled)', tag = 'C.', title = 'Sadness') +
+  theme(axis.text = element_text(size=10),
+        plot.title = element_text(size = 16, hjust = 0.5, face = 'bold'),
+        strip.background = element_rect(color = 'black', fill='gray99', size = 0.25),
+        strip.text = element_text(face = 'bold', size = 12),
+        panel.border = element_rect(colour = 'black', fill = NA, size = 0.25),
+        axis.line = element_line(size = 0.25),
+        text = element_text(family = 'Times New Roman'))
+ggsave('figures/paper/plot_sadness.png', width = 13, dpi = 300)
+contrast(sadness.emt)
 
-fearPlot <- ggplot(fear, aes(x=category, y=afraid.trend, color=category)) +
-  ylim(-0.5, 0.75) +
-  geom_hline(aes(yintercept = -0.009), size=0.5) +
-  geom_pointrange(aes(ymax=upper.CL, ymin=lower.CL), fatten = 6) +
-  MFT_color() +
+ggplot(fear_trends, aes(x=afraid, y=emmean,ymin=lower.CL, ymax=upper.CL)) +
+  geom_line(data = fear_effect) +
+  geom_ribbon(data = fear_effect, alpha = 0.2) +
+  geom_line(aes(color=category)) +
+  geom_ribbon(aes(fill=category), alpha=0.3) +
+  facet_grid(. ~ category) +
+  MFT_color() + MFT_fill() +
   theme_pubr(legend = 'none') +
-  theme(axis.text = element_text(size = 10),
-        plot.title = element_text(size = 14, hjust = 0.5, face = 'bold'),
-        axis.title = element_blank()) +
-  ggtitle('Fear')
+  labs(y='Moral judgment', x='Fear (scaled)', tag = 'D.', title = 'Fear') +
+  theme(axis.text = element_text(size=10),
+        plot.title = element_text(size = 16, hjust = 0.5, face = 'bold'),
+        strip.background = element_rect(color = 'black', fill='gray99', size = 0.25),
+        strip.text = element_text(face = 'bold', size = 12),
+        panel.border = element_rect(colour = 'black', fill = NA, size = 0.25),
+        axis.line = element_line(size = 0.25),
+        text = element_text(family = 'Times New Roman'))
+ggsave('figures/paper/plot_fear.png', width = 13, dpi = 300)
+contrast(fear.emt)
 
-contemptPlot <- ggplot(contempt, aes(x=category, y=contemptuous.trend, color=category)) +
-  ylim(-0.5, 0.75) +
-  geom_hline(aes(yintercept = 0.074), size=0.5) +
-  geom_pointrange(aes(ymax=upper.CL, ymin=lower.CL), fatten = 6) +
-  MFT_color() +
+ggplot(contempt_trends, aes(x=contemptuous, y=emmean,ymin=lower.CL, ymax=upper.CL)) +
+  geom_line(data = contempt_effect) +
+  geom_ribbon(data = contempt_effect, alpha = 0.2) +
+  geom_line(aes(color=category)) +
+  geom_ribbon(aes(fill=category), alpha=0.3) +
+  facet_grid(. ~ category) +
+  MFT_color() + MFT_fill() +
   theme_pubr(legend = 'none') +
-  theme(axis.text = element_text(size = 10),
-        plot.title = element_text(size = 14, hjust = 0.5, face = 'bold'),
-        axis.title = element_blank()) +
-  ggtitle('Contempt')
+  labs(y='Moral judgment', x='Contempt (scaled)', tag = 'E.', title = 'Contempt') +
+  theme(axis.text = element_text(size=10),
+        plot.title = element_text(size = 16, hjust = 0.5, face = 'bold'),
+        strip.background = element_rect(color = 'black', fill='gray99', size = 0.25),
+        strip.text = element_text(face = 'bold', size = 12),
+        panel.border = element_rect(colour = 'black', fill = NA, size = 0.25),
+        axis.line = element_line(size = 0.25),
+        text = element_text(family = 'Times New Roman'))
+ggsave('figures/paper/plot_contempt.png', width = 13, dpi = 300)
+contrast(contempt.emt)
 
-disgustPlot <- ggplot(disgust, aes(x=category, y=disgusted.trend, color=category)) +
-  ylim(-0.5, 0.75) +
-  geom_hline(aes(yintercept = 0.159), size=0.5) +
-  geom_pointrange(aes(ymax=upper.CL, ymin=lower.CL), fatten = 6) +
-  MFT_color() +
+ggplot(disgust_trends, aes(x=disgusted, y=emmean,ymin=lower.CL, ymax=upper.CL)) +
+  geom_line(data = disgust_effect) +
+  geom_ribbon(data = disgust_effect, alpha = 0.2) +
+  geom_line(aes(color=category)) +
+  geom_ribbon(aes(fill=category), alpha=0.3) +
+  facet_grid(. ~ category) +
+  MFT_color() + MFT_fill() +
   theme_pubr(legend = 'none') +
-  theme(axis.text = element_text(size = 10),
-        plot.title = element_text(size = 14, hjust = 0.5, face = 'bold'),
-        axis.title = element_blank()) +
-  ggtitle('Disgust')
+  labs(y='Moral judgment', x='Disgust (scaled)', tag = 'F.', title = 'Disgust') +
+  theme(axis.text = element_text(size=10),
+        plot.title = element_text(size = 16, hjust = 0.5, face = 'bold'),
+        strip.background = element_rect(color = 'black', fill='gray99', size = 0.25),
+        strip.text = element_text(face = 'bold', size = 12),
+        panel.border = element_rect(colour = 'black', fill = NA, size = 0.25),
+        axis.line = element_line(size = 0.25),
+        text = element_text(family = 'Times New Roman'))
+ggsave('figures/paper/plot_disgust.png', width = 13, dpi = 300)
+contrast(disgust.emt)
 
-personalDistressPlot <- ggplot(PersonalDistress, aes(x=category, y=PersonalDistressScore.trend, color=category)) +
-  ylim(-0.5, 0.75) + 
-  geom_hline(aes(yintercept = 0.025), size=0.5) +
-  geom_pointrange(aes(ymax=upper.CL, ymin=lower.CL), fatten = 6) +
-  MFT_color() +
+ggplot(personalDistress_trends, aes(x=PersonalDistressScore, y=emmean,ymin=lower.CL, ymax=upper.CL)) +
+  geom_line(data = personalDistress_effect) +
+  geom_ribbon(data = personalDistress_effect, alpha = 0.2) +
+  geom_line(aes(color=category)) +
+  geom_ribbon(aes(fill=category), alpha=0.3) +
+  facet_grid(. ~ category) +
+  MFT_color() + MFT_fill() +
   theme_pubr(legend = 'none') +
-  theme(axis.text = element_text(size = 10),
-        plot.title = element_text(size = 14, hjust = 0.5, face = 'bold'),
-        axis.title = element_blank()) +
-  ggtitle('Personal Distress')
+  labs(y='Moral judgment', x='Personal Distress (scaled)', tag = 'G.', title = 'Personal Distress') +
+  theme(axis.text = element_text(size=10),
+        plot.title = element_text(size = 16, hjust = 0.5, face = 'bold'),
+        strip.background = element_rect(color = 'black', fill='gray99', size = 0.25),
+        strip.text = element_text(face = 'bold', size = 12),
+        panel.border = element_rect(colour = 'black', fill = NA, size = 0.25),
+        axis.line = element_line(size = 0.25),
+        text = element_text(family = 'Times New Roman'))
+ggsave('figures/paper/plot_personalDistress.png', width = 13, dpi = 300)
+contrast(PD.emt)
 
-empathicConcernPlot <- ggplot(EmpathicConcern, aes(x=category, y=EmpathicConcernScore.trend, color=category)) +
-  ylim(-0.5, 0.75) + 
-  geom_hline(aes(yintercept = 0.018), size=0.5) +
-  geom_pointrange(aes(ymax=upper.CL, ymin=lower.CL), fatten = 6) +
-  MFT_color() +
+ggplot(empathicConcern_trends, aes(x=EmpathicConcernScore, y=emmean,ymin=lower.CL, ymax=upper.CL)) +
+  geom_line(data = empathicConcern_effect) +
+  geom_ribbon(data = empathicConcern_effect, alpha = 0.2) +
+  geom_line(aes(color=category)) +
+  geom_ribbon(aes(fill=category), alpha=0.3) +
+  facet_grid(. ~ category) +
+  MFT_color() + MFT_fill() +
   theme_pubr(legend = 'none') +
-  labs(color = 'Foundation') +
-  theme(axis.text = element_text(size = 10),
-        plot.title = element_text(size = 14, hjust = 0.5, face = 'bold'),
-        axis.title = element_blank()) +
-  ggtitle('Empathic Concern')
-
-((angerPlot | amusementPlot) /  (sadnessPlot | fearPlot) / (contemptPlot | disgustPlot) / (personalDistressPlot | empathicConcernPlot)) &
-  plot_annotation(tag_levels = 'A', tag_suffix = '.') & 
-  theme(text = element_text(family = 'Times New Roman'), plot.tag = element_text(size = 11))
-  
-ggsave('plot_emtrends.png', width = 13, height = 10, dpi = 400)
+  labs(y='Moral judgment', x='Empathic Concern (scaled)', tag = 'H.', title = 'Empathic Concern') +
+  theme(axis.text = element_text(size=10),
+        plot.title = element_text(size = 16, hjust = 0.5, face = 'bold'),
+        strip.background = element_rect(color = 'black', fill='gray99', size = 0.25),
+        strip.text = element_text(face = 'bold', size = 12),
+        panel.border = element_rect(colour = 'black', fill = NA, size = 0.25),
+        axis.line = element_line(size = 0.25),
+        text = element_text(family = 'Times New Roman'))
+ggsave('figures/paper/plot_empathicConcern.png', width = 13, dpi = 300)
+contrast(EC.emt)
 ```
 
 ## Memory
