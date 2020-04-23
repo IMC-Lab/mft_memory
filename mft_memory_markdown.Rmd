@@ -203,7 +203,6 @@ data_old <- subset(data, old == '1' & encoding_RT > 0.25)
 # make custom color palette
 ## shoutout https://edwinth.github.io/blog/paletti/ for the elegant paletti method of doing this
 ## https://learnui.design/tools/data-color-picker.html used for generating the gradients, but I heavily tweaked the default output
-colors <- c('#c179f7', '#f59692', '#e65e60', '#cc2943', '#bfd2f2', '#86b1e4', '#2b8cd6', '#7CAE00')
 colors <- c('#c179f7', '#c40233', '#E60026','#ea3c53', '#2b8cd6', '#86b1e4','#bfd2f2','#7CAE00')
 viz_palette(colors)
 mem_colors <- c('#c179f7', '#c40233', '#E60026','#ea3c53', '#2b8cd6', '#86b1e4','#bfd2f2','#7CAE00',
