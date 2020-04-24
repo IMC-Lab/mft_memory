@@ -1031,7 +1031,8 @@ contrast(fantasy.emt, adjust = 'none')
 # generalized linear mixed effect model (outcome is binary)
 modelMemory <- glmer(correct ~ category * old + (1|subID) + (1|vigfile),
                      data=data, family = binomial(link = 'logit'), 
-                     control=glmerControl(optimizer = 'bobyqa', optCtrl = list(maxfun=5000)))
+                     control=glmerControl(optimizer = 'bobyqa', optCtrl = list(maxfun=5000)),
+                     contrasts = list(category=contr.sum))
 summary(modelMemory)
 
 # make pretty table
@@ -1043,22 +1044,21 @@ tab_model(modelMemory,
           strings = c(stat = 't value', ci = 'CI (95%)', pred = 'Factors', p = 'p value'),
           dv.labels = 'correct', 
           col.order = c('est','ci','df.error','stat','p'),
-          pred.labels = c('Intercept (Social Norms)', 
-                          'Authority', 'Loyalty', 'Purity', 'Harm-Emo', 'Harm-Phys', 'Fairness', 'Liberty',
-                          'New', 'Authority*New', 'Loyalty*New', 'Purity*New', 'Harm-Emo*New', 'Harm-Phys*New',
-                          'Fairness*New', 'Liberty*New'))
+          pred.labels = c('Intercept', 
+                          'Social Norms', 'Authority', 'Loyalty', 'Purity', 'Harm-Emo', 'Harm-Phys', 'Fairness',
+                          'New - Old', 'Social Norms*New', 'Authority*New', 'Loyalty*New', 'Purity*New', 'Harm-Emo*New', 'Harm-Phys*New',
+                          'Fairness*New'))
 
 # compute effect size 
-modelMemory.emt <- emmeans(modelMemory, ~ old*category, type='response')
+emmeans(modelMemory, ~ category, at=list(c(old=1)), type = 'response') %>%
+  eff_size(sigma = sd(data$correct), edf = df.residual(modelMemory), method = 'eff')
 
-modelMemory %>% emmeans( ~ old | category) %>%
-  eff_size(edf = df.residual(modelMemory), sigma = sd(data$correct), method = 'pairwise')
+emmeans(modelMemory, ~ old, type = 'response') %>%
+  eff_size(sigma = sd(data$correct), edf = df.residual(modelMemory), method = 'eff')
 
-modelMemory.emt <- emmeans(modelMemory, ~ category)
-eff_size(modelMemory.emt, edf = df.residual(modelMemory), sigma = sd(data$correct), method = 'identity')
-
-modelMemoryOld.emt <- emmeans(modelMemory, ~old)
-eff_size(modelMemoryOld.emt, edf = df.residual(modelMemory), sigma = sd(data$correct), method = 'pairwise')
+emmeans(modelMemory, ~ old | category, at=list(c(old=0,1)), type='response') %>% 
+  contrast(interaction=c('revpairwise', 'eff')) %>%
+  eff_size(sigma = sd(data$correct), edf = df.residual(modelMemory), method = 'identity')
 
 # plotting prep
 data <- data %>% group_by(subID, category, old) %>% mutate(propCorrect = mean(correct)) # so that violin plots can reflect participant response densities
@@ -1083,19 +1083,18 @@ ggsave('figures/memory_accuracy.png', dpi = 1200)
 # superordinate model comparison
 modelMemoryNull <- glmer(correct ~ old + (1 | subID) + (1|vigfile),
                  data=data, family=binomial(link = 'logit'),
-                 control=glmerControl(optimizer = 'bobyqa', optCtrl=list(maxfun=50000)))
-
-modelMemory <- glmer(correct ~ category * old + (1|subID) + (1|vigfile),
-                     data=data, family = binomial(link = 'logit'), 
-                     control=glmerControl(optimizer = 'bobyqa', optCtrl = list(maxfun=5000)))
+                 control=glmerControl(optimizer = 'bobyqa', optCtrl=list(maxfun=5000)),
+                 contrasts = list(category=contr.sum))
 
 modelSupMemory <- glmer(correct ~ superordinate * old + (1 | subID) + (1|vigfile),
                  data=data, family=binomial(link = 'logit'), 
-                 control=glmerControl(optimizer = 'bobyqa', optCtrl=list(maxfun=50000)))
+                 control=glmerControl(optimizer = 'bobyqa', optCtrl=list(maxfun=5000)),
+                 contrasts = list(superordinate=contr.sum))
 
 modelSupMemoryNew <- glmer(correct ~ superordinate_new * old + (1 | subID) + (1|vigfile),
                  data=data, family=binomial(link = 'logit'), 
-                 control=glmerControl(optimizer = 'bobyqa',optCtrl=list(maxfun=50000)))
+                 control=glmerControl(optimizer = 'bobyqa',optCtrl=list(maxfun=5000)),
+                 contrasts = list(superordinate_new=contr.sum))
 
 kable(compare_performance(modelMemoryNull, modelSupMemory, modelSupMemoryNew, modelMemory, bayesfactor = FALSE, rank = TRUE))
 
