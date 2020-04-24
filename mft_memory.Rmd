@@ -664,12 +664,6 @@ em_category <- lmer(moral_decision ~
                         category * FantasyScore +
                         (1|subID) + (1|vigfile), data = em_compare,
                     contrasts = list(category=contr.sum))
-
-emmeans(em_category, ~ category * angry) %>% eff_size(sigma=sd(em_compare$moral_decision), edf=df.residual(modelMoral), method='eff')
-
-em_category.cov <- list(angry=0, amused=0, sad=0, afraid=0, contemptuous=0, disgusted=0, 
-                        PersonalDistressScore=0, EmpathicConcernScore=0, 
-                        PerspectiveTakingScore=0, FantasyScore=0)
 ```
 
 ```{r make em comparison table}
@@ -677,6 +671,7 @@ kable(compare_performance(modelNull, modelMoral, em_everything, em_category, bay
 ```
 
 ```{r sum-code em_category, include = FALSE}
+# make pretty table
 tab_model(em_category,
           #file = 'figures/paper/table_Emotion&Empathy*Foundation_2.html',
           digits = 3, 
@@ -703,54 +698,87 @@ tab_model(em_category,
                           'Harm-Emo*Perspective Taking', 'Harm-Phys*Perspective Taking', 'Fairness*Perspective Taking',
                           'Social Norms*Fantasy', 'Authority*Fantasy', 'Loyalty*Fantasy','Purity*Fantasy','Harm-Emo*Fantasy','Harm-Phys*Fantasy','Fairness*Fantasy'))
 
+# compute effect sizes
+em_category.cov <- list(angry=0, amused=0, sad=0, afraid=0, contemptuous=0, disgusted=0, 
+                        PersonalDistressScore=0, EmpathicConcernScore=0, 
+                        PerspectiveTakingScore=0, FantasyScore=0)
 
-em_categoryCategory <- emmeans(em_category, ~ category, at=em_category.cov)
-eff_size(em_categoryCategory, sigma = sd(em_compare$moral_decision), edf = df.residual(em_category), method = 'eff')
+emmeans(em_category, ~ category, at=em_category.cov) %>%
+  eff_size(em_categoryCategory, sigma = sd(em_compare$moral_decision), edf = df.residual(em_category), method = 'eff')
 
-em_categoryAngry <- emmeans(em_category, ~ angry, at=list_modify(em_category.cov, angry=c(0,1)))
-eff_size(em_categoryAngry, sigma = sd(em_compare$moral_decision), edf = df.residual(em_category), method = 'revpairwise')
+emmeans(em_category, ~ angry, at=list_modify(em_category.cov, angry=c(0,1))) %>%
+  eff_size(sigma = sd(em_compare$moral_decision), edf = df.residual(em_category), method = 'revpairwise')
 
-em_categoryAmused <- emmeans(em_category, ~ amused, at=list_modify(em_category.cov, amused=c(0,1)))
-eff_size(em_categoryAmused, sigma = sd(em_compare$moral_decision), edf = df.residual(em_category), method = 'revpairwise')
+emmeans(em_category, ~ amused, at=list_modify(em_category.cov, amused=c(0,1))) %>%
+  eff_size(sigma = sd(em_compare$moral_decision), edf = df.residual(em_category), method = 'revpairwise')
 
-em_categorySad <- emmeans(em_category, ~ sad, at=list_modify(em_category.cov, sad=c(0,1)))
-eff_size(em_categorySad, sigma = sd(em_compare$moral_decision), edf = df.residual(em_category), method = 'revpairwise')
+em_categorySad <- emmeans(em_category, ~ sad, at=list_modify(em_category.cov, sad=c(0,1))) %>%
+  eff_size(sigma = sd(em_compare$moral_decision), edf = df.residual(em_category), method = 'revpairwise')
 
-em_categoryFear <- emmeans(em_category, ~ afraid, at=list_modify(em_category.cov, afraid=c(0,1)))
-eff_size(em_categoryFear, sigma = sd(em_compare$moral_decision), edf = df.residual(em_category), method = 'revpairwise')
+emmeans(em_category, ~ afraid, at=list_modify(em_category.cov, afraid=c(0,1))) %>%
+  eff_size(sigma = sd(em_compare$moral_decision), edf = df.residual(em_category), method = 'revpairwise')
 
-em_categoryContempt <- emmeans(em_category, ~ contemptuous, at=list_modify(em_category.cov, contemptuous=c(0,1)))
-eff_size(em_categoryContempt, sigma = sd(em_compare$moral_decision), edf = df.residual(em_category), method = 'revpairwise')
+emmeans(em_category, ~ contemptuous, at=list_modify(em_category.cov, contemptuous=c(0,1))) %>%
+  eff_size(sigma = sd(em_compare$moral_decision), edf = df.residual(em_category), method = 'revpairwise')
 
-em_categoryDisgust <- emmeans(em_category, ~ disgusted, at=list_modify(em_category.cov, disgusted=c(0,1)))
-eff_size(em_categoryDisgust, sigma = sd(em_compare$moral_decision), edf = df.residual(em_category), method = 'revpairwise')
+emmeans(em_category, ~ disgusted, at=list_modify(em_category.cov, disgusted=c(0,1))) %>% 
+  eff_size(sigma = sd(em_compare$moral_decision), edf = df.residual(em_category), method = 'revpairwise')
 
-em_categoryPD <- emmeans(em_category, ~ PersonalDistressScore, at=list_modify(em_category.cov, PersonalDistressScore=c(0,1)))
-eff_size(em_categoryPD, sigma = sd(em_compare$moral_decision), edf = df.residual(em_category), method = 'revpairwise')
+emmeans(em_category, ~ PersonalDistressScore, at=list_modify(em_category.cov, PersonalDistressScore=c(0,1))) %>%
+  eff_size(sigma = sd(em_compare$moral_decision), edf = df.residual(em_category), method = 'revpairwise')
 
-em_categoryEC <- emmeans(em_category, ~ EmpathicConcernScore, at=list_modify(em_category.cov, EmpathicConcernScore=c(0,1)))
-eff_size(em_categoryEC, sigma = sd(em_compare$moral_decision), edf = df.residual(em_category), method = 'revpairwise')
+emmeans(em_category, ~ EmpathicConcernScore, at=list_modify(em_category.cov, EmpathicConcernScore=c(0,1))) %>%
+  eff_size(sigma = sd(em_compare$moral_decision), edf = df.residual(em_category), method = 'revpairwise')
 
-em_categoryPT <- emmeans(em_category, ~ PerspectiveTakingScore, at=list_modify(em_category.cov, PerspectiveTakingScore=c(0,1)))
-eff_size(em_categoryPT, sigma = sd(em_compare$moral_decision), edf = df.residual(em_category), method = 'revpairwise')
+emmeans(em_category, ~ PerspectiveTakingScore, at=list_modify(em_category.cov, PerspectiveTakingScore=c(0,1))) %>%
+  eff_size(sigma = sd(em_compare$moral_decision), edf = df.residual(em_category), method = 'revpairwise')
 
-em_categoryF <- emmeans(em_category, ~ FantasyScore, at=list_modify(em_category.cov, FantasyScore=c(0,1)))
-eff_size(em_categoryF, sigma = sd(em_compare$moral_decision), edf = df.residual(em_category), method = 'revpairwise')
+emmeans(em_category, ~ FantasyScore, at=list_modify(em_category.cov, FantasyScore=c(0,1))) %>% 
+  eff_size(sigma = sd(em_compare$moral_decision), edf = df.residual(em_category), method = 'revpairwise')
 
-em_categoryAngryInt <- emmeans(em_category, ~ angry * category, at=list_modify(em_category.cov, angry=c(0,1)))
-em_categoryAngryInt %>% contrast(interaction=c('revpairwise', 'eff')) %>%
+emmeans(em_category, ~ angry * category, at=list_modify(em_category.cov, angry=c(0,1))) %>% 
+  contrast(interaction=c('revpairwise', 'eff')) %>%
   eff_size(sigma = sd(em_compare$moral_decision), edf = df.residual(em_category), method = 'identity')
 
-em_categoryAmusedInt <- emmeans(em_category, ~ amused * category, at=list_modify(em_category.cov, amused=c(0,1)))
-em_categoryAmusedInt %>% contrast(interaction=c('revpairwise', 'eff')) %>%
+emmeans(em_category, ~ amused * category, at=list_modify(em_category.cov, amused=c(0,1))) %>% 
+  contrast(interaction=c('revpairwise', 'eff')) %>%
   eff_size(sigma = sd(em_compare$moral_decision), edf = df.residual(em_category), method = 'identity')
 
-em_categorySadInt <- emmeans(em_category, ~ sad * category, at=list_modify(em_category.cov, sad=c(0,1)))
-em_categorySadInt %>% contrast(interaction=c('revpairwise', 'eff')) %>%
+emmeans(em_category, ~ sad * category, at=list_modify(em_category.cov, sad=c(0,1))) %>%
+  contrast(interaction=c('revpairwise', 'eff')) %>%
   eff_size(sigma = sd(em_compare$moral_decision), edf = df.residual(em_category), method = 'identity')
 
+emmeans(em_category, ~ afraid * category, at=list_modify(em_category.cov, afraid=c(0,1))) %>% 
+  contrast(interaction=c('revpairwise', 'eff')) %>%
+  eff_size(sigma = sd(em_compare$moral_decision), edf = df.residual(em_category), method = 'identity')
 
+emmeans(em_category, ~ afraid * category, at=list_modify(em_category.cov, afraid=c(0,1))) %>% 
+  contrast(interaction=c('revpairwise', 'eff')) %>%
+  eff_size(sigma = sd(em_compare$moral_decision), edf = df.residual(em_category), method = 'identity')
 
+emmeans(em_category, ~ contemptuous * category, at=list_modify(em_category.cov, contemptuous=c(0,1))) %>% 
+  contrast(interaction=c('revpairwise', 'eff')) %>%
+  eff_size(sigma = sd(em_compare$moral_decision), edf = df.residual(em_category), method = 'identity')
+
+emmeans(em_category, ~ disgusted * category, at=list_modify(em_category.cov, disgusted=c(0,1))) %>% 
+  contrast(interaction=c('revpairwise', 'eff')) %>%
+  eff_size(sigma = sd(em_compare$moral_decision), edf = df.residual(em_category), method = 'identity')
+
+emmeans(em_category, ~ PersonalDistressScore * category, at=list_modify(em_category.cov, PersonalDistressScore=c(0,1))) %>% 
+  contrast(interaction=c('revpairwise', 'eff')) %>%
+  eff_size(sigma = sd(em_compare$moral_decision), edf = df.residual(em_category), method = 'identity')
+
+emmeans(em_category, ~ EmpathicConcernScore * category, at=list_modify(em_category.cov, EmpathicConcernScore=c(0,1))) %>% 
+  contrast(interaction=c('revpairwise', 'eff')) %>%
+  eff_size(sigma = sd(em_compare$moral_decision), edf = df.residual(em_category), method = 'identity')
+
+emmeans(em_category, ~ PerspectiveTakingScore * category, at=list_modify(em_category.cov, PerspectiveTakingScore=c(0,1))) %>% 
+  contrast(interaction=c('revpairwise', 'eff')) %>%
+  eff_size(sigma = sd(em_compare$moral_decision), edf = df.residual(em_category), method = 'identity')
+
+emmeans(em_category, ~ FantasyScore * category, at=list_modify(em_category.cov, FantasyScore=c(0,1))) %>% 
+  contrast(interaction=c('revpairwise', 'eff')) %>%
+  eff_size(sigma = sd(em_compare$moral_decision), edf = df.residual(em_category), method = 'identity')
 ```
 
 
