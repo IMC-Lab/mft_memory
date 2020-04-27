@@ -360,8 +360,7 @@ MFT_memcol <- get_scale_color(get_pal(mem_colors))
 
 # import font I'm using on my poster
 font_import(paths = NULL, recursive = TRUE, prompt = TRUE,pattern = NULL)
-font_add_google('Lato', 'Lato')
-showtext_auto()
+font_add(family = 'Times')
 
 # prep for PLS
 # task PLS 
@@ -498,11 +497,13 @@ modelMoral_df <- as.data.frame(modelMoral.em)
 ggplot(modelMoral_df, aes(x=category, y=emmean)) +
   ylim(0.98,4) +
   labs(x = 'Foundation', y='Estimated marginal mean', fill='Foundation') +
-  geom_violin(data=data_old, mapping=aes(y=moral_decision, fill=category), alpha=0.85, bw=0.4) + 
+  geom_violin(data=data_old, mapping=aes(y=moral_decision, fill=category), alpha=0.85, bw=0.45) + 
   geom_pointrange(aes(ymin=lower.CL, ymax=upper.CL), alpha=1, fatten=5, color='black') +
   MFT_fill() + MFT_color() +
-  theme_pubr(legend = 'none') +
-  theme(text = element_text(family = 'Times New Roman', size = 12))
+  theme_pubr(legend = 'none',
+             base_family = 'Times New Roman',
+             base_size = 20) +
+  theme(axis.title.x = element_blank())
 ggsave('figures/paper/plot_modelMoral.png', dpi=300)
 ```
 
@@ -664,6 +665,12 @@ em_category <- lmer(moral_decision ~
                         category * FantasyScore +
                         (1|subID) + (1|vigfile), data = em_compare,
                     contrasts = list(category=contr.sum))
+
+modelMoralSup <- lmer(moral_decision ~ superordinate + (1|subID) + (1|vigfile), data = em_compare, contrasts = list(superordinate=contr.sum))
+
+modelMoralSupNew <- lmer(moral_decision ~ superordinate_new + (1|subID) + (1|vigfile), data = em_compare, contrasts = list(superordinate_new=contr.sum))
+
+kable(compare_performance(modelMoral, em_everything, em_category, modelMoralSup, modelMoralSupNew, bayesfactor = FALSE, rank = TRUE))
 ```
 
 ```{r make em comparison table}
