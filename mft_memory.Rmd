@@ -359,8 +359,7 @@ MFT_memfill <- get_scale_fill(get_pal(mem_colors))
 MFT_memcol <- get_scale_color(get_pal(mem_colors))
 
 # import font I'm using on my poster
-font_import(paths = NULL, recursive = TRUE, prompt = TRUE,pattern = NULL)
-font_add(family = 'Times')
+#font_import(paths = NULL, recursive = TRUE, prompt = TRUE,pattern = NULL)
 
 # prep for PLS
 # task PLS 
@@ -428,13 +427,13 @@ confLabels <- c('1' = 'Correct', '0' = 'Incorrect')
 #   xlab('1=not confident at all, 4=extremely confident')
 
 # normed data from Clifford et al (2015)
-mfv <- read.csv('data/mfv.csv')
-mfv$moral_decision <- scale(mfv$moral_decision)
-mfv_comp <- data_old %>% select(category, vigfile, subID, moral_decision) %>%
-  mutate(moral_decision = scale(moral_decision)) %>%
-  group_by(vigfile) %>% 
-  summarise(moral_decision = mean(moral_decision))
-t.test(mfv$moral_decision, mfv_comp$moral_decision, var.eq = T)
+# mfv <- read.csv('data/mfv.csv')
+# mfv$moral_decision <- scale(mfv$moral_decision)
+# mfv_comp <- data_old %>% select(category, vigfile, subID, moral_decision) %>%
+#   mutate(moral_decision = scale(moral_decision)) %>%
+#   group_by(vigfile) %>% 
+#   summarise(moral_decision = mean(moral_decision))
+# t.test(mfv$moral_decision, mfv_comp$moral_decision, var.eq = T)
 ```
 
 
@@ -493,7 +492,7 @@ modelMoral.newContrast <- emmeans(modelMoral, ~ category) %>% contrast(newSupero
 eff_size(modelMoral.newContrast, sigma = modelMoral.sigma, edf = df.residual(modelMoral), method = 'identity')
 
 # plot
-modelMoral_df <- as.data.frame(modelMoral.em)
+modelMoral_df <- as.data.frame(emmeans(modelMoral, ~ category))
 ggplot(modelMoral_df, aes(x=category, y=emmean)) +
   ylim(0.98,4) +
   labs(x = 'Foundation', y='Estimated marginal mean', fill='Foundation') +
@@ -635,13 +634,13 @@ superordinateNew <- lmer(moral_decision ~ superordinate_new + (1|subID) + (1|vig
 ```
 
 ```{r make table for sup comparison results}
-kable(compare_performance(superordinateNull, modelMoral, superordinateOG, superordinateNew, bayesfactor = FALSE, rank = TRUE))
+compare_performance(superordinateNull, modelMoral, superordinateOG, superordinateNew, bayesfactor = FALSE, rank = TRUE)
 ```
 
 ### empathy & emotion model comparison
 ```{r em model comparison, include=FALSE}
 # baseline: no fixed effects
-modelNull <- lmer(moral_decision ~ 1 + (1|subID) + (1|vigfile), data = em_compare, contrasts = list(category=contr.sum)) 
+modelNull <- lmer(moral_decision ~ 1 + (1|subID) + (1|vigfile), data = em_compare) 
 
 # standard: category as fixed effect
 modelMoral <- lmer(moral_decision ~ category + (1|subID) + (1|vigfile), data = em_compare, contrasts = list(category=contr.sum))
@@ -649,7 +648,7 @@ modelMoral <- lmer(moral_decision ~ category + (1|subID) + (1|vigfile), data = e
 # just emotion & empathy as fixed effects
 em_everything <- lmer(moral_decision ~ angry + sad + disgusted + afraid + contemptuous + amused +
                        PersonalDistressScore + EmpathicConcernScore + PerspectiveTakingScore + FantasyScore +
-                        (1|subID) + (1|vigfile), data=em_compare, contrasts = list(category=contr.sum))
+                        (1|subID) + (1|vigfile), data=em_compare)
 
 # each em (emotion & empathy) measure interacts with category
 em_category <- lmer(moral_decision ~ 
@@ -670,11 +669,11 @@ modelMoralSup <- lmer(moral_decision ~ superordinate + (1|subID) + (1|vigfile), 
 
 modelMoralSupNew <- lmer(moral_decision ~ superordinate_new + (1|subID) + (1|vigfile), data = em_compare, contrasts = list(superordinate_new=contr.sum))
 
-kable(compare_performance(modelMoral, em_everything, em_category, modelMoralSup, modelMoralSupNew, bayesfactor = FALSE, rank = TRUE))
+compare_performance(modelMoral, em_everything, em_category, modelMoralSup, modelMoralSupNew, bayesfactor = FALSE, rank = TRUE)
 ```
 
 ```{r make em comparison table}
-kable(compare_performance(modelNull, modelMoral, em_everything, em_category, bayesfactor = FALSE, rank = TRUE))
+compare_performance(modelNull, modelMoral, em_everything, em_category, bayesfactor = FALSE, rank = TRUE)
 ```
 
 ```{r sum-code em_category, include = FALSE}
