@@ -358,9 +358,9 @@ MFT_color <- get_scale_color(get_pal(colors))
 MFT_memfill <- get_scale_fill(get_pal(mem_colors))
 MFT_memcol <- get_scale_color(get_pal(mem_colors))
 
-# import font I'm using on my poster
+# import fonts from my poster
 font_import(paths = NULL, recursive = TRUE, prompt = TRUE,pattern = NULL)
-font_add_google('Lato', 'Lato')
+font_add_google('Raleway', 'Raleway')
 showtext_auto()
 
 # prep for PLS
@@ -430,12 +430,15 @@ confLabels <- c('1' = 'Correct', '0' = 'Incorrect')
 
 # normed data from Clifford et al (2015)
 mfv <- read.csv('data/mfv.csv')
-mfv$moral_decision <- scale(mfv$moral_decision)
-mfv_comp <- data_old %>% select(category, vigfile, subID, moral_decision) %>%
+mfv <- mfv %>% group_by(category) %>%
+  mutate(moral_decision = scale(moral_decision))
+mfv_comp <- data_old %>% 
+  select(category, vigfile, moral_decision) %>%
   mutate(moral_decision = scale(moral_decision)) %>%
   group_by(vigfile) %>% 
   summarise(moral_decision = mean(moral_decision))
-t.test(mfv$moral_decision, mfv_comp$moral_decision, var.eq = T)
+t.test(mfv$moral_decision, mfv_comp$moral_decision)
+wilcox.test(mfv$moral_decision, mfv_comp$moral_decision, conf.int = 0.95)
 ```
 
 
@@ -511,7 +514,7 @@ ggsave('figures/paper/plot_modelMoral.png', dpi=300)
 p1 <- ggplot(data = mean_centered_results_LV1, 
        aes(x=category, y=LV1, fill=category, color=category)) +
   geom_hline(aes(yintercept = 0), size = 0.5) +
-  ylab('Brain scores') + xlab('Foundation') +
+  labs(y = 'Brain scores', x = 'Foundation', title = 'LV1: 24.4% crossblock variance') +
   geom_col(color='black') + 
   geom_point(color='black', size=1) +
   geom_errorbar(aes(ymax = upper, ymin = lower), color='black', size=0.5, width=0.25) +
@@ -520,8 +523,22 @@ p1 <- ggplot(data = mean_centered_results_LV1,
   theme(axis.title.x = element_blank(),
         axis.title.y = element_text(size=14),
         axis.text = element_text(size = 12),
-        plot.title = element_text(hjust = 0.5, size = 14)) +
-  ggtitle('LV1: 24.4% crossblock variance')
+        plot.title = element_text(hjust = 0.5, size = 14))
+
+ggplot(data = mean_centered_results_LV1, 
+       aes(x=category, y=LV1, fill=category, color=category)) +
+  geom_hline(aes(yintercept = 0), size = 1) +
+  labs(y = 'Brain scores', x = 'Foundation', title = 'LV1: 24.4% crossblock variance') +
+  geom_col(color='black') + 
+  geom_point(color='black', size=1) +
+  geom_errorbar(aes(ymax = upper, ymin = lower), color='black', size=0.5, width=0.1) +
+  MFT_fill() + MFT_color() +
+  theme_pubr(legend = 'none', base_family = 'Avenir') +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_text(size=16),
+        axis.text = element_text(size = 16),
+        plot.title = element_text(hjust = 0.5, size = 20, face = 'bold'))
+ggsave('../poster/LV1_pattern.png', width = 10)
 
 modelLV1 <- lmer(score ~ lag * category + (1 | subID), data = LV1)
 
@@ -558,6 +575,21 @@ p3 <- ggplot(data = mean_centered_results_LV2,
         axis.text = element_text(size = 12),
         plot.title = element_text(hjust = 0.5, size = 14)) +
   ggtitle('LV2: 18.13% crossblock variance')
+
+ggplot(data = mean_centered_results_LV2, 
+       aes(x=category, y=LV2, fill=category, color=category)) +
+  geom_hline(aes(yintercept = 0), size = 0.5) +
+labs(y = 'Brain scores', x = 'Foundation', title = 'LV2: 18.13% crossblock variance') +
+  geom_col(color='black') + 
+  geom_point(color='black', size=1) +
+  geom_errorbar(aes(ymax = upper, ymin = lower), color='black', size=0.5, width=0.1) +
+  MFT_fill() + MFT_color() +
+  theme_pubr(legend = 'none', base_family = 'Avenir') +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_text(size=16),
+        axis.text = element_text(size = 16),
+        plot.title = element_text(hjust = 0.5, size = 20, face = 'bold'))
+ggsave('../poster/LV2_pattern.png', width = 10)
 
 modelLV2 <- lmer(score ~ lag * category + (1 | subID), data = LV2)
 
