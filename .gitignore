@@ -45,4 +45,6 @@ rsconnect/
 
 # stuff for my poster
 /poster/
-/figures/poster/
+
+# paper figures
+/figures/
