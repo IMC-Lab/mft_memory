@@ -36,8 +36,9 @@ vignettes/*.pdf
 rsconnect/
 *.driveupload
 
-# Images used only for the markdown
+# Markdown related things
 /markdown_images/
+mft_memory_markdown.html
 
 # .DS_store objects
 .DS_store
@@ -48,3 +49,6 @@ rsconnect/
 
 # paper figures
 /figures/
+
+# behavioral PLS
+/data/PLS/behavioral/
