@@ -50,5 +50,7 @@ mft_memory_markdown.html
 # paper figures
 /figures/
 
-# behavioral PLS
+# behavioral PLS & old cluster reports
 /data/PLS/behavioral/
+/data/PLS/cluster_reports/mem_*.csv
+/data/PLS/cluster_reports/NR_LV2.csv
