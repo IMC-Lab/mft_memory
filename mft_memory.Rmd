@@ -34,6 +34,7 @@ library(eeptools) #note: this is not compatible with R version 4.0.0 as of 05/12
 library(ggcorrplot)
 library(extrafont)
 library(purrr)
+library(parameters)
 se <- function(x) sqrt(var(x)/length(x))
 `%notin%` <- Negate(`%in%`)
 emm_options(lmerTest.limit = 5000)
@@ -458,6 +459,9 @@ wilcox.test(mfv$moral_decision, mfv_comp$moral_decision, var.eq = T)
 # linear mixed effect model
 modelMoral <- lmer(moral_decision ~ category + (1 | subID) + (1|vigfile), data = data_old, control=lmerControl(optCtrl = list(maxeval=5000))) 
 
+model_parameters(modelMoral)
+model_parameters(modelMoral, standardize = 'refit')
+
 tab_model(modelMoral, 
           #file = 'figures/paper/table_modelMoral.html',  
           digits = 3, 
@@ -733,6 +737,7 @@ modelMemory <- glmer(correct ~ category * old + (1|subID) + (1|vigfile),
                      control=glmerControl(optimizer = 'bobyqa', optCtrl = list(maxfun=5000)),
                      contrasts = list(category=contr.sum))
 summary(modelMemory)
+exp(fixef(modelMemory))
 
 # make pretty table
 tab_model(modelMemory, 
@@ -802,28 +807,21 @@ modelSupMemoryNew <- glmer(correct ~ superordinate_new * old + (1 | subID) + (1|
 compare_performance(modelMemoryNull, modelSupMemory, modelSupMemoryNew, modelMemory, bayesfactor = FALSE, rank = TRUE)
 
 # superordinate contrasts 
-## I exponentiated each estimate in the console to get the odds ratio; used instead of Cohen's d for effect size
-emmeans(modelMemory, ~ old * category, type = 'response', lmer.df = 'satterthwaite') %>% 
-  contrast(interaction = c("pairwise", old_superordinate, by = NULL), adjust='bonferroni')
-  
-emmeans(modelMemory, ~ old * category) %>% 
-  contrast(interaction = c("pairwise", new_superordinate, by = NULL), adjust='bonferroni')
+memory_supContrast.df <- emmeans(modelMemory, ~ old * category, type = 'response', lmer.df = 'satterthwaite') %>% 
+  contrast(interaction = c("pairwise", old_superordinate, by = NULL), adjust='bonferroni') %>% as.data.frame() %>%
+  mutate(odds_ratio = exp(estimate))
+
+memory_supContrastNew.df <- emmeans(modelMemory, ~ old * category, type = 'response', lmer.df = 'satterthwaite') %>% 
+  contrast(interaction = c("pairwise", new_superordinate, by = NULL), adjust='bonferroni') %>% as.data.frame() %>%
+  mutate(odds_ratio = exp(estimate))
 
 # em model comparison
-em_compare$correct <- as.factor(em_compare$correct)
-
-modelMemoryNull <- glmer(correct ~ 1 + (1 | subID) + (1|vigfile),
+em_null_memory <- glmer(correct ~ 1 + (1 | subID) + (1|vigfile),
                  data=em_compare, family=binomial(link = 'logit'), control=glmerControl(optCtrl=list(maxfun=50000)))
 
-modelMemory <- glmer(correct ~ category + (1|subID) + (1|vigfile),
+em_modelMemory <- glmer(correct ~ category + (1|subID) + (1|vigfile),
                      data=em_compare, family = binomial(link = 'logit'), control=glmerControl(optCtrl = list(maxfun=5000),
                                                                                               optimizer = 'bobyqa'))
-
-em_memory <- glmer(correct ~ category + angry + sad + disgusted + afraid + contemptuous + amused +
-                       PersonalDistressScore + EmpathicConcernScore +
-                       (1|subID) + (1|vigfile),
-                       data=em_compare, family = binomial(link = 'logit'), control=glmerControl(optCtrl = list(maxfun=5000),
-                                                                                                optimizer = 'bobyqa'))
 
 em_only_memory <- glmer(correct ~ angry + sad + disgusted + afraid + contemptuous + amused +
                        PersonalDistressScore + EmpathicConcernScore +
@@ -831,7 +829,13 @@ em_only_memory <- glmer(correct ~ angry + sad + disgusted + afraid + contemptuou
                        data=em_compare, family = binomial(link = 'logit'), control=glmerControl(optCtrl = list(maxfun=5000),
                                                                                                 optimizer = 'bobyqa'))
 
-em_category_memory <- glmer(correct ~ 
+em_add_memory <- glmer(correct ~ category + angry + sad + disgusted + afraid + contemptuous + amused +
+                       PersonalDistressScore + EmpathicConcernScore +
+                       (1|subID) + (1|vigfile),
+                       data=em_compare, family = binomial(link = 'logit'), control=glmerControl(optCtrl = list(maxfun=5000),
+                                                                                                optimizer = 'bobyqa'))
+
+em_int_memory <- glmer(correct ~ 
                                  category * angry + 
                                  category * amused + 
                                  category * sad + 
@@ -844,14 +848,22 @@ em_category_memory <- glmer(correct ~
                  data=em_compare, family=binomial(link = 'logit'), control=glmerControl(optCtrl=list(maxfun=1e9),
                                                                                         optimizer = 'bobyqa'))
 
-compare_performance(modelMemoryNull, modelMemory, em_memory, em_category_memory, em_only_memory, 
-                    bayesfactor = FALSE, rank = TRUE)
+em_comp_memory.df <- compare_performance(em_null_memory, em_modelMemory, em_only_memory, em_add_memory, em_int_memory, 
+                    bayesfactor = FALSE, rank = TRUE, metrics = c('AIC', 'BIC', 'R2', 'ICC', 'RMSE')) %>% 
+  as.data.frame() %>% 
+  mutate(AIC = round(AIC, 2),
+         BIC = round(BIC, 2),
+         R2_conditional = round(R2_conditional, 2),
+         R2_marginal = round(R2_marginal, 2),
+         ICC = round(ICC, 2),
+         RMSE = round(RMSE, 2))
+
+write.csv(em_comp_memory.df, file = 'figures/paper/table_emCompMemory.csv', row.names = FALSE)
 ```
 
 ### Confidence
 ```{r, fig.width=8, fig.height=4, include=FALSE}
-data$correct <- factor(data$correct, levels = c('1','0'), labels = c('Correct', 'Incorrect'))
-
+data$correct <- factor(data$correct, levels = c('1','0'))
 
 # run model
 modelConfidence <- lmer(confresp ~ category * old * correct + (1 | subID) + (1|vigfile), data=data,
@@ -875,7 +887,7 @@ tab_model(modelConfidence,
                           'Social Norms*New*Incorrect', 'Authority*New*Incorrect', 'Loyalty*New*Incorrect', 'Purity*New*Incorrect', 
                           'Harm-Emo*New*Incorrect', 'Harm-Phys*New*Incorrect','Fairness*New*Incorrect'))
 
-# compute effect size 
+# compute effect size -- update after tomorrow's call with Felipe
 emmeans(modelConfidence, ~ category) %>%
   eff_size(sigma = sd(data$confresp), edf = df.residual(modelConfidence), method = 'eff')
 
@@ -907,57 +919,87 @@ ggplot(modelConfidence_df, aes(x=category, y=emmean)) +
   scale_shape_manual(values = c(16,1), labels = c('Old', 'New')) +
   ylim(0,4) +
   MFT_color() + MFT_fill() + 
-  theme_pubr(legend = 'right') +
+  theme_pubr(legend = 'top',
+             base_family = 'Times New Roman') +
   guides(color=FALSE, shape=guide_legend(title=NULL)) +
   theme(strip.text.x = element_text(size=16, face='bold'), 
         strip.background = element_rect(color = 'white'),
-        axis.text.x = element_text(size = 10),
+        axis.text.x = element_text(size = 12),
         axis.title.x = element_blank(),
-        plot.title = element_text(hjust = 0.5, face = 'bold', size=18),
         axis.title.y = element_text(size=12),
-        legend.text = element_text(size=14)) +
-  labs(y = 'Estimated mean confidence', x = 'Foundation', color = 'Foundation') +
-  ggtitle('Memory confidence') 
-#ggsave('figures/memory_confidence.png', dpi = 400)
+        legend.text = element_text(size=14),
+        legend.position = c(0.05, 0.89)) +
+  labs(y = 'Estimated mean confidence', x = 'Foundation', color = 'Foundation')
+ggsave('figures/paper/plot_modelConfidence.png', dpi = 'retina', width = 14, height = 4)
 
 # superordinate model comparison
-modelConfidenceNull <- lmer(confresp ~  old * correct + (1 | subID), data=data,
+modelConfidenceNull <- lmer(confresp ~  old * correct + (1 | subID) + (1|vigfile), data=data,
                         control=lmerControl(optCtrl = list(maxeval=5000)))
-modelConfidenceSup <- lmer(confresp ~ superordinate * old * correct + (1 | subID), data=data,
-                        control=lmerControl(optCtrl = list(maxeval=5000)))
-modelConfidenceSupNew <- lmer(confresp ~ superordinate_new * old * correct + (1 | subID), data=data,
-                        control=lmerControl(optCtrl = list(maxeval=5000)))
-compare_performance(modelConfidenceNull, modelConfidenceSup, modelConfidenceSupNew, modelConfidence, bayesfactor = FALSE)
+modelConfidenceSup <- lmer(confresp ~ superordinate * old * correct + (1 | subID) + (1|vigfile), 
+                           data=data,control=lmerControl(optCtrl = list(maxeval=5000)))
+modelConfidenceSupNew <- lmer(confresp ~ superordinate_new * old * correct + (1 | subID) + (1|vigfile), 
+                              data=data,control=lmerControl(optCtrl = list(maxeval=5000)))
+supCompConf.df <- as.data.frame(compare_performance(modelConfidenceNull, modelConfidenceSup, modelConfidenceSupNew, modelConfidence, bayesfactor = F)) %>% 
+  mutate_at(c('AIC', 'BIC', 'R2_conditional', 'R2_marginal', 'ICC', 'RMSE'), funs(round(., 2)))
+write.csv(supCompConf.df, file = 'figures/paper/table_supCompConf.csv', row.names = F)
 
 # superordinate contrasts
-modelConfidence %>% 
+supContrastConf <- modelConfidence %>% 
   emmeans(~ old * correct * category) %>%
-  contrast(interaction=c('pairwise', 'pairwise', old_superordinate))
+  contrast(interaction=c('pairwise', 'pairwise', old_superordinate), adjust = 'bonferroni')
 
-modelConfidence %>% 
+supContrastConf.eff <- eff_size(supContrastConf, sigma = sd(data$confresp), edf = df.residual(modelConfidence), method = 'identity') %>%
+  as.data.frame() %>% mutate(effect.size = round(effect.size, 2))
+
+supContrastConf.df <- as.data.frame(supContrastConf) %>%
+  mutate_at(c('estimate', 'SE', 'df', 't.ratio', 'p.value'), functions(round(.,2)))
+
+supContrastConf.df$eff_size <- supContrastConf.eff$effect.size 
+write.csv(supContrastConf.df, file = 'figures/paper/table_supContrastConf.csv', row.names = F)
+
+supContrastNewConf <- modelConfidence %>% 
   emmeans(~ old * correct * category) %>%
-  contrast(interaction=c('pairwise', 'pairwise', new_superordinate))
+    contrast(interaction=c('pairwise', 'pairwise', new_superordinate), adjust = 'bonferroni')
+
+supContrastNewConf.eff <- eff_size(supContrastNewConf, sigma = sd(data$confresp), edf = df.residual(modelConfidence), method = 'identity') %>%
+  as.data.frame() %>% mutate(effect.size = round(effect.size, 2))
+
+supContrastNewConf.df <- as.data.frame(supContrastNewConf) %>%
+  mutate_at(c('estimate', 'SE', 'df', 't.ratio', 'p.value'), funs(round(.,2)))
+
+supContrastNewConf.df$eff_size <- supContrastNewConf.eff$effect.size 
+write.csv(supContrastNewConf.df, file = 'figures/paper/table_supContrastNewConf.csv', row.names = F)
 
 # em model comparisons
-modelConfidenceNull <- lmer(confresp ~  correct + (1 | subID) + (1|vigfile), 
+em_null_confidence <- lmer(confresp ~  correct + (1 | subID) + (1|vigfile), 
                             data=em_compare, control=lmerControl(optCtrl = list(maxeval=5000)))
 
-modelConfidence <- lmer(confresp ~ category * correct + (1 | subID) + (1|vigfile), 
+em_modelConfidence <- lmer(confresp ~ category * correct + (1 | subID) + (1|vigfile), 
                         data=em_compare, control=lmerControl(optCtrl = list(maxeval=5000)))
 
-em_confidence <- lmer(confresp ~ 
-                        correct * angry + 
-                        correct * sad + 
-                        correct * disgusted + 
-                        correct * afraid + 
-                        correct * contemptuous + 
-                        correct * amused +
-                        correct * PersonalDistressScore + 
-                        correct * EmpathicConcernScore +
+em_only_confidence <- lmer(confresp ~ correct + angry + sad + disgusted + afraid + contemptuous + amused +
+                             PersonalDistressScore + EmpathicConcernScore + PerspectiveTakingScore + FantasyScore +
+                             (1 | subID) + (1|vigfile), 
+                        data=em_compare, control=lmerControl(optCtrl = list(maxeval=5000)))
+
+em_add_confidence <- lmer(confresp ~ category + correct +  angry + sad + disgusted + afraid + contemptuous + amused +
+                             PersonalDistressScore + EmpathicConcernScore + PerspectiveTakingScore + FantasyScore +
                         (1|subID) + (1|vigfile),
                         data=em_compare, control=lmerControl(optCtrl = list(maxeval=5000)))
 
-em_category_confidence <- lmer(confresp ~ 
+em_int_confidence1 <- lmer(confresp ~ correct +
+                                 category * angry + 
+                                 category * amused + 
+                                 category * sad + 
+                                 category * afraid + 
+                                 category * contemptuous + 
+                                 category * disgusted + 
+                                 category * PersonalDistressScore + 
+                                 category * EmpathicConcernScore + 
+                                 (1 | subID) + (1|vigfile),
+                 data=em_compare, control=lmerControl(optCtrl=list(maxfun=5000)))
+
+em_int_confidence2 <- lmer(confresp ~ 
                                  correct * category * angry + 
                                  correct * category * amused + 
                                  correct * category * sad + 
@@ -969,7 +1011,15 @@ em_category_confidence <- lmer(confresp ~
                                  (1 | subID) + (1|vigfile),
                  data=em_compare, control=lmerControl(optCtrl=list(maxfun=5000)))
 
-kable(compare_performance(modelConfidenceNull, modelConfidence, em_confidence, em_category_confidence, bayesfactor = FALSE, rank = TRUE))
+emCompConf.df <- compare_performance(em_null_confidence, em_modelConfidence, em_only_confidence, em_add_confidence, em_int_confidence1, em_int_confidence2, bayesfactor = FALSE, rank = TRUE) %>% 
+  as.data.frame() %>%
+  mutate(AIC = round(AIC, 2),
+         BIC = round(BIC,2),
+         R2_marginal = round(R2_marginal, 2),
+         R2_conditional = round(R2_conditional, 2),
+         ICC = round(ICC, 2),
+         RMSE = round(RMSE, 2))
+write.csv(emCompConf.df, file = 'figures/paper/table_emCompConf.csv', row.names = F)
 ```
 
 # multiple voxel extraction
