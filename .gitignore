@@ -36,8 +36,9 @@ vignettes/*.pdf
 rsconnect/
 *.driveupload
 
-# Images used only for the markdown
+# Markdown related things
 /markdown_images/
+mft_memory_markdown.html
 
 # .DS_store objects
 .DS_store
@@ -45,4 +46,12 @@ rsconnect/
 
 # stuff for my poster
 /poster/
-/figures/poster/
+
+# paper figures
+/figures/
+
+# behavioral PLS & old cluster reports
+/data/PLS/behavioral/
+/data/PLS/cluster_reports/mem_*.csv
+/data/PLS/cluster_reports/NR_LV2.csv
+/data/ppt_log.csv
