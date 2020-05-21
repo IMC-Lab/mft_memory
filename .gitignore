@@ -39,6 +39,7 @@ rsconnect/
 # Markdown related things
 /markdown_images/
 mft_memory_markdown.html
+mft_memory_markdown.Rmd
 
 # .DS_store objects
 .DS_store
