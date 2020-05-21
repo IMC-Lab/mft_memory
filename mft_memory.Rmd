@@ -357,15 +357,15 @@ MFT_color <- get_scale_color(get_pal(colors))
 MFT_memfill <- get_scale_fill(get_pal(mem_colors))
 MFT_memcol <- get_scale_color(get_pal(mem_colors))
 
-<<<<<<< HEAD
+
 # import fonts from my poster
 font_import(paths = NULL, recursive = TRUE, prompt = TRUE,pattern = NULL)
 font_add_google('Raleway', 'Raleway')
 showtext_auto()
-=======
+
 # import font I'm using on my poster
 #font_import(paths = NULL, recursive = TRUE, prompt = TRUE,pattern = NULL)
->>>>>>> 6df7b9f47a07458cc47cb498520b9e215ecd5abe
+
 
 # prep for PLS
 # task PLS 
@@ -431,21 +431,6 @@ memLabels <- c('1' = 'Old', '0' = 'New')
 #   facet_grid(correct~category, labeller = labeller(correct=confLabels)) + 
 #   ggtitle('Distribution of Confidence Judgments by Accuracy') +
 #   xlab('1=not confident at all, 4=extremely confident')
-<<<<<<< HEAD
-
-# normed data from Clifford et al (2015)
-mfv <- read.csv('data/mfv.csv')
-mfv <- mfv %>% group_by(category) %>%
-  mutate(moral_decision = scale(moral_decision))
-mfv_comp <- data_old %>% 
-  select(category, vigfile, moral_decision) %>%
-  mutate(moral_decision = scale(moral_decision)) %>%
-  group_by(vigfile) %>% 
-  summarise(moral_decision = mean(moral_decision))
-t.test(mfv$moral_decision, mfv_comp$moral_decision)
-wilcox.test(mfv$moral_decision, mfv_comp$moral_decision, conf.int = 0.95)
-=======
->>>>>>> 6df7b9f47a07458cc47cb498520b9e215ecd5abe
 ```
 
 
