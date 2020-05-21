@@ -1,0 +1,79 @@
+%%%General section start%%%
+
+prefix	MFT_12_prelim	% prefix for session file and datamat file
+brain_region	0.15 % threshold or file name for brain region 
+win_size	4	 % number of scans in one hemodynamic period
+across_run	1	% 1 for merge data across all runs, 0 for within each run
+single_subj	0	% 1 for single subject analysis, 0 for normal analysis
+
+%%%General section end%%%
+%-----------------------
+%%%Condition section start%%%
+
+cond_name	auth	% condition1 name
+ref_scan_onset	0	% reference scan onset for condition1
+num_ref_scan	1	% number of reference scan for condition1
+
+cond_name	carm	% condition2 name
+ref_scan_onset	0	% reference scan onset for condition2
+num_ref_scan	1	% number of reference scan for condition2
+
+cond_name	carp	% condition3 name
+ref_scan_onset	0	% reference scan onset for condition3
+num_ref_scan	1	% number of reference scan for condition3
+
+cond_name	fair	% condition4 name
+ref_scan_onset	0	% reference scan onset for condition4
+num_ref_scan	1	% number of reference scan for condition4
+
+cond_name	lbrt	% condition5 name
+ref_scan_onset	0	% reference scan onset for condition5
+num_ref_scan	1	% number of reference scan for condition5
+
+cond_name	lylt	% condition6 name
+ref_scan_onset	0	% reference scan onset for condition6
+num_ref_scan	1	% number of reference scan for condition6
+
+cond_name	pure	% condition7 name
+ref_scan_onset	0	% reference scan onset for condition7
+num_ref_scan	1	% number of reference scan for condition7
+
+cond_name	socn	% condition8 name
+ref_scan_onset	0	% reference scan onset for condition8
+num_ref_scan	1	% number of reference scan for condition8
+
+%%%Condition section end%%%
+
+%-----------------------
+%%%Run section end%%%
+
+data_files	/Users/mak127-ccn/Desktop/MFT_4TR_func_data/MFT_12/filtered_func_data_reg_run1.nii % run1 data pattern (must use wildcard)
+event_onsets	16	100	105	115	137
+event_onsets	33	67	72	92	191
+event_onsets	12	27	87	163	181
+event_onsets	77	111	131	146	202
+event_onsets	1	60	82	196	214
+event_onsets	39	121	169	175	208
+event_onsets	6	44	127	142	157
+event_onsets	21	51	56	151	186
+
+data_files	/Users/mak127-ccn/Desktop/MFT_4TR_func_data/MFT_12/filtered_func_data_reg_run2.nii % run2 data pattern (must use wildcard)
+event_onsets	14	29	106	159	169
+event_onsets	19	83	100	112	216
+event_onsets	40	88	180	186	192
+event_onsets	24	77	149	175	198
+event_onsets	33	50	55	71	209
+event_onsets	60	65	96	116	134
+event_onsets	45	123	128	144	204
+event_onsets	1	7	139	154	164
+
+data_files	/Users/mak127-ccn/Desktop/MFT_4TR_func_data/MFT_12/filtered_func_data_reg_run3.nii % run3 data pattern (must use wildcard)
+event_onsets	7	96	149	169	209
+event_onsets	14	29	45	159	186
+event_onsets	55	71	106	116	123
+event_onsets	19	33	112	164	180
+event_onsets	50	65	77	83	154
+event_onsets	60	100	128	144	176
+event_onsets	1	40	134	192	204
+event_onsets	24	88	139	198	216
+
