@@ -363,10 +363,6 @@ font_import(paths = NULL, recursive = TRUE, prompt = TRUE,pattern = NULL)
 font_add_google('Raleway', 'Raleway')
 showtext_auto()
 
-# import font I'm using on my poster
-#font_import(paths = NULL, recursive = TRUE, prompt = TRUE,pattern = NULL)
-
-
 # prep for PLS
 # task PLS 
 mean_brain_scores <- read.csv('data/PLS/mean-centered/brain_scores.csv')
@@ -457,13 +453,10 @@ shapiro.test(mfv$moral_decision)
 shapiro.test(mfv_comp$moral_decision)
 # run a t-test anyway (ordinal data is hardly ever normal) & wilcox test for extra validity
 t.test(mfv$moral_decision, mfv_comp$moral_decision, var.eq = T)
-wilcox.test(mfv$moral_decision, mfv_comp$moral_decision, var.eq = T)
+wilcox.test(mfv$moral_decision, mfv_comp$moral_decision, var.eq = T, conf.int = T, conf.level = 0.95)
 
 # linear mixed effect model
 modelMoral <- lmer(moral_decision ~ category + (1 | subID) + (1|vigfile), data = data_old, control=lmerControl(optCtrl = list(maxeval=5000))) 
-
-model_parameters(modelMoral)
-model_parameters(modelMoral, standardize = 'refit')
 
 tab_model(modelMoral, 
           #file = 'figures/paper/table_modelMoral.html',  
@@ -482,11 +475,28 @@ emmeans(modelMoral, ~ category) %>%
   eff_size(sigma=sd(data_old$moral_decision), edf=df.residual(modelMoral), method='trt.vs.ctrl')
 
 # contrasts
-modelMoral.supContrast <- emmeans(modelMoral, ~ category) %>% contrast(SuperordinateContrasts, adjust='bonferroni')
-eff_size(modelMoral.supContrast, sigma = modelMoral.sigma, edf = df.residual(modelMoral), method = 'identity')
+supContrastMoral <- modelMoral %>% 
+  emmeans(~ category) %>%
+  contrast(SuperordinateContrasts, adjust = 'tukey')
+supContrastMoral.eff <- eff_size(supContrastMoral, sigma = sd(data_old$moral_decision), edf = df.residual(modelMoral), method = 'identity') %>%
+  as.data.frame() %>%
+  mutate(effect.size = round(effect.size, 2))
+supContrastMoral.df <- as.data.frame(supContrastMoral) %>%
+  mutate_at(c('estimate', 'SE', 'df', 't.ratio'), funs(round(.,2)))
+supContrastMoral.df$eff_size <- supContrastMoral.eff$effect.size 
+write.csv(supContrastMoral.df, file = 'figures/paper/table_supContrastMoral.csv', row.names = F)
 
-modelMoral.newContrast <- emmeans(modelMoral, ~ category) %>% contrast(newSuperordinateContrasts, adjust='bonferroni')
-eff_size(modelMoral.newContrast, sigma = modelMoral.sigma, edf = df.residual(modelMoral), method = 'identity')
+supContrastMoralNew <- modelMoral %>% 
+  emmeans(~ category) %>%
+  contrast(newSuperordinateContrasts, adjust = 'tukey')
+supContrastMoralNew.eff <- eff_size(supContrastMoralNew, sigma = sd(data_old$moral_decision), edf = df.residual(modelMoral), method = 'identity') %>%
+  as.data.frame() %>%
+  mutate(effect.size = round(effect.size, 2))
+supContrastMoralNew.df <- as.data.frame(supContrastMoralNew) %>%
+  mutate_at(c('estimate', 'SE', 'df', 't.ratio'), funs(round(.,2)))
+supContrastMoralNew.df$eff_size <- supContrastMoralNew.eff$effect.size 
+write.csv(supContrastMoralNew.df, file = 'figures/paper/table_supContrastMoralNew.csv', row.names = F)
+
 
 # plot
 modelMoral_df <- as.data.frame(emmeans(modelMoral, ~ category))
@@ -661,7 +671,16 @@ superordinateNull <- lmer(moral_decision ~ 1 + (1|subID) + (1|vigfile), data = d
 superordinateOG <- lmer(moral_decision ~ superordinate + (1|subID) + (1|vigfile), data = data_old, control=lmerControl(optCtrl = list(maxeval=5000))) 
 superordinateNew <- lmer(moral_decision ~ superordinate_new + (1|subID) + (1|vigfile), data = data_old, control=lmerControl(optCtrl = list(maxeval=5000))) 
 
-compare_performance(superordinateNull, modelMoral, superordinateOG, superordinateNew, bayesfactor = FALSE, rank = TRUE)
+supCompMoral.df <- compare_performance(superordinateNull, modelMoral, superordinateOG, superordinateNew, 
+                                       bayesfactor = FALSE, rank = TRUE) %>% 
+  as.data.frame() %>% 
+  mutate(AIC = round(AIC, 2),
+         BIC = round(BIC, 2),
+         R2_conditional = round(R2_conditional, 2),
+         R2_marginal = round(R2_marginal, 2),
+         ICC = round(ICC, 2),
+         RMSE = round(RMSE, 2))
+write.csv(supCompMoral.df, file = 'figures/paper/table_supCompMoral.csv', row.names = F)
 ```
 
 ### empathy & emotion model comparison
@@ -697,7 +716,16 @@ em_int_moral <- lmer(moral_decision ~
                         (1|subID) + (1|vigfile), data = em_compare,
                     contrasts = list(category=contr.sum))
 
-compare_performance(em_null_moral, em_modelMoral, em_only_moral, em_add_moral, em_int_moral, bayesfactor = FALSE, rank = TRUE)
+em_comp_moral.df <- compare_performance(em_null_moral, em_modelMoral, em_only_moral, em_add_moral, em_int_moral,
+                                        bayesfactor = FALSE, rank = TRUE) %>% 
+  as.data.frame() %>% 
+  mutate(AIC = round(AIC, 2),
+         BIC = round(BIC, 2),
+         R2_conditional = round(R2_conditional, 2),
+         R2_marginal = round(R2_marginal, 2),
+         ICC = round(ICC, 2),
+         RMSE = round(RMSE, 2))
+write.csv(em_comp_moral.df, file = 'figures/paper/table_emCompMoral.csv', row.names = F)
 ```
 
 ```{r sum-code em_category, include = FALSE}
@@ -823,13 +851,23 @@ modelSupMemoryNew <- glmer(correct ~ superordinate_new * old + (1 | subID) + (1|
 compare_performance(modelMemoryNull, modelSupMemory, modelSupMemoryNew, modelMemory, bayesfactor = FALSE, rank = TRUE)
 
 # superordinate contrasts 
-memory_supContrast.df <- emmeans(modelMemory, ~ old * category, type = 'response', lmer.df = 'satterthwaite') %>% 
-  contrast(interaction = c("pairwise", old_superordinate, by = NULL), adjust='bonferroni') %>% as.data.frame() %>%
-  mutate(odds_ratio = exp(estimate))
+supContrastMemory.df <- emmeans(modelMemory, ~ old * category, type = 'response', lmer.df = 'satterthwaite') %>% 
+  contrast(interaction = c("pairwise", old_superordinate, by = NULL)) %>% as.data.frame() %>%
+  mutate(odds_ratio = round(exp(estimate),2),
+         estimate = round(estimate, 2),
+         SE = round(SE, 2),
+         z.ratio = round(z.ratio, 2),
+         p.value = round(p.value, 3)) 
+write.csv(supContrastMemory.df, file = 'figures/paper/table_supContrastMemory.csv', row.names = F)
 
-memory_supContrastNew.df <- emmeans(modelMemory, ~ old * category, type = 'response', lmer.df = 'satterthwaite') %>% 
-  contrast(interaction = c("pairwise", new_superordinate, by = NULL), adjust='bonferroni') %>% as.data.frame() %>%
-  mutate(odds_ratio = exp(estimate))
+supContrastMemoryNew.df <- emmeans(modelMemory, ~ old * category, type = 'response', lmer.df = 'satterthwaite') %>% 
+  contrast(interaction = c("pairwise", new_superordinate, by = NULL)) %>% as.data.frame() %>%
+  mutate(odds_ratio = round(exp(estimate),2),
+         estimate = round(estimate, 2),
+         SE = round(SE, 2),
+         z.ratio = round(z.ratio, 2),
+         p.value = round(p.value, 3))
+write.csv(supContrastMemoryNew.df, file = 'figures/paper/table_supContrastMemoryNew.csv', row.names = F)
 
 # em model comparison
 em_null_memory <- glmer(correct ~ 1 + (1 | subID) + (1|vigfile),
@@ -864,7 +902,7 @@ em_int_memory <- glmer(correct ~
                  data=em_compare, family=binomial(link = 'logit'), control=glmerControl(optCtrl=list(maxfun=1e9),
                                                                                         optimizer = 'bobyqa'))
 
-em_comp_memory.df <- compare_performance(em_null_memory, em_modelMemory, em_only_memory, em_add_memory, em_int_memory, 
+emCompMemory.df <- compare_performance(em_null_memory, em_modelMemory, em_only_memory, em_add_memory, em_int_memory, 
                     bayesfactor = FALSE, rank = TRUE, metrics = c('AIC', 'BIC', 'R2', 'ICC', 'RMSE')) %>% 
   as.data.frame() %>% 
   mutate(AIC = round(AIC, 2),
@@ -873,8 +911,7 @@ em_comp_memory.df <- compare_performance(em_null_memory, em_modelMemory, em_only
          R2_marginal = round(R2_marginal, 2),
          ICC = round(ICC, 2),
          RMSE = round(RMSE, 2))
-
-write.csv(em_comp_memory.df, file = 'figures/paper/table_emCompMemory.csv', row.names = FALSE)
+write.csv(emCompMemory.df, file = 'figures/paper/table_emCompMemory.csv', row.names = FALSE)
 ```
 
 ### Confidence
@@ -887,7 +924,7 @@ modelConfidence <- lmer(confresp ~ category * old * correct + (1 | subID) + (1|v
                         contrasts = list(category=contr.sum))
 tab_model(modelConfidence, 
           #file = 'figures/paper/table_modelConfidence.html',  
-          digits = 3, 
+          digits = 2, 
           show.ci = 0.95, show.stat = TRUE, show.p = TRUE, show.ngroups = TRUE, show.df = TRUE,
           p.val = 'satterthwaite', 
           strings = c(stat = 't value', ci = 'CI (95%)', pred = 'Factors', p = 'p value'),
@@ -902,29 +939,6 @@ tab_model(modelConfidence,
                           'New*Incorrect',
                           'Social Norms*New*Incorrect', 'Authority*New*Incorrect', 'Loyalty*New*Incorrect', 'Purity*New*Incorrect', 
                           'Harm-Emo*New*Incorrect', 'Harm-Phys*New*Incorrect','Fairness*New*Incorrect'))
-
-# compute effect size -- update after tomorrow's call with Felipe
-emmeans(modelConfidence, ~ category) %>%
-  eff_size(sigma = sd(data$confresp), edf = df.residual(modelConfidence), method = 'eff')
-
-emmeans(modelConfidence, ~ old) %>%
-  eff_size(sigma = sd(data$confresp), edf = df.residual(modelConfidence), method = 'eff')
-
-emmeans(modelConfidence, ~ correct) %>%
-  eff_size(sigma = sd(data$confresp), edf = df.residual(modelConfidence), method = 'eff')
-
-emmeans(modelConfidence, eff ~ correct*old) %>%
-  eff_size(sigma = sd(data$confresp), edf = df.residual(modelConfidence), method = 'eff')
-
-emmeans(modelConfidence, ~ correct*category) %>%
-  eff_size(sigma = sd(data$confresp), edf = df.residual(modelConfidence), method = 'eff')
-
-emmeans(modelConfidence, ~ category*old) %>%
-  eff_size(sigma = sd(data$confresp), edf = df.residual(modelConfidence), method = 'eff')
-
-emmeans(modelConfidence, ~ correct*old*category) %>%
-  eff_size(sigma = sd(data$confresp), edf = df.residual(modelConfidence), method = 'eff')
-
 
 # plot
 modelConfidence_df <- modelConfidence %>% emmeans(~ category * old * correct, type='response') %>% as.data.frame
@@ -955,36 +969,30 @@ modelConfidenceSup <- lmer(confresp ~ superordinate * old * correct + (1 | subID
                            data=data,control=lmerControl(optCtrl = list(maxeval=5000)))
 modelConfidenceSupNew <- lmer(confresp ~ superordinate_new * old * correct + (1 | subID) + (1|vigfile), 
                               data=data,control=lmerControl(optCtrl = list(maxeval=5000)))
+
 supCompConf.df <- as.data.frame(compare_performance(modelConfidenceNull, modelConfidenceSup, modelConfidenceSupNew, modelConfidence, bayesfactor = F)) %>% 
   mutate_at(c('AIC', 'BIC', 'R2_conditional', 'R2_marginal', 'ICC', 'RMSE'), funs(round(., 2)))
 write.csv(supCompConf.df, file = 'figures/paper/table_supCompConf.csv', row.names = F)
 
 # superordinate contrasts
 supContrastConf <- modelConfidence %>% 
-  emmeans(~ old * correct * category) %>%
-  contrast(interaction=c('pairwise', 'pairwise', old_superordinate), adjust = 'bonferroni')
-
-supContrastConf.eff <- eff_size(supContrastConf, sigma = sd(data$confresp), edf = df.residual(modelConfidence), method = 'identity') %>%
-  as.data.frame() %>% mutate(effect.size = round(effect.size, 2))
-
+  emmeans(~ old * correct * category, type = 'response') %>%
+  contrast(interaction=c('pairwise', 'pairwise', old_superordinate))
+supContrastConf.eff <- eff_size(supContrastConf, sigma = sd(data$confresp), edf = df.residual(modelConfidence), method = 'identity') %>% as.data.frame() %>% mutate(effect.size = round(effect.size, 2))
 supContrastConf.df <- as.data.frame(supContrastConf) %>%
-  mutate_at(c('estimate', 'SE', 'df', 't.ratio', 'p.value'), functions(round(.,2)))
-
+  mutate_at(c('estimate', 'SE', 'df', 't.ratio'), funs(round(.,2)))
 supContrastConf.df$eff_size <- supContrastConf.eff$effect.size 
 write.csv(supContrastConf.df, file = 'figures/paper/table_supContrastConf.csv', row.names = F)
 
-supContrastNewConf <- modelConfidence %>% 
-  emmeans(~ old * correct * category) %>%
-    contrast(interaction=c('pairwise', 'pairwise', new_superordinate), adjust = 'bonferroni')
-
-supContrastNewConf.eff <- eff_size(supContrastNewConf, sigma = sd(data$confresp), edf = df.residual(modelConfidence), method = 'identity') %>%
+supContrastConfNew <- modelConfidence %>% 
+  emmeans(~ old * correct * category, type = 'response') %>%
+    contrast(interaction=c('pairwise', 'pairwise', new_superordinate))
+supContrastConfNew.eff <- eff_size(supContrastConfNew, sigma = sd(data$confresp), edf = df.residual(modelConfidence), method = 'identity') %>%
   as.data.frame() %>% mutate(effect.size = round(effect.size, 2))
-
-supContrastNewConf.df <- as.data.frame(supContrastNewConf) %>%
-  mutate_at(c('estimate', 'SE', 'df', 't.ratio', 'p.value'), funs(round(.,2)))
-
-supContrastNewConf.df$eff_size <- supContrastNewConf.eff$effect.size 
-write.csv(supContrastNewConf.df, file = 'figures/paper/table_supContrastNewConf.csv', row.names = F)
+supContrastConfNew.df <- as.data.frame(supContrastConfNew) %>%
+  mutate_at(c('estimate', 'SE', 'df', 't.ratio'), funs(round(.,2)))
+supContrastConfNew.df$eff_size <- supContrastConfNew.eff$effect.size 
+write.csv(supContrastConfNew.df, file = 'figures/paper/table_supContrastConfNew.csv', row.names = F)
 
 # em model comparisons
 em_null_confidence <- lmer(confresp ~  correct + (1 | subID) + (1|vigfile), 
