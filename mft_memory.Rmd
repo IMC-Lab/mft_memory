@@ -444,16 +444,31 @@ memLabels <- c('1' = 'Old', '0' = 'New')
 # compare our data to normed data from Clifford et al (2015)
 mfv <- read.csv('data/mfv_norms.csv')
 mfv$moral_decision <- scale(mfv$moral_decision)
-mfv_comp <- data_old %>% select(category, vigfile, subID, moral_decision) %>%
+mfv$dataset <- 'Normed'
+mfv$category <- factor(mfv$category, levels = c('Social Norms', 'Authority', 'Loyalty', 'Sanctity',
+                                                 'Harm-Phys', 'Harm-Emo', 'Fairness', 'Liberty'),
+                       labels = c('Social Norms', 'Authority', 'Loyalty', 'Purity',
+                                                 'Harm-Phys', 'Harm-Emo', 'Fairness', 'Liberty'))
+mfv_comp <- data_old %>% select(category, vigfile, vignette, subID, moral_decision) %>%
   mutate(moral_decision = scale(moral_decision)) %>%
   group_by(vigfile) %>%
-  summarise(moral_decision = mean(moral_decision))
-# test for normality
-shapiro.test(mfv$moral_decision)
-shapiro.test(mfv_comp$moral_decision)
-# run a t-test anyway (ordinal data is hardly ever normal) & wilcox test for extra validity
-t.test(mfv$moral_decision, mfv_comp$moral_decision, var.eq = T)
-wilcox.test(mfv$moral_decision, mfv_comp$moral_decision, var.eq = T, conf.int = T, conf.level = 0.95)
+  summarise(moral_decision = mean(moral_decision)) %>%
+  mutate(category = assignCategory(vigfile)) %>% 
+  rename(vigtext = vigfile)
+mfv_comp$dataset <- 'Ours'
+mfv_comp <- rbind(mfv_comp, mfv)
+mfv_comp$category <- factor(mfv_comp$category, levels = plotting_categories)
+
+normCheck <- lm(moral_decision ~ dataset*category, data = mfv_comp)
+summary(normCheck)
+
+as.data.frame(emmeans(normCheck, ~ dataset*category)) %>%
+  ggplot(aes(x = category, y = emmean, color = dataset, fill = dataset)) +
+  geom_pointrange(aes(ymin = lower.CL, ymax = upper.CL), position = position_dodge(0.5)) +
+  labs(y = 'Estimated mean moral judgment (scaled)', title = 'Comparison to Clifford et al. (2015)') +
+  theme_pubr(base_family = 'Times New Roman', legend = 'right') +
+  theme(axis.title.x = element_blank(),
+        plot.title = element_text(hjust = 0.5))
 
 # linear mixed effect model
 modelMoral <- lmer(moral_decision ~ category + (1 | subID) + (1|vigfile), data = data_old, control=lmerControl(optCtrl = list(maxeval=5000))) 
