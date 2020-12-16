@@ -108,9 +108,49 @@ MFT_fill  <- get_scale_fill(get_pal(colors))
 MFT_color <- get_scale_color(get_pal(colors))
 MFT_memfill <- get_scale_fill(get_pal(mem_colors))
 MFT_memcol <- get_scale_color(get_pal(mem_colors))
+
+# PLS plotting functions 
+# plotting functions
+brain_scores <- function(df, LV, title) {
+  ggplot(df, aes_(x=~category, y=LV, fill=~category, color=~category)) +
+    geom_hline(aes(yintercept = 0), size = 0.5) +
+    labs(y = 'Brain scores', x = 'Foundation', title = title) +
+    geom_col(color='black') + 
+    geom_point(color='black', size=1) +
+    geom_errorbar(aes(ymax = upper, ymin = lower), color='black', size=0.5, width=0.25) +
+    MFT_fill() + MFT_color() +
+    theme_pubr(legend = 'none') +
+    theme(axis.title.x = element_blank(),
+          axis.title.y = element_text(size=14),
+          axis.text = element_text(size = 12),
+          plot.title = element_text(hjust = 0.5, size = 14),
+          plot.margin=unit(c(0.5,0.5,1.25,0.5),"cm"))
+}
+
+temporal_brain_scores <- function(df) {
+    lmer(score ~ lag * category + (1 | subID), data = df) %>%
+    emmeans(~ lag * category) %>% as.data.frame() %>%
+    mutate(superordinate = superordinateCategory(category),
+           category = factor(category, levels = plotting_categories)) %>%
+    ggplot(aes(x=lag, y=emmean, group=category, color=category, fill=category))  + 
+    scale_x_discrete(expand = c(0, 0, 0, 0.1), labels = c('TR1', 'TR2', 'TR3', 'TR4', 'TR5', 'TR6', 'TR7')) +
+    geom_hline(aes(yintercept = 0), size=1) +
+    geom_line(size=1) + 
+    geom_point(aes(fill=category, color=category, shape = category), size=3) +
+    scale_shape_manual(values = c(4,15,16,17,0,1,2, 3)) +
+    MFT_fill() + MFT_color() +
+    theme_pubr(legend = 'right') +
+    theme(axis.title.x = element_blank(),
+          axis.title.y = element_blank(), 
+          axis.text = element_text(size = 12),
+          plot.title = element_text(hjust = 0.5, size = 14)) +
+    labs(y = 'Brain score', x= 'TR=2s', color='Foundation', fill='Foundation', shape='Foundation') +
+    ggtitle('Temporal brain scores')
+}
 ```
 
 
+# Load in data
 ```{r Load in data}
 # load encoding data
 encodingfiles = list.files('data/behavior/encoding', full.names = TRUE, pattern = '.csv', recursive = FALSE)
@@ -124,6 +164,8 @@ retFull = do.call(rbind, lapply(retfiles, function(x){read.csv(x, header = TRUE,
 key <- read.csv('data/key.csv', stringsAsFactors = FALSE)
 ```
 
+
+# Tidy data
 ```{r Tidy data & analysis prep}
 # tidy encoding
 envars <- names(encodingFull) %in% c('run','pres_order','vignum','trialstart_raw','trialstart_zeroed','trialstart_TR','trialdur','intended_jitter','ITI_start_raw','ITI_start_zeroed','ITI_start_TR','ITI_duration','ITI_accuracy', 'foundation', 'vigtext') 
@@ -228,55 +270,56 @@ confLabels <- c('1' = 'Correct', '0' = 'Incorrect')
 memLabels <- c('1' = 'Old', '0' = 'New')
 ```
 
+
+
+
+
 # PLS plots
 ```{r prep for PLS}
-# task PLS 
-mean_brain_scores <- read.csv('data/PLS/mean-centered/brain_scores.csv')
-mean_brain_scores$category <- matlab_categories
-mean_brain_scores$superordinate <- superordinateCategory(mean_brain_scores$category)
-upper_CIs <- read.csv('data/PLS/mean-centered/upper_CIs.csv')
-lower_CIs <- read.csv('data/PLS/mean-centered/lower_CIs.csv')
-colnames(upper_CIs) <- paste0('upper_', colnames(upper_CIs))
-colnames(lower_CIs) <- paste0('lower_', colnames(lower_CIs))
-mean_centered_results_LV1 <- select(mean_brain_scores, category, superordinate, LV1)
-mean_centered_results_LV1$upper <- upper_CIs$upper_LV1
-mean_centered_results_LV1$lower <- lower_CIs$lower_LV1
-mean_centered_results_LV1$category <- factor(mean_centered_results_LV1$category, 
-                                             levels=plotting_categories)
+#### all conditions ####
+# prep main df
+all_mean <- read.csv('data/PLS/mean-centered/all_conditions/means.csv')
+all_mean$category <- matlab_categories
+all_mean$superordinate <- superordinateCategory(all_mean$category)
+all_upper_CIs <- read.csv('data/PLS/mean-centered/all_conditions/upper_adj.csv')
+all_lower_CIs <- read.csv('data/PLS/mean-centered/all_conditions/lower_adj.csv')
+colnames(all_upper_CIs) <- paste0('upper_', colnames(all_upper_CIs))
+colnames(all_lower_CIs) <- paste0('lower_', colnames(all_lower_CIs))
 
-mean_centered_results_LV2 <- select(mean_brain_scores, category, superordinate, LV2)
-mean_centered_results_LV2$upper <- upper_CIs$upper_LV2
-mean_centered_results_LV2$lower <- lower_CIs$lower_LV2
-mean_centered_results_LV2$category <- factor(mean_centered_results_LV2$category, 
-                                             levels=plotting_categories)
-# task temporal brain score data
-LV1 <- read.csv('data/PLS/mean-centered/temporal_brainscores_LV1_all.csv')
-LV2 <- read.csv('data/PLS/mean-centered/temporal_brainscores_LV2_all.csv')
-LV1$subID <- rep(dataSubs, each = 8)
-LV2$subID <- rep(dataSubs, each = 8)
-LV1$category <- matlab_categories
-LV2$category <- matlab_categories
+# plot LV1
+all_LV1 <- select(all_mean, category, superordinate, LV1)
+all_LV1$upper <- all_upper_CIs$upper_LV1
+all_LV1$lower <- all_lower_CIs$lower_LV1
+all_LV1$category <- factor(all_LV1$category,levels=plotting_categories)
+LV1_tbs <- read.csv('data/PLS/mean-centered/all_conditions/LV1_tbs.csv')
+LV1_tbs$subID <- rep(1:27, each = 8)
+LV1_tbs$category <- matlab_categories
+LV1_tbs <- pivot_longer(LV1_tbs, cols = starts_with('Lag'), names_to = 'lag', values_to = 'score')
+p1 <- brain_scores(all_LV1, ~LV1, 'LV1: 26.99% crossblock variance, p<0.000')
+p2 <- temporal_brain_scores(LV1_tbs)
+p1 + p2 +
+  plot_layout(ncol = 2, nrow = 2, widths = c(2, 0.95), guides = 'collect') +
+  plot_annotation(title = '') &
+  theme(text = element_text(family = 'Times New Roman'), plot.tag = element_text(size = 11), plot.title = element_text(hjust=0.5))
 
-LV1 <- pivot_longer(LV1, cols = starts_with('Lag'), names_to = 'lag', values_to = 'score')
-LV2 <- pivot_longer(LV2, cols = starts_with('Lag'), names_to = 'lag', values_to = 'score')
-
-# task non-rotated data -- commented out because we're not reporting plots for this analysis
-# nr_social <- read.csv('data/PLS/results/non-rotated/socialnorms_means.csv', header = FALSE)
-# nr_social_upper <- read.csv('data/PLS/results/non-rotated/socialnorms_upper.csv', header = FALSE)
-# nr_social_lower <- read.csv('data/PLS/results/non-rotated/socialnorms_lower.csv', header = FALSE)
-# nr_social$upper <- nr_social_upper$V1
-# nr_social$lower <- nr_social_lower$V1
-# nr_social$category <- matlab_categories
-# nr_social$category <- factor(nr_social$category, levels = plotting_categories)
-# 
-# nr_superordinate <- read.csv('data/PLS/results/non-rotated/superordinate_means.csv', header = FALSE)
-# nr_superordinate_upper <- read.csv('data/PLS/results/non-rotated/superordinate_upper.csv', header = FALSE)
-# nr_superordinate_lower <- read.csv('data/PLS/results/non-rotated/superordinate_lower.csv', header = FALSE)
-# nr_superordinate$upper <- nr_superordinate_upper$V1
-# nr_superordinate$lower <- nr_superordinate_lower$V1
-# nr_superordinate$category <- matlab_categories[1:7]
-# nr_superordinate$category <- factor(nr_superordinate$category, levels = plotting_categories[2:8])
+# plot LV2
+all_LV2 <- select(all_mean, category, superordinate, LV2)
+all_LV2$upper <- all_upper_CIs$upper_LV2
+all_LV2$lower <- all_lower_CIs$lower_LV2
+all_LV2$category <- factor(all_LV2$category, levels=plotting_categories)
+LV2_tbs <- read.csv('data/PLS/mean-centered/all_conditions/LV2_tbs.csv')
+LV2_tbs$subID <- rep(1:27, each = 8)
+LV2_tbs$category <- matlab_categories
+LV2_tbs <- pivot_longer(LV2_tbs, cols = starts_with('Lag'), names_to = 'lag', values_to = 'score')
+p3 <- brain_scores(all_LV2, ~LV2, 'LV2: 20.51% crossblock variance, p<0.010')
+p4 <- temporal_brain_scores(LV2_tbs)
+p3 + p4 +
+  plot_layout(ncol = 2, nrow = 2, widths = c(2, 0.95), guides = 'collect') +
+  plot_annotation(title = '') &
+  theme(text = element_text(family = 'Times New Roman'), plot.tag = element_text(size = 11), plot.title = element_text(hjust=0.5))
 ```
+
+
 
 # Emotion analyses
 ```{r emotion & empathy analyses}
@@ -385,13 +428,12 @@ em_compare <- em_compare %>%
 # corr <- cor(emotion_scores)
 # ggcorrplot(corr, lab = TRUE)
 # ggsave('emo_corr_matrix.png')
-
 ```
+
 
 ## Results: Moral Judgments
 ### Behavior
 ```{r Moral judgments: Behavior, message=FALSE, warning=FALSE, include=FALSE}
-
 # # look at spread of moral judgement
 # ggplot(data_old, aes(x=moral_decision, color=category, fill=category)) +
 #   geom_bar() + 
@@ -485,7 +527,6 @@ ggplot(modelMoral_df, aes(x=category, y=emmean)) +
   theme(axis.title.x = element_blank())
 ggsave('figures/paper/plot_modelMoral.png', dpi=300)
 ```
-
 
 ### Task PLS results: LV1 
 ```{r make LV plots, include=FALSE}
@@ -622,6 +663,7 @@ ggsave('figures/paper/plot_LV2.png', width = 15, height = 4.5, dpi = 'retina')
 #         plot.title = element_text(hjust = 0.5, face = 'bold')) +
 #   ggtitle('Social Norms vs. Moral Foundations: p < 0.059')
 ```
+
 
 # Model comparisons
 ### different superordinate categories 
@@ -1005,6 +1047,7 @@ emCompConf.df <- compare_performance(em_null_confidence, em_modelConfidence, em_
 write.csv(emCompConf.df, file = 'figures/paper/table_emCompConf.csv', row.names = F)
 ```
 
+
 # multiple voxel extraction
 ```{r}
 assignSupLV1 <- function(c) {
@@ -1108,6 +1151,7 @@ ggplot(insula_activity_means, aes(x=TR, y=Intensity, color=category, group = cat
   ggtitle('Insula voxel response')
 
 ```
+
 
 # Manuscript things
 ```{r summary tables and such}
