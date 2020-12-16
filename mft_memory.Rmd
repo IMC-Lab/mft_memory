@@ -471,26 +471,8 @@ ggsave('figures/paper/plot_modelMoral.png', dpi=300)
 ```
 
 
+
 # Model comparisons
-### different superordinate categories 
-```{r superordinate model comparisons}
-superordinateNull <- lmer(moral_decision ~ 1 + (1|subID) + (1|vigfile), data = data_old, control=lmerControl(optCtrl = list(maxeval=5000))) 
-superordinateOG <- lmer(moral_decision ~ superordinate + (1|subID) + (1|vigfile), data = data_old, control=lmerControl(optCtrl = list(maxeval=5000))) 
-superordinateNew <- lmer(moral_decision ~ superordinate_new + (1|subID) + (1|vigfile), data = data_old, control=lmerControl(optCtrl = list(maxeval=5000))) 
-
-supCompMoral.df <- compare_performance(superordinateNull, modelMoral, superordinateOG, superordinateNew, 
-                                       bayesfactor = FALSE, rank = TRUE) %>% 
-  as.data.frame() %>% 
-  mutate(AIC = round(AIC, 2),
-         BIC = round(BIC, 2),
-         R2_conditional = round(R2_conditional, 2),
-         R2_marginal = round(R2_marginal, 2),
-         ICC = round(ICC, 2),
-         RMSE = round(RMSE, 2))
-write.csv(supCompMoral.df, file = 'figures/paper/table_supCompMoral.csv', row.names = F)
-```
-
-### empathy & emotion model comparison
 ```{r em model comparison}
 # baseline: no fixed effects
 em_null_moral <- lmer(moral_decision ~ 1 + (1|subID) + (1|vigfile), data = emo_df) 
