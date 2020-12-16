@@ -365,23 +365,23 @@ emo_df <- emo_df %>%
 ## Results: Moral Judgments
 ### Behavior
 ```{r Moral judgments: Behavior, message=FALSE, warning=FALSE, include=FALSE}
-# # look at spread of moral judgement
-# ggplot(data_old, aes(x=moral_decision, color=category, fill=category)) +
-#   geom_bar() + 
-#   facet_wrap(~category, nrow=2) + 
-#   ggtitle('Distribution of Moral Judgments') +
-#   xlab('1=not morally wrong, 4=extremely morally wrong')
-# 
+# look at spread of moral judgement
+ggplot(data_old, aes(x=moral_decision, color=category, fill=category)) +
+  geom_bar() +
+  facet_wrap(~category, nrow=2) +
+  ggtitle('Distribution of Moral Judgments') +
+  xlab('1=not morally wrong, 4=extremely morally wrong')
+
 # compare our data to normed data from Clifford et al (2015)
 mfv <- read.csv('data/mfv_norms.csv')
-mfv$moral_decision <- scale(mfv$moral_decision)
+mfv$moral_decision <- scale(mfv$moral_decision, center = T)
 mfv$dataset <- 'Normed'
 mfv$category <- factor(mfv$category, levels = c('Social Norms', 'Authority', 'Loyalty', 'Sanctity',
                                                  'Harm-Phys', 'Harm-Emo', 'Fairness', 'Liberty'),
                        labels = c('Social Norms', 'Authority', 'Loyalty', 'Purity',
                                                  'Harm-Phys', 'Harm-Emo', 'Fairness', 'Liberty'))
 mfv_comp <- data_old %>% select(category, vigfile, vignette, subID, moral_decision) %>%
-  mutate(moral_decision = scale(moral_decision)) %>%
+  mutate(moral_decision = scale(moral_decision, center = T)) %>%
   group_by(vigfile) %>%
   summarise(moral_decision = mean(moral_decision)) %>%
   mutate(category = assignCategory(vigfile)) %>% 
@@ -392,11 +392,22 @@ mfv_comp$category <- factor(mfv_comp$category, levels = plotting_categories)
 
 normCheck <- lm(moral_decision ~ dataset*category, data = mfv_comp)
 summary(normCheck)
-
 as.data.frame(emmeans(normCheck, ~ dataset*category)) %>%
   ggplot(aes(x = category, y = emmean, color = dataset, fill = dataset)) +
   geom_pointrange(aes(ymin = lower.CL, ymax = upper.CL), position = position_dodge(0.5)) +
-  labs(y = 'Estimated mean moral judgment (scaled)', title = 'Comparison to Clifford et al. (2015)') +
+  labs(y = 'Estimated mean moral judgment (z-scored)', title = 'Comparison to Clifford et al. (2015)') +
+  theme_pubr(base_family = 'Times New Roman', legend = 'right') +
+  theme(axis.title.x = element_blank(),
+        plot.title = element_text(hjust = 0.5))
+
+# take out social norms -- dataset interactions all go away
+normCheck2 <- mfv_comp %>% filter(category != 'Social Norms') %>%
+  lm(moral_decision ~ dataset*category, .)
+summary(normCheck2)
+as.data.frame(emmeans(normCheck2, ~ dataset*category)) %>%
+  ggplot(aes(x = category, y = emmean, color = dataset, fill = dataset)) +
+  geom_pointrange(aes(ymin = lower.CL, ymax = upper.CL), position = position_dodge(0.5)) +
+  labs(y = 'Estimated mean moral judgment (z-scored)', title = 'Comparison to Clifford et al. (2015)') +
   theme_pubr(base_family = 'Times New Roman', legend = 'right') +
   theme(axis.title.x = element_blank(),
         plot.title = element_text(hjust = 0.5))
@@ -482,20 +493,18 @@ write.csv(supCompMoral.df, file = 'figures/paper/table_supCompMoral.csv', row.na
 ### empathy & emotion model comparison
 ```{r em model comparison}
 # baseline: no fixed effects
-em_null_moral <- lmer(moral_decision ~ 1 + (1|subID) + (1|vigfile), data = em_compare) 
+em_null_moral <- lmer(moral_decision ~ 1 + (1|subID) + (1|vigfile), data = emo_df) 
 
 # standard: category as fixed effect
-em_modelMoral <- lmer(moral_decision ~ category + (1|subID) + (1|vigfile), data = em_compare, contrasts = list(category=contr.sum))
+em_modelMoral <- lmer(moral_decision ~ category + (1|subID) + (1|vigfile), data = emo_df, contrasts = list(category=contr.sum))
 
 # just emotion & empathy as fixed effects
 em_only_moral <- lmer(moral_decision ~ angry + sad + disgusted + afraid + contemptuous + amused +
-                       PersonalDistressScore + EmpathicConcernScore + PerspectiveTakingScore + FantasyScore +
-                        (1|subID) + (1|vigfile), data=em_compare)
+                        (1|subID) + (1|vigfile), data=emo_df)
 
 # add emotion & empathy to foundations
 em_add_moral <- lmer(moral_decision ~ category + angry + sad + disgusted + afraid + contemptuous + amused +
-                       PersonalDistressScore + EmpathicConcernScore + PerspectiveTakingScore + FantasyScore +
-                        (1|subID) + (1|vigfile), data=em_compare, contrasts = list(category=contr.sum))
+                        (1|subID) + (1|vigfile), data=emo_df, contrasts = list(category=contr.sum))
 
 # each em (emotion & empathy) measure interacts with category
 em_int_moral <- lmer(moral_decision ~ 
@@ -505,11 +514,7 @@ em_int_moral <- lmer(moral_decision ~
                         category * afraid + 
                         category * contemptuous + 
                         category * amused + 
-                        category * PersonalDistressScore + 
-                        category * EmpathicConcernScore + 
-                        category * PerspectiveTakingScore +
-                        category * FantasyScore +
-                        (1|subID) + (1|vigfile), data = em_compare,
+                        (1|subID) + (1|vigfile), data = emo_df,
                     contrasts = list(category=contr.sum))
 
 em_comp_moral.df <- compare_performance(em_null_moral, em_modelMoral, em_only_moral, em_add_moral, em_int_moral,
