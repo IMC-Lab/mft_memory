@@ -1,44 +1,113 @@
 ---
 title: "A Functional Neuroimaging Investigation of Moral Foundations Theory"
-output: word_document
+output: 
 editor_options: 
   chunk_output_type: console
 ---
 
 ```{r load packages}
-library(knitr)
-library(ggplot2)
-library(psych)
+library(tidyverse)
 library(lme4)
 library(lmerTest)
-library(ggpubr)
-library(tidyr)
-library(ggeffects)
 library(emmeans)
-library(tidyselect)
-library(dplyr)
-library(ordinal)
-library(vcrpart)
-library(brms)
-library(pracma)
-library(forcats)
+library(performance)
+library(devtools)
+library(ggpubr)
+library(ggeffects)
 library(sjPlot)
 library(RColorBrewer)
-library(nortest)
-library(devtools)
 library(paletti)
-library(showtext)
 library(patchwork)
-library(performance)
-library(eeptools) #note: this is not compatible with R version 4.0.0 as of 05/12/2020
 library(ggcorrplot)
 library(extrafont)
-library(purrr)
-library(parameters)
+```
+
+# Global variables, functions, etc
+```{r custom global things}
 se <- function(x) sqrt(var(x)/length(x))
 `%notin%` <- Negate(`%in%`)
 emm_options(lmerTest.limit = 5000)
 emm_options(pbkrtest.limit = 5000)
+
+# assign OG & new superordinate category
+superordinateCategory <- function(c) {
+  return(ifelse(c == 'Harm-Emo', 'Individualizing',
+         ifelse(c == 'Harm-Phys', 'Individualizing',
+         ifelse(c == 'Fairness', 'Individualizing',
+         ifelse(c == 'Loyalty', 'Binding',
+         ifelse(c == 'Authority', 'Binding',
+         ifelse(c == 'Purity', 'Binding', as.character(c))))))))
+}
+
+superordinateNew <- function(c) {
+  return(ifelse(c == 'Harm-Emo', 'Emotion',
+         ifelse(c == 'Harm-Phys', 'Emotion',
+         ifelse(c == 'Loyalty', 'Not Emotion',
+         ifelse(c == 'Authority', 'Not Emotion',
+         ifelse(c == 'Purity', 'Emotion', 
+         ifelse(c == 'Liberty', 'Not Emotion', as.character(c))))))))
+}
+
+# getting var names straightened out 
+assignCategory <- function(c) {
+  return(ifelse(substr(c, 1,4) == 'auth', 'Authority', 
+         ifelse(substr(c, 1,7) == 'careemo', 'Harm-Emo', 
+         ifelse(substr(c, 1,8) == 'carephys', 'Harm-Phys', 
+         ifelse(substr(c, 1,4) == 'fair', 'Fairness', 
+         ifelse(substr(c, 1,3) == 'lib', 'Liberty', 
+         ifelse(substr(c, 1,3) == 'loy', 'Loyalty',
+         ifelse(substr(c, 1,3) == 'pur' , 'Purity', 
+         ifelse(substr(c, 1,7) == 'socnorm', 'Social Norms', NA)))))))))
+}
+plotting_categories <- c('Social Norms', 
+                         'Authority', 'Loyalty', 'Purity', 
+                         'Harm-Emo', 'Harm-Phys', 'Fairness', 
+                         'Liberty')
+
+matlab_categories <- c('Authority', 'Harm-Emo', 'Harm-Phys', 'Fairness', 'Liberty', 
+                       'Loyalty', 'Purity', 'Social Norms')
+
+# contrasts 
+SuperordinateContrasts <- list(LibertyVsSocial=c(-1, 0, 0, 0, 0, 0, 0, 1),
+                BindingVsSocial=c(-1, 1/3, 1/3, 1/3, 0, 0, 0,0),
+                IndividualizingVsSocial=c(-1, 0, 0, 0, 1/3, 1/3, 1/3, 0),
+                LibertyVsBinding=c(0, -1/3, -1/3, -1/3, 0, 0, 0, 1),
+                LibertyVsIndividualizing=c(0, 0, 0, 0, -1/3, -1/3, -1/3, 1),
+                IndividualizingVsBinding=c(0, 0, -1/3, -1/3, -1/3, 1/3, 1/3, 1/3))
+
+newSuperordinateContrasts <- list(FairnessVsSocial=c(-1, 0, 0, 0, 0, 0, 1, 0),
+                EmotionVsSocial=c(-1, 0, 0, 1/3, 1/3, 1/3, 0, 0),
+                NotEmotionVsSocial=c(-1, 1/3, 1/3, 0, 0, 0, 0, 1/3),
+                EmotionVsNotEmotion=c(0, -1/3, -1/3, 1/3, 1/3, 1/3, 0, -1/3),
+                EmotionVsFairness=c(0, 0, 0, 1/3, 1/3, 1/3, -1, 0),
+                NotEmotionVsFairness=c(0, 1/3, 1/3, 0, 0, 0, -1, 1/3))
+
+old_superordinate <- function(levels) {
+  if (length(levels) == 8) {
+    return(as.data.frame(SuperordinateContrasts))
+  }
+  return(NULL)
+}
+
+new_superordinate <- function(levels) {
+  if (length(levels) == 8) {
+    return(as.data.frame(newSuperordinateContrasts))
+  }
+  return(NULL)
+}
+
+# custom color palette
+## shoutout https://edwinth.github.io/blog/paletti/ for the elegant paletti method of doing this
+## https://learnui.design/tools/data-color-picker.html used for generating the gradients, but I heavily tweaked the default output
+colors <- c('#c179f7', '#c40233', '#E60026','#ea3c53', '#2b8cd6', '#86b1e4','#bfd2f2','#7CAE00')
+#viz_palette(colors) - uncomment to visualize palette
+mem_colors <- c('#c179f7', '#c40233', '#E60026','#ea3c53', '#2b8cd6', '#86b1e4','#bfd2f2','#7CAE00',
+                '#c179f7', '#c40233', '#E60026','#ea3c53', '#2b8cd6', '#86b1e4','#bfd2f2','#7CAE00')
+#viz_palette(mem_colors)
+MFT_fill  <- get_scale_fill(get_pal(colors))
+MFT_color <- get_scale_color(get_pal(colors))
+MFT_memfill <- get_scale_fill(get_pal(mem_colors))
+MFT_memcol <- get_scale_color(get_pal(mem_colors))
 ```
 
 
@@ -97,19 +166,8 @@ data <- merge(retrieval, encoding, by=c('subID', 'vigfile'), all.x = TRUE) # con
 #sort(as.numeric(levels(as.factor(all_other_surveys$subID))))
 dataN = length(levels(as.factor(data$subID)))
 dataSubs = sort(as.numeric(levels(as.factor(data$subID))))
-#qualtricsSubs = sort(as.numeric(levels(as.factor(all_other_surveys$subID))))
-
-# participant demographics -- this data is not available in the repo
-# full_demographics <- read.csv('data/ppt_log.csv', stringsAsFactors = FALSE)
-# sex_distribution <- full_demographics %>% 
-#   filter(MFT_id %in% dataSubs) %>% 
-#   count(Sex)
-# age_stats <- full_demographics %>% 
-#   filter(MFT_id %in% dataSubs) %>% 
-#   mutate(Birthdate = as.Date(Birthdate), #as.Date is from eeptools, which is not compatible with R version 4.0.0
-#          Scan.date = as.Date(Scan.date),
-#          age = age_calc(Birthdate, Scan.date, units = 'years')) %>%
-#   summarise(meanAge = mean(age), SD = sd(age))
+#qualtricsSubs = sort(as.numeric(levels(as.factor(all_other_surveys$subID)))) 
+## missing qualtrics data for sub 20
 
 # homogenize variable names
 data$category[data$category == "SN"] <- "Social-Norms"
@@ -144,37 +202,12 @@ for (n in data$resp) {
 data$correct <- as.numeric((!is.na(data$text_response) & data$text_response == data$correct_answer) |
   (is.na(data$text_response) & data$old == 0))
 
-# make function for assigning OG & new superordinate category
-superordinateCategory <- function(c) {
-  return(ifelse(c == 'Harm-Emo', 'Individualizing',
-         ifelse(c == 'Harm-Phys', 'Individualizing',
-         ifelse(c == 'Fairness', 'Individualizing',
-         ifelse(c == 'Loyalty', 'Binding',
-         ifelse(c == 'Authority', 'Binding',
-         ifelse(c == 'Purity', 'Binding', as.character(c))))))))
-}
-
-superordinateNew <- function(c) {
-  return(ifelse(c == 'Harm-Emo', 'Emotion',
-         ifelse(c == 'Harm-Phys', 'Emotion',
-         ifelse(c == 'Loyalty', 'Not Emotion',
-         ifelse(c == 'Authority', 'Not Emotion',
-         ifelse(c == 'Purity', 'Emotion', 
-         ifelse(c == 'Liberty', 'Not Emotion', as.character(c))))))))
-}
-
+# make columns with superordinate categories
 data$superordinate = (superordinateCategory(data$category))
 data$superordinate_new = (superordinateNew(data$category))
 data$superordinate <- factor(data$superordinate, levels = c('Social Norms', 'Liberty', "Individualizing", "Binding"))
 data$superordinate_new <- factor(data$superordinate_new, levels = c('Social Norms', 'Fairness', 'Emotion', 'Not Emotion'))
 
-plotting_categories <- c('Social Norms', 
-                         'Authority', 'Loyalty', 'Purity', 
-                         'Harm-Emo', 'Harm-Phys', 'Fairness', 
-                         'Liberty')
-
-matlab_categories <- c('Authority', 'Harm-Emo', 'Harm-Phys', 'Fairness', 'Liberty', 
-                       'Loyalty', 'Purity', 'Social Norms')
 
 # convert RTs & moral judgment to numeric
 RT_cols <- c(9,11,15)
@@ -186,48 +219,67 @@ data <- data %>% filter(retrieval_RT > 0.25) %>%
          category=factor(category, levels=plotting_categories),
          old=factor(old, levels = c('1', '0')))
 
-# prep for contrasts 
-SuperordinateContrasts <- list(LibertyVsSocial=c(-1, 0, 0, 0, 0, 0, 0, 1),
-                BindingVsSocial=c(-1, 1/3, 1/3, 1/3, 0, 0, 0,0),
-                IndividualizingVsSocial=c(-1, 0, 0, 0, 1/3, 1/3, 1/3, 0),
-                LibertyVsBinding=c(0, -1/3, -1/3, -1/3, 0, 0, 0, 1),
-                LibertyVsIndividualizing=c(0, 0, 0, 0, -1/3, -1/3, -1/3, 1),
-                IndividualizingVsBinding=c(0, 0, -1/3, -1/3, -1/3, 1/3, 1/3, 1/3))
-
-newSuperordinateContrasts <- list(FairnessVsSocial=c(-1, 0, 0, 0, 0, 0, 1, 0),
-                EmotionVsSocial=c(-1, 0, 0, 1/3, 1/3, 1/3, 0, 0),
-                NotEmotionVsSocial=c(-1, 1/3, 1/3, 0, 0, 0, 0, 1/3),
-                EmotionVsNotEmotion=c(0, -1/3, -1/3, 1/3, 1/3, 1/3, 0, -1/3),
-                EmotionVsFairness=c(0, 0, 0, 1/3, 1/3, 1/3, -1, 0),
-                NotEmotionVsFairness=c(0, 1/3, 1/3, 0, 0, 0, -1, 1/3))
-
-# functions for running superordinate contrasts
-old_superordinate <- function(levels) {
-  if (length(levels) == 8) {
-    return(as.data.frame(SuperordinateContrasts))
-  }
-  return(NULL)
-}
-
-new_superordinate <- function(levels) {
-  if (length(levels) == 8) {
-    return(as.data.frame(newSuperordinateContrasts))
-  }
-  return(NULL)
-}
-
-# make data_old
+# make encoding/moral judgment dataframe
 data_old <- subset(data, old == '1' & encoding_RT > 0.25)
 
-# write table with means for supplement
-data_means <- data %>% group_by(category, old) %>% summarise(moral_judgment_mean = round(mean(moral_decision, na.rm = T), 3),
-                                                                 moral_judgment_SD = round(sd(moral_decision, na.rm = T), 3),
-                                                                 memory_accuracy_mean = round(mean(correct), 3),
-                                                                 memory_accuracy_SD = round(sd(correct), 3),
-                                                                 memory_confidence_mean = round(mean(confresp), 3),
-                                                                 memory_confidence_SD = round(sd(confresp), 3))
-write.csv(data_means, file = 'figures/paper/table_dataMeans.csv', row.names = F)
+# for behavioral analyses and plotting
+data <- data %>% group_by(subID, category, old) %>% mutate(propCorrect = mean(correct)) %>% ungroup() # so that violin plots can reflect participant response densities
+confLabels <- c('1' = 'Correct', '0' = 'Incorrect')
+memLabels <- c('1' = 'Old', '0' = 'New')
+```
 
+# PLS plots
+```{r prep for PLS}
+# task PLS 
+mean_brain_scores <- read.csv('data/PLS/mean-centered/brain_scores.csv')
+mean_brain_scores$category <- matlab_categories
+mean_brain_scores$superordinate <- superordinateCategory(mean_brain_scores$category)
+upper_CIs <- read.csv('data/PLS/mean-centered/upper_CIs.csv')
+lower_CIs <- read.csv('data/PLS/mean-centered/lower_CIs.csv')
+colnames(upper_CIs) <- paste0('upper_', colnames(upper_CIs))
+colnames(lower_CIs) <- paste0('lower_', colnames(lower_CIs))
+mean_centered_results_LV1 <- select(mean_brain_scores, category, superordinate, LV1)
+mean_centered_results_LV1$upper <- upper_CIs$upper_LV1
+mean_centered_results_LV1$lower <- lower_CIs$lower_LV1
+mean_centered_results_LV1$category <- factor(mean_centered_results_LV1$category, 
+                                             levels=plotting_categories)
+
+mean_centered_results_LV2 <- select(mean_brain_scores, category, superordinate, LV2)
+mean_centered_results_LV2$upper <- upper_CIs$upper_LV2
+mean_centered_results_LV2$lower <- lower_CIs$lower_LV2
+mean_centered_results_LV2$category <- factor(mean_centered_results_LV2$category, 
+                                             levels=plotting_categories)
+# task temporal brain score data
+LV1 <- read.csv('data/PLS/mean-centered/temporal_brainscores_LV1_all.csv')
+LV2 <- read.csv('data/PLS/mean-centered/temporal_brainscores_LV2_all.csv')
+LV1$subID <- rep(dataSubs, each = 8)
+LV2$subID <- rep(dataSubs, each = 8)
+LV1$category <- matlab_categories
+LV2$category <- matlab_categories
+
+LV1 <- pivot_longer(LV1, cols = starts_with('Lag'), names_to = 'lag', values_to = 'score')
+LV2 <- pivot_longer(LV2, cols = starts_with('Lag'), names_to = 'lag', values_to = 'score')
+
+# task non-rotated data -- commented out because we're not reporting plots for this analysis
+# nr_social <- read.csv('data/PLS/results/non-rotated/socialnorms_means.csv', header = FALSE)
+# nr_social_upper <- read.csv('data/PLS/results/non-rotated/socialnorms_upper.csv', header = FALSE)
+# nr_social_lower <- read.csv('data/PLS/results/non-rotated/socialnorms_lower.csv', header = FALSE)
+# nr_social$upper <- nr_social_upper$V1
+# nr_social$lower <- nr_social_lower$V1
+# nr_social$category <- matlab_categories
+# nr_social$category <- factor(nr_social$category, levels = plotting_categories)
+# 
+# nr_superordinate <- read.csv('data/PLS/results/non-rotated/superordinate_means.csv', header = FALSE)
+# nr_superordinate_upper <- read.csv('data/PLS/results/non-rotated/superordinate_upper.csv', header = FALSE)
+# nr_superordinate_lower <- read.csv('data/PLS/results/non-rotated/superordinate_lower.csv', header = FALSE)
+# nr_superordinate$upper <- nr_superordinate_upper$V1
+# nr_superordinate$lower <- nr_superordinate_lower$V1
+# nr_superordinate$category <- matlab_categories[1:7]
+# nr_superordinate$category <- factor(nr_superordinate$category, levels = plotting_categories[2:8])
+```
+
+# Emotion analyses
+```{r emotion & empathy analyses}
 ### prep for emotion & empathy comparison
 # Emotion responses
 emotion_rating <- read.csv('data/behavior/qualtrics/emotion_ratings.csv', stringsAsFactors = FALSE)
@@ -244,16 +296,6 @@ emotion_rating$emoresp <- as.numeric(emotion_rating$emoresp)
 emotion_rating <- subset(emotion_rating, subID != c('20', '35', '36'))
 # emotion_rating_pls <- pivot_wider(emotion_rating, names_from = emotion, values_from = emoresp)
 
-assignCategory <- function(c) {
-  return(ifelse(substr(c, 1,4) == 'auth', 'Authority', 
-         ifelse(substr(c, 1,7) == 'careemo', 'Harm-Emo', 
-         ifelse(substr(c, 1,8) == 'carephys', 'Harm-Phys', 
-         ifelse(substr(c, 1,4) == 'fair', 'Fairness', 
-         ifelse(substr(c, 1,3) == 'lib', 'Liberty', 
-         ifelse(substr(c, 1,3) == 'loy', 'Loyalty',
-         ifelse(substr(c, 1,3) == 'pur' , 'Purity', 
-         ifelse(substr(c, 1,7) == 'socnorm', 'Social Norms', NA)))))))))
-}
 
 emotion_rating$category <- assignCategory(emotion_rating$vigfile)
 emotion_rating$category <- factor(emotion_rating$category, levels = plotting_categories)
@@ -344,91 +386,7 @@ em_compare <- em_compare %>%
 # ggcorrplot(corr, lab = TRUE)
 # ggsave('emo_corr_matrix.png')
 
-# make custom color palette
-## shoutout https://edwinth.github.io/blog/paletti/ for the elegant paletti method of doing this
-## https://learnui.design/tools/data-color-picker.html used for generating the gradients, but I heavily tweaked the default output
-colors <- c('#c179f7', '#c40233', '#E60026','#ea3c53', '#2b8cd6', '#86b1e4','#bfd2f2','#7CAE00')
-viz_palette(colors)
-mem_colors <- c('#c179f7', '#c40233', '#E60026','#ea3c53', '#2b8cd6', '#86b1e4','#bfd2f2','#7CAE00',
-                '#c179f7', '#c40233', '#E60026','#ea3c53', '#2b8cd6', '#86b1e4','#bfd2f2','#7CAE00')
-viz_palette(mem_colors)
-MFT_fill  <- get_scale_fill(get_pal(colors))
-MFT_color <- get_scale_color(get_pal(colors))
-MFT_memfill <- get_scale_fill(get_pal(mem_colors))
-MFT_memcol <- get_scale_color(get_pal(mem_colors))
-
-
-# import fonts from my poster
-font_import(paths = NULL, recursive = TRUE, prompt = TRUE,pattern = NULL)
-font_add_google('Raleway', 'Raleway')
-showtext_auto()
-
-# prep for PLS
-# task PLS 
-mean_brain_scores <- read.csv('data/PLS/mean-centered/brain_scores.csv')
-mean_brain_scores$category <- matlab_categories
-mean_brain_scores$superordinate <- superordinateCategory(mean_brain_scores$category)
-upper_CIs <- read.csv('data/PLS/mean-centered/upper_CIs.csv')
-lower_CIs <- read.csv('data/PLS/mean-centered/lower_CIs.csv')
-colnames(upper_CIs) <- paste0('upper_', colnames(upper_CIs))
-colnames(lower_CIs) <- paste0('lower_', colnames(lower_CIs))
-mean_centered_results_LV1 <- select(mean_brain_scores, category, superordinate, LV1)
-mean_centered_results_LV1$upper <- upper_CIs$upper_LV1
-mean_centered_results_LV1$lower <- lower_CIs$lower_LV1
-mean_centered_results_LV1$category <- factor(mean_centered_results_LV1$category, 
-                                             levels=plotting_categories)
-
-mean_centered_results_LV2 <- select(mean_brain_scores, category, superordinate, LV2)
-mean_centered_results_LV2$upper <- upper_CIs$upper_LV2
-mean_centered_results_LV2$lower <- lower_CIs$lower_LV2
-mean_centered_results_LV2$category <- factor(mean_centered_results_LV2$category, 
-                                             levels=plotting_categories)
-# task temporal brain score data
-LV1 <- read.csv('data/PLS/mean-centered/temporal_brainscores_LV1_all.csv')
-LV2 <- read.csv('data/PLS/mean-centered/temporal_brainscores_LV2_all.csv')
-LV1$subID <- rep(dataSubs, each = 8)
-LV2$subID <- rep(dataSubs, each = 8)
-LV1$category <- matlab_categories
-LV2$category <- matlab_categories
-
-LV1 <- pivot_longer(LV1, cols = starts_with('Lag'), names_to = 'lag', values_to = 'score')
-LV2 <- pivot_longer(LV2, cols = starts_with('Lag'), names_to = 'lag', values_to = 'score')
-
-# task non-rotated data -- commented out because we're not reporting plots for this analysis
-# nr_social <- read.csv('data/PLS/results/non-rotated/socialnorms_means.csv', header = FALSE)
-# nr_social_upper <- read.csv('data/PLS/results/non-rotated/socialnorms_upper.csv', header = FALSE)
-# nr_social_lower <- read.csv('data/PLS/results/non-rotated/socialnorms_lower.csv', header = FALSE)
-# nr_social$upper <- nr_social_upper$V1
-# nr_social$lower <- nr_social_lower$V1
-# nr_social$category <- matlab_categories
-# nr_social$category <- factor(nr_social$category, levels = plotting_categories)
-# 
-# nr_superordinate <- read.csv('data/PLS/results/non-rotated/superordinate_means.csv', header = FALSE)
-# nr_superordinate_upper <- read.csv('data/PLS/results/non-rotated/superordinate_upper.csv', header = FALSE)
-# nr_superordinate_lower <- read.csv('data/PLS/results/non-rotated/superordinate_lower.csv', header = FALSE)
-# nr_superordinate$upper <- nr_superordinate_upper$V1
-# nr_superordinate$lower <- nr_superordinate_lower$V1
-# nr_superordinate$category <- matlab_categories[1:7]
-# nr_superordinate$category <- factor(nr_superordinate$category, levels = plotting_categories[2:8])
-
-# for behavioral analyses and plotting
-data <- data %>% group_by(subID, category, old) %>% mutate(propCorrect = mean(correct)) %>% ungroup() # so that violin plots can reflect participant response densities
-confLabels <- c('1' = 'Correct', '0' = 'Incorrect')
-memLabels <- c('1' = 'Old', '0' = 'New')
-
-# ggplot(data, aes(x=confresp, fill=category)) +
-#   geom_bar() + 
-#   facet_grid(old~category, labeller = labeller(old=confLabels)) + 
-#   ggtitle('Distribution of Confidence judgments in each category') +
-#   xlab('1=not confident at all, 4=extremely confident')
-# 
-# ggplot(data, aes(x=confresp, color=category, fill=category)) +
-#   geom_bar() + 
-#   facet_grid(correct~category, labeller = labeller(correct=confLabels)) + 
-#   ggtitle('Distribution of Confidence Judgments by Accuracy') +
-#   xlab('1=not confident at all, 4=extremely confident')
 ```
-
 
 ## Results: Moral Judgments
 ### Behavior
@@ -528,6 +486,7 @@ ggplot(modelMoral_df, aes(x=category, y=emmean)) +
 ggsave('figures/paper/plot_modelMoral.png', dpi=300)
 ```
 
+
 ### Task PLS results: LV1 
 ```{r make LV plots, include=FALSE}
 p1 <- ggplot(data = mean_centered_results_LV1, 
@@ -544,23 +503,7 @@ p1 <- ggplot(data = mean_centered_results_LV1,
         axis.text = element_text(size = 12),
         plot.title = element_text(hjust = 0.5, size = 14))
 
-ggplot(data = mean_centered_results_LV1, 
-       aes(x=category, y=LV1, fill=category, color=category)) +
-  geom_hline(aes(yintercept = 0), size = 1) +
-  labs(y = 'Brain scores', x = 'Foundation', title = 'LV1: 24.4% crossblock variance') +
-  geom_col(color='black') + 
-  geom_point(color='black', size=1) +
-  geom_errorbar(aes(ymax = upper, ymin = lower), color='black', size=0.5, width=0.1) +
-  MFT_fill() + MFT_color() +
-  theme_pubr(legend = 'none', base_family = 'Avenir') +
-  theme(axis.title.x = element_blank(),
-        axis.title.y = element_text(size=16),
-        axis.text = element_text(size = 16),
-        plot.title = element_text(hjust = 0.5, size = 20, face = 'bold'))
-ggsave('../poster/LV1_pattern.png', width = 10)
-
 modelLV1 <- lmer(score ~ lag * category + (1 | subID), data = LV1)
-
 p2 <- modelLV1 %>% emmeans(~ lag * category) %>% as.data.frame() %>%
   mutate(superordinate = superordinateCategory(category),
          category = factor(category, levels = plotting_categories)) %>%
@@ -578,6 +521,7 @@ p2 <- modelLV1 %>% emmeans(~ lag * category) %>% as.data.frame() %>%
         plot.title = element_text(hjust = 0.5, size = 14)) +
   labs(y = 'Brain score', x= 'TR=2s', color='Foundation', fill='Foundation', shape='Foundation') +
   ggtitle('Temporal brain scores')
+ggsave('../4TR_LV1.png', width = 8)
 
 
 p3 <- ggplot(data = mean_centered_results_LV2, 
@@ -1063,7 +1007,6 @@ write.csv(emCompConf.df, file = 'figures/paper/table_emCompConf.csv', row.names 
 
 # multiple voxel extraction
 ```{r}
-
 assignSupLV1 <- function(c) {
   return(ifelse(c == 'Authority', 0,
          ifelse(c == 'Harm-Emo', 1,
@@ -1164,6 +1107,30 @@ ggplot(insula_activity_means, aes(x=TR, y=Intensity, color=category, group = cat
   theme_pubr() +
   ggtitle('Insula voxel response')
 
+```
+
+# Manuscript things
+```{r summary tables and such}
+# participant demographics -- this data is not available in the repo
+# full_demographics <- read.csv('data/ppt_log.csv', stringsAsFactors = FALSE)
+# sex_distribution <- full_demographics %>% 
+#   filter(MFT_id %in% dataSubs) %>% 
+#   count(Sex)
+# age_stats <- full_demographics %>% 
+#   filter(MFT_id %in% dataSubs) %>% 
+#   mutate(Birthdate = as.Date(Birthdate), #as.Date is from eeptools, which is not compatible with R version 4.0.0
+#          Scan.date = as.Date(Scan.date),
+#          age = age_calc(Birthdate, Scan.date, units = 'years')) %>%
+#   summarise(meanAge = mean(age), SD = sd(age))
+
+# write table with means for supplement
+data_means <- data %>% group_by(category, old) %>% summarise(moral_judgment_mean = round(mean(moral_decision, na.rm = T), 3),
+                                                                 moral_judgment_SD = round(sd(moral_decision, na.rm = T), 3),
+                                                                 memory_accuracy_mean = round(mean(correct), 3),
+                                                                 memory_accuracy_SD = round(sd(correct), 3),
+                                                                 memory_confidence_mean = round(mean(confresp), 3),
+                                                                 memory_confidence_SD = round(sd(confresp), 3))
+write.csv(data_means, file = 'figures/paper/table_dataMeans.csv', row.names = F)
 ```
 
 ### Old code -- not used
