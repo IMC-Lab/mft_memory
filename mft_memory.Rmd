@@ -95,13 +95,12 @@ brain_scores <- function(df, LV, title) {
     geom_col(color='black') + 
     geom_point(color='black', size=1) +
     geom_errorbar(aes(ymax = upper, ymin = lower), color='black', size=0.5, width=0.25) +
-    #MFT_fill() + MFT_color() +
+    scale_x_discrete(labels = c('S.N.', 'Auth.', 'Loy.', 'Pur.', 'Harm-E.', 'Harm-P.', 'Fair.', 'Lib.')) +
     theme_pubr(legend = 'none') +
     theme(axis.title.x = element_blank(),
           axis.title.y = element_text(size=14),
-          axis.text = element_text(size = 12),
-          plot.title = element_text(hjust = 0.5, size = 14),
-          plot.margin=unit(c(0.5,0.5,1.25,0.5),"cm"))
+          axis.text = element_text(size = 14),
+          plot.title = element_text(hjust = 0.5, size = 16))
 }
 
 temporal_brain_scores <- function(df) {
@@ -269,9 +268,10 @@ LV1_tbs <- pivot_longer(LV1_tbs, cols = starts_with('Lag'), names_to = 'lag', va
 p1 <- brain_scores(all_LV1, ~LV1, 'LV1: 26.99% crossblock variance, p<0.000') + MFT_color() + MFT_fill()
 p2 <- temporal_brain_scores(LV1_tbs) + MFT_color() + MFT_fill()
 p1 + p2 +
-  plot_layout(ncol = 2, nrow = 2, widths = c(2, 0.95), guides = 'collect') +
+  plot_layout(ncol = 2, nrow = 1, widths = c(1.95, 0.95), guides = 'collect') +
   plot_annotation(title = '') &
   theme(text = element_text(family = 'Times New Roman'), plot.tag = element_text(size = 11), plot.title = element_text(hjust=0.5))
+ggsave('figures/paper/plot_LV1.png', width = 10.5, height = 3)
 
 # plot LV2
 all_LV2 <- select(all_mean, category, superordinate, LV2)
@@ -282,13 +282,30 @@ LV2_tbs <- read.csv('data/PLS/mean-centered/all_conditions/LV2_tbs.csv')
 LV2_tbs$subID <- rep(1:27, each = 8)
 LV2_tbs$category <- matlab_categories
 LV2_tbs <- pivot_longer(LV2_tbs, cols = starts_with('Lag'), names_to = 'lag', values_to = 'score')
-p3 <- brain_scores(all_LV2, ~LV2, 'LV2: 20.51% crossblock variance, p<0.010') + MFT_color() + MFT_fill()
-p4 <- temporal_brain_scores(LV2_tbs) + MFT_color() + MFT_fill()
+p3 <- brain_scores(all_LV2, ~LV2, 'LV2: 20.51% crossblock variance, p<0.010') + MFT_color() + MFT_fill() 
+p4 <- temporal_brain_scores(LV2_tbs) + MFT_color() + MFT_fill() 
 p3 + p4 +
-  plot_layout(ncol = 2, nrow = 2, widths = c(2, 0.95), guides = 'collect') +
+  plot_layout(ncol = 2, nrow = 1, widths = c(2, 0.95), guides = 'collect') +
   plot_annotation(title = '') &
   theme(text = element_text(family = 'Times New Roman'), plot.tag = element_text(size = 11), plot.title = element_text(hjust=0.5))
+ggsave('figures/paper/plot_LV2.png', width = 10, height = 3)
 
+# plot LV3
+all_LV3 <- select(all_mean, category, superordinate, LV3)
+all_LV3$upper <- all_upper_CIs$upper_LV3
+all_LV3$lower <- all_lower_CIs$lower_LV3
+all_LV3$category <- factor(all_LV3$category, levels=plotting_categories)
+LV3_tbs <- read.csv('data/PLS/mean-centered/all_conditions/LV3_tbs.csv')
+LV3_tbs$subID <- rep(1:27, each = 8)
+LV3_tbs$category <- matlab_categories
+LV3_tbs <- pivot_longer(LV3_tbs, cols = starts_with('Lag'), names_to = 'lag', values_to = 'score')
+p5 <- brain_scores(all_LV3, ~LV3, 'LV3: 20.51% crossblock variance, p<0.050') + MFT_color() + MFT_fill()
+p6 <- temporal_brain_scores(LV3_tbs) + MFT_color() + MFT_fill()
+p5 + p6 +
+  plot_layout(ncol = 2, nrow = 1, widths = c(2, 0.95), guides = 'collect') +
+  plot_annotation(title = '') &
+  theme(text = element_text(family = 'Times New Roman'), plot.tag = element_text(size = 11), plot.title = element_text(hjust=0.5))
+ggsave('figures/paper/plot_LV3.png', width = 10, height = 5)
 
 
 
@@ -376,12 +393,15 @@ mfv_comp$category <- factor(mfv_comp$category, levels = plotting_categories)
 normCheck <- lm(moral_decision ~ dataset*category, data = mfv_comp)
 summary(normCheck)
 as.data.frame(emmeans(normCheck, ~ dataset*category)) %>%
+  mutate(dataset = factor(dataset, labels = c('Normed data', 'Our sample'))) %>%
   ggplot(aes(x = category, y = emmean, color = dataset, fill = dataset)) +
   geom_pointrange(aes(ymin = lower.CL, ymax = upper.CL), position = position_dodge(0.5)) +
-  labs(y = 'Estimated mean moral judgment (z-scored)', title = 'Comparison to Clifford et al. (2015)') +
+  labs(y = 'Estimated mean moral judgment (z-scored)', title = 'Comparison to Clifford et al. (2015)', color=NULL, fill=NULL) +
+  scale_color_manual(values=c('black', 'gray70')) +
   theme_pubr(base_family = 'Times New Roman', legend = 'right') +
   theme(axis.title.x = element_blank(),
-        plot.title = element_text(hjust = 0.5))
+        plot.title = element_text(hjust = 0.5)) 
+ggsave('figures/paper/plot_normComparison.png', width=9, height=3)
 
 # take out social norms -- dataset interactions all go away
 normCheck2 <- mfv_comp %>% filter(category != 'Social Norms') %>%
@@ -426,17 +446,8 @@ supContrastMoral.df <- as.data.frame(supContrastMoral) %>%
 supContrastMoral.df$eff_size <- supContrastMoral.eff$effect.size 
 write.csv(supContrastMoral.df, file = 'figures/paper/table_supContrastMoral.csv', row.names = F)
 
-supContrastMoralNew <- modelMoral %>% 
-  emmeans(~ category) %>%
-  contrast(newSuperordinateContrasts, adjust = 'tukey')
-supContrastMoralNew.eff <- eff_size(supContrastMoralNew, sigma = sd(data_old$moral_decision), edf = df.residual(modelMoral), method = 'identity') %>%
-  as.data.frame() %>%
-  mutate(effect.size = round(effect.size, 2))
-supContrastMoralNew.df <- as.data.frame(supContrastMoralNew) %>%
-  mutate_at(c('estimate', 'SE', 'df', 't.ratio'), funs(round(.,2)))
-supContrastMoralNew.df$eff_size <- supContrastMoralNew.eff$effect.size 
-write.csv(supContrastMoralNew.df, file = 'figures/paper/table_supContrastMoralNew.csv', row.names = F)
-
+# mixed model contrast
+con_df <- 
 
 # plot
 modelMoral_df <- as.data.frame(emmeans(modelMoral, ~ category))
@@ -452,10 +463,6 @@ ggplot(modelMoral_df, aes(x=category, y=emmean)) +
   theme(axis.title.x = element_blank())
 ggsave('figures/paper/plot_modelMoral.png', dpi=300)
 ```
-
-
-
-
 
 # prep emotion analyses
 ```{r emotion & empathy analyses}
@@ -481,7 +488,7 @@ emo_df <- left_join(data_old, emo_df, by = c('subID', 'vigfile', 'category')) %>
   drop_na(c(angry, sad, disgusted, afraid, contemptuous, amused))
 
 # visualize variable correlations
-emotion_scores <- na.omit(emo_df[,20:25])
+emotion_scores <- na.omit(emo_df[,19:24])
 corr <- cor(emotion_scores)
 ggcorrplot(corr, lab = TRUE) # perhaps we should drop contemptuous from the analysis
 # ggsave('emo_corr_matrix.png')
@@ -496,6 +503,7 @@ emo_df <- emo_df %>%
          amused = scale(amused)) %>%
   filter(subID != '20')
 ```
+
 
 
 
@@ -539,7 +547,8 @@ em_comp_moral.df <- compare_performance(em_null_moral, em_modelMoral, em_only_mo
          R2_conditional = round(R2_conditional, 2),
          R2_marginal = round(R2_marginal, 2),
          ICC = round(ICC, 2),
-         RMSE = round(RMSE, 2))
+         RMSE = round(RMSE, 2)) %>%
+  select(-Type)
 write.csv(em_comp_moral.df, file = 'figures/paper/table_emCompMoral.csv', row.names = F)
 
 summary(em_add_moral)
@@ -549,7 +558,7 @@ summary(em_add_moral)
 ```{r sum-code em_category, include = FALSE}
 # make pretty table
 tab_model(em_add_moral,
-          file = 'figures/paper/table_Emotion+Empathy+Foundation.html',
+          file = 'figures/paper/table_emAddMoral.html',
           digits = 2, 
           show.ci = 0.95, show.stat = TRUE, show.p = TRUE, show.ngroups = TRUE, show.df = TRUE,
           p.val = 'satterthwaite', 
@@ -558,29 +567,21 @@ tab_model(em_add_moral,
           col.order = c('est','ci','df.error','stat','p'),
           pred.labels = c('Intercept',
                           'Social Norms', 'Authority', 'Loyalty', 'Purity', 'Harm-Emo', 'Harm-Phys', 'Fairness', 
-                          'Anger', 'Sadness', 'Disgust', 'Fear','Contempt','Amusement', 
-                          'Personal Distress Score', 'Empathic Concern Score', 'Perspective Taking Score', 'Fantasy Score'))
+                          'Anger', 'Sadness', 'Disgust', 'Fear','Contempt','Amusement'))
 
-# compute effect size
+# compute effect size 
 emmeans(em_add_moral, ~ category) %>% 
-  eff_size(sigma=sd(em_compare$moral_decision), edf=df.residual(em_add_moral), method='eff')
+  eff_size(sigma=sd(emo_df$moral_decision), edf=df.residual(em_add_moral), method='eff')
+moral_sd <- sd(emo_df$moral_decision)
+moral_anger_eff <- 1.255e-01/moral_sd
+moral_sad_eff <- 1.924e-02/moral_sd
+moral_disgust_eff <- 1.600e-01/moral_sd
+moral_fear_eff <- 1.057e-04/moral_sd
+moral_contempt_eff <- 7.254e-02/moral_sd
+moral_amused_eff <- -9.659e-02/moral_sd
 
-em_add.cov <- list(angry=0, amused=0, sad=0, afraid=0, contemptuous=0, disgusted=0)
-
-em_add_effsize <- function(model, dv, em_measure) {
-   arglist <- list(em_add.cov, c(0,1))
-   names(arglist) <- c('.x', em_measure)
-   return(emmeans(model, as.formula(paste0('~', em_measure)),
-                  at=do.call(list_modify, arglist)) %>%
-     eff_size(sigma=sd(em_compare[,c(dv)]), edf=df.residual(model), method='revpairwise'))
-}
-
-em_add_effsize(em_add_moral, 'moral_decision', 'angry')
-em_add_effsize(em_add_moral, 'moral_decision', 'sad')
-em_add_effsize(em_add_moral, 'moral_decision', 'disgusted')
-em_add_effsize(em_add_moral, 'moral_decision', 'afraid')
-em_add_effsize(em_add_moral, 'moral_decision', 'contemptuous')
-em_add_effsize(em_add_moral, 'moral_decision', 'amused')
+# get npar
+anova(em_null_moral, em_modelMoral, em_only_moral, em_add_moral, em_int_moral)
 
 # plot
 plot_moral_emo <- function(emotion, title) {
@@ -605,7 +606,7 @@ amusement_plot <- plot_moral_emo('amused', 'Amusement')
 
 anger_plot + sadness_plot + disgust_plot + fear_plot + contempt_plot + amusement_plot +
   plot_layout(ncol = 3, nrow = 2)
-ggsave('em_moral.png', width=10)
+ggsave('figures/paper/plot_emAddMoral.png', width=8)
 ```
 
 # Memory
@@ -616,6 +617,7 @@ modelMemory <- glmer(correct ~ category * old + (1|subID) + (1|vigfile),
                      control=glmerControl(optimizer = 'bobyqa', optCtrl = list(maxfun=5000)),
                      contrasts = list(category=contr.sum))
 summary(modelMemory)
+# get effect size -- odds ratios
 exp(fixef(modelMemory))
 
 # make pretty table
@@ -651,6 +653,7 @@ emmeans(modelMemory, ~ category*old, type = 'response') %>% as.data.frame %>%
   geom_pointrange(aes(y=prob, ymax=asymp.LCL, ymin=asymp.UCL, shape=old), 
                   position = position_dodge(0.9), color='black', fatten=4) +
   scale_shape_manual(values = c(16,21), labels = c('Old', 'New')) +
+  scale_x_discrete(labels=c('S.N.', 'Auth.', 'Loy.', 'Pur.', 'Harm-E.', 'Harm-P.', 'Fair.', 'Lib.')) +
   MFT_memfill() +
   theme_pubr(legend = 'right',
              base_family = 'Times New Roman',
@@ -658,9 +661,10 @@ emmeans(modelMemory, ~ category*old, type = 'response') %>% as.data.frame %>%
   guides(fill=FALSE, shape=guide_legend(title=NULL)) +
   theme(plot.title = element_text(hjust = 0.5),
         legend.text = element_text(size = 18),
+        axis.text.x = element_text(size=18),
         axis.title.x = element_blank()) + 
   labs(x = 'Foundation', y = 'Estimate probability of correct response', color = 'Old/New Status')
-ggsave('figures/paper/plot_modelMemory.png')
+ggsave('figures/paper/plot_modelMemory.png', width=10, height =4)
 
 # superordinate contrasts 
 supContrastMemory.df <- emmeans(modelMemory, ~ old * category, type = 'response', lmer.df = 'satterthwaite') %>% 
@@ -710,11 +714,18 @@ emCompMemory.df <- compare_performance(em_null_memory, em_modelMemory, em_only_m
          R2_conditional = round(R2_conditional, 2),
          R2_marginal = round(R2_marginal, 2),
          ICC = round(ICC, 2),
-         RMSE = round(RMSE, 2))
+         RMSE = round(RMSE, 2)) %>%
+  select(-Type)
 write.csv(emCompMemory.df, file = 'figures/paper/table_emCompMemory.csv', row.names = FALSE)
+
+# get npar
+anova(em_null_memory, em_modelMemory, em_only_memory, em_add_memory, em_int_memory)
 
 # see printout of winner
 summary(em_only_memory)
+
+# get effect sizes as odds ratios
+exp(fixef(em_only_memory))
 
 # plot results
 ## first transform intercept to probability
@@ -745,8 +756,8 @@ contempt_plot <- plot_mem_emo('contemptuous', 'Contempt')
 amusement_plot <- plot_mem_emo('amused', 'Amusement')
 
 anger_plot + sadness_plot + disgust_plot + fear_plot + contempt_plot + amusement_plot +
-  plot_layout(ncol = 3, nrow = 2) & plot_annotation(title = 'Memory')
-ggsave('em_memory.png', width = 10)
+  plot_layout(ncol = 3, nrow = 2) 
+ggsave('figures/paper/plot_emMemory.png', width = 10)
 ```
 
 # Memory Confidence
@@ -851,8 +862,12 @@ emCompConf.df <- compare_performance(em_null_confidence, em_modelConfidence, em_
          R2_marginal = round(R2_marginal, 2),
          R2_conditional = round(R2_conditional, 2),
          ICC = round(ICC, 2),
-         RMSE = round(RMSE, 2))
+         RMSE = round(RMSE, 2)) %>%
+  select(-Type)
 write.csv(emCompConf.df, file = 'figures/paper/table_emCompConf.csv', row.names = F)
+
+# use anova to get npar
+anova(em_null_confidence, em_modelConfidence, em_only_confidence, em_add_confidence, em_int_confidence1, em_int_confidence2)
 ```
 
 
@@ -1110,6 +1125,7 @@ secs[,reverseScoredSECS] <- reverse100(secs[,reverseScoredSECS])
 secs <- secs %>% 
   mutate(SocialConservatism = rowMeans(select(., social), na.rm = TRUE),
          EconomicConservatism = rowMeans(select(., economic), na.rm = TRUE),
+         MeanConservatism = rowMeans(select(., 1:12), na.rm = TRUE),
          subID = as.numeric(subID)) %>%
   filter(subID != 20, subID %in% dataSubs)
 
@@ -1155,6 +1171,28 @@ iri <- filter(iri, subID %in% dataSubs, subID != 20)
 ```
 
 ```{r em_int_moral summary stuff}
+
+# compute effect size
+# emmeans(em_add_moral, ~ category) %>% 
+#   eff_size(sigma=sd(em_compare$moral_decision), edf=df.residual(em_add_moral), method='eff')
+# 
+# em_add.cov <- list(angry=0, amused=0, sad=0, afraid=0, contemptuous=0, disgusted=0)
+# 
+# em_add_effsize <- function(model, dv, em_measure) {
+#    arglist <- list(em_add.cov, c(0,1))
+#    names(arglist) <- c('.x', em_measure)
+#    return(emmeans(model, as.formula(paste0('~', em_measure)),
+#                   at=do.call(list_modify, arglist)) %>%
+#      eff_size(sigma=sd(em_compare[,c(dv)]), edf=df.residual(model), method='revpairwise'))
+# }
+# 
+# em_add_effsize(em_add_moral, 'moral_decision', 'angry')
+# em_add_effsize(em_add_moral, 'moral_decision', 'sad')
+# em_add_effsize(em_add_moral, 'moral_decision', 'disgusted')
+# em_add_effsize(em_add_moral, 'moral_decision', 'afraid')
+# em_add_effsize(em_add_moral, 'moral_decision', 'contemptuous')
+# em_add_effsize(em_add_moral, 'moral_decision', 'amused')
+
 # compute effect sizes
 # em_category.cov <- list(angry=0, amused=0, sad=0, afraid=0, contemptuous=0, disgusted=0, 
 #                         PersonalDistressScore=0, EmpathicConcernScore=0, 
@@ -1440,4 +1478,24 @@ iri <- filter(iri, subID %in% dataSubs, subID != 20)
 #         text = element_text(family = 'Times New Roman'))
 # ggsave('figures/paper/plot_fantasy.png', width = 13, height = 3.5, dpi = 300)
 # contrast(fantasy.emt, adjust = 'none')
+```
+
+
+# Behavioral PLS
+```{r behavioral PLS}
+# create txt file for analysis -- participants nested in condition, conservatism score assigned to each participant
+# let's do 1 analysis where we split up conservatism btwn social and economic, and another where we use the mean conservatism score
+two_cond <- cbind.data.frame(rep(matlab_categories, each=26), rep(secs$subID, 8), 
+                             rep(secs$EconomicConservatism, 8), rep(secs$SocialConservatism, 8))
+names <- c('foundation', 'subID', 'EconomicConservatism', 'SocialConservatism')
+colnames(two_cond) <- names
+two_cond %>% select(EconomicConservatism, SocialConservatism) %>%
+  write.table(., 'data/two_cond_behav.txt', row.names = F, col.names = F, sep=' ')
+
+mean_cond <- cbind.data.frame(rep(matlab_categories, each=26), rep(secs$subID, 8), rep(secs$MeanConservatism, 8))
+names <- c('foundation', 'subID', 'Conservatism')
+colnames(mean_cond) <- names
+mean_cond %>% select(Conservatism) %>%
+  write.table(., 'data/mean_cond_behav.txt', row.names = F, col.names=F, sep=' ')
+
 ```
