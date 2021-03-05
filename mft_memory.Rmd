@@ -22,22 +22,12 @@ library(ggcorrplot)
 library(extrafont)
 ```
 
-# Global variables, functions, etc
+# Global variables, helper functions, etc
 ```{r custom global things}
 se <- function(x) sqrt(var(x)/length(x))
 `%notin%` <- Negate(`%in%`)
 emm_options(lmerTest.limit = 5000)
 emm_options(pbkrtest.limit = 2500)
-
-# assign OG & new superordinate category
-superordinateCategory <- function(c) {
-  return(ifelse(c == 'Harm-Emo', 'Individualizing',
-         ifelse(c == 'Harm-Phys', 'Individualizing',
-         ifelse(c == 'Fairness', 'Individualizing',
-         ifelse(c == 'Loyalty', 'Binding',
-         ifelse(c == 'Authority', 'Binding',
-         ifelse(c == 'Purity', 'Binding', as.character(c))))))))
-}
 
 # getting var names straightened out 
 assignCategory <- function(c) {
@@ -57,6 +47,16 @@ plotting_categories <- c('Social Norms',
 
 matlab_categories <- c('Authority', 'Harm-Emo', 'Harm-Phys', 'Fairness', 'Liberty', 
                        'Loyalty', 'Purity', 'Social Norms')
+
+# assign superordinate category
+superordinateCategory <- function(c) {
+  return(ifelse(c == 'Harm-Emo', 'Individualizing',
+         ifelse(c == 'Harm-Phys', 'Individualizing',
+         ifelse(c == 'Fairness', 'Individualizing',
+         ifelse(c == 'Loyalty', 'Binding',
+         ifelse(c == 'Authority', 'Binding',
+         ifelse(c == 'Purity', 'Binding', as.character(c))))))))
+}
 
 # contrasts 
 SuperordinateContrasts <- list(LibertyVsSocial=c(-1, 0, 0, 0, 0, 0, 0, 1),
@@ -144,7 +144,7 @@ all_other_surveys <- read.csv('data/behavior/qualtrics/all_other_surveys.csv', s
 ```
 
 
-# Tidy data
+# Tidy behavioral data
 ```{r Tidy data & analysis prep}
 # tidy encoding
 envars <- names(encodingFull) %in% c('run','pres_order','vignum','trialstart_raw','trialstart_zeroed','trialstart_TR','trialdur','intended_jitter','ITI_start_raw','ITI_start_zeroed','ITI_start_TR','ITI_duration','ITI_accuracy', 'foundation', 'vigtext') 
@@ -237,111 +237,6 @@ data <- data %>% filter(retrieval_RT > 0.25) %>%
          category=factor(category, levels=plotting_categories),
          old=factor(old, levels = c('1', '0')))
 
-# secs <- select(all_other_surveys, starts_with('sub'), starts_with('secs'))
-# colnames(secs) <- substr(colnames(secs), 6, 8)
-# names(secs)[1] <- 'subID'
-# secs <- secs[-1,]
-# secs[,2:13] <- as.numeric(unlist(secs[,2:13]))
-# social <- c('1','3','4','7','8','11','12')
-# economic <- c('2', '5', '6', '9', '10')
-# reverse100 <- function(x) 100 - x
-# reverseScoredSECS <- c('1', '5')
-# secs[,reverseScoredSECS] <- reverse100(secs[,reverseScoredSECS])
-# secs <- secs %>% 
-#   mutate(SocialConservatism = rowMeans(select(., social), na.rm = TRUE),
-#          EconomicConservatism = rowMeans(select(., economic), na.rm = TRUE),
-#          subID = as.numeric(subID)) %>%
-#   filter(subID != 20, subID %in% dataSubs) %>%
-#   select(subID, SocialConservatism, EconomicConservatism) %>%
-#   mutate(subID = as.character(subID),
-#          SocialConservatism = scale(SocialConservatism),
-#          EconomicConservatism = scale(EconomicConservatism))
-# data <- left_join(data, secs, by = 'subID')
-# 
-# secs_corr <- secs %>% select(-subID)
-# corr <- cor(secs_corr)
-# ggcorrplot(corr, lab = T)
-
-# prep for contrasts 
-SuperordinateContrasts <- list(LibertyVsSocial=c(-1, 0, 0, 0, 0, 0, 0, 1),
-                BindingVsSocial=c(-1, 1/3, 1/3, 1/3, 0, 0, 0,0),
-                IndividualizingVsSocial=c(-1, 0, 0, 0, 1/3, 1/3, 1/3, 0),
-                LibertyVsBinding=c(0, -1/3, -1/3, -1/3, 0, 0, 0, 1),
-                LibertyVsIndividualizing=c(0, 0, 0, 0, -1/3, -1/3, -1/3, 1),
-                IndividualizingVsBinding=c(0, 0, -1/3, -1/3, -1/3, 1/3, 1/3, 1/3))
-
-newSuperordinateContrasts <- list(FairnessVsSocial=c(-1, 0, 0, 0, 0, 0, 1, 0),
-                EmotionVsSocial=c(-1, 0, 0, 1/3, 1/3, 1/3, 0, 0),
-                NotEmotionVsSocial=c(-1, 1/3, 1/3, 0, 0, 0, 0, 1/3),
-                EmotionVsNotEmotion=c(0, -1/3, -1/3, 1/3, 1/3, 1/3, 0, -1/3),
-                EmotionVsFairness=c(0, 0, 0, 1/3, 1/3, 1/3, -1, 0),
-                NotEmotionVsFairness=c(0, 1/3, 1/3, 0, 0, 0, -1, 1/3))
-
-# functions for running superordinate contrasts
-old_superordinate <- function(levels) {
-  if (length(levels) == 8) {
-    return(as.data.frame(SuperordinateContrasts))
-  }
-  return(NULL)
-}
-
-new_superordinate <- function(levels) {
-  if (length(levels) == 8) {
-    return(as.data.frame(newSuperordinateContrasts))
-  }
-  return(NULL)
-}
-
-# score MFQ
-mfq <- select(all_other_surveys, starts_with('sub'), starts_with('mfq'))
-#part one
-mfq[mfq == 'Not at all relevant' ] <- 0
-mfq[mfq == 'Not very relevant' ] <- 1
-mfq[mfq == 'Slightly relevant' ] <- 2
-mfq[mfq == 'Somewhat relevant' ] <- 3
-mfq[mfq == 'Very relevant' ] <- 4
-mfq[mfq == 'Extremely relevant' ] <- 5
-#part two
-mfq[mfq == 'Strongly disagree' ] <- 0
-mfq[mfq == 'Moderately disagree' ] <- 1
-mfq[mfq == 'Slightly disagree' ] <- 2
-mfq[mfq == 'Slightly agree' ] <- 3
-mfq[mfq == 'Moderately agree' ] <- 4
-mfq[mfq == 'Strongly agree' ] <- 5
-# compute results
-colnames(mfq) <- substr(colnames(mfq), 5, 7)
-names(mfq)[1] <- 'subID'
-mfq <- mfq[-1,]
-mfq[,2:33] <- as.numeric(unlist(mfq[,2:33]))
-mfq <- mfq %>% mutate(careScore = rowSums(select(., c('1','7','12','17','23','28')), na.rm = TRUE),
-                     fairnessScore = rowSums(select(., c('2','8','13','18','24','29')), na.rm = TRUE),
-                     loyaltyScore = rowSums(select(., c('3','9','14','19','25','30')), na.rm = TRUE),
-                     authorityScore = rowSums(select(., c('4','10','15','20','26','31')), na.rm = TRUE),
-                     purityScore = rowSums(select(., c('5','11','16','21','27','32')), na.rm = TRUE),
-                     subID = as.numeric(subID)) %>%
-  filter(subID != 20, subID %in% dataSubs)
-
-mfq_data <- mfq %>% select(subID, careScore, fairnessScore, loyaltyScore, authorityScore, purityScore) %>%
-  mutate(subID = as.character(subID),
-         careEmoScore = careScore,
-         carePhysScore = careScore) %>% 
-  pivot_longer(cols = c(careEmoScore, carePhysScore, fairnessScore, loyaltyScore, authorityScore, purityScore),
-               names_to = 'category',
-               values_to = 'MFQ') %>%
-  mutate(category = factor(category, levels = c('authorityScore', 'loyaltyScore', 'purityScore', 
-                                                'carePhysScore', 'careEmoScore', 'fairnessScore'),
-                           labels = c('Authority', 'Loyalty', 'Purity', 'Harm-Phys', 'Harm-Emo', 'Fairness')))
-
-data <- left_join(data, mfq_data, by=c('subID','category'))
-
-mfq_data2 <- mfq %>% select(subID, careScore, fairnessScore, loyaltyScore, authorityScore, purityScore) %>%
-  mutate(subID = as.character(subID)) %>%
-  group_by(subID) %>%
-  mutate(supDiffScore = (careScore + fairnessScore) - (authorityScore + loyaltyScore + purityScore)) %>% 
-  select(subID, supDiffScore)
-
-data <- left_join(data, mfq_data2, by='subID')
-
 # add normed arousal data
 mfv <- read.csv('data/mfv_norms.csv') 
 mfv <- mfv %>% filter(vigfile %in% data$vigfile) %>% 
@@ -350,42 +245,18 @@ mfv <- mfv %>% filter(vigfile %in% data$vigfile) %>%
 mfv_arousal <- mfv %>% select(vigfile, arousal)
 data <- left_join(data, mfv_arousal, by='vigfile')
 
+# for behavioral analyses and plotting
+data <- data %>% group_by(subID, category, old) %>% mutate(propCorrect = mean(correct)) %>% ungroup() # so that violin plots can reflect participant response densities
+confLabels <- c('1' = 'Correct', '0' = 'Incorrect')
+memLabels <- c('1' = 'Old', '0' = 'New')
 
 # make data_old
 data_old <- subset(data, old == '1' & encoding_RT > 0.25)
-
-# write table with means for supplement
-data_means <- data %>% group_by(category, old) %>% summarise(moral_judgment_mean = round(mean(moral_decision, na.rm = T), 3),
-                                                                 moral_judgment_SD = round(sd(moral_decision, na.rm = T), 3),
-                                                                 memory_accuracy_mean = round(mean(correct), 3),
-                                                                 memory_accuracy_SD = round(sd(correct), 3),
-                                                                 memory_confidence_mean = round(mean(confresp), 3),
-                                                                 memory_confidence_SD = round(sd(confresp), 3))
-write.csv(data_means, file = 'figures/paper/table_dataMeans.csv', row.names = F)
+```
 
 
-# make custom color palette
-## shoutout https://edwinth.github.io/blog/paletti/ for the elegant paletti method of doing this
-## https://learnui.design/tools/data-color-picker.html used for generating the gradients, but I heavily tweaked the default output
-colors <- c('#c179f7', '#c40233', '#E60026','#ea3c53', '#2b8cd6', '#86b1e4','#bfd2f2','#7CAE00')
-viz_palette(colors)
-mem_colors <- c('#c179f7', '#c40233', '#E60026','#ea3c53', '#2b8cd6', '#86b1e4','#bfd2f2','#7CAE00',
-                '#c179f7', '#c40233', '#E60026','#ea3c53', '#2b8cd6', '#86b1e4','#bfd2f2','#7CAE00')
-viz_palette(mem_colors)
-MFT_fill  <- get_scale_fill(get_pal(colors))
-MFT_color <- get_scale_color(get_pal(colors))
-MFT_memfill <- get_scale_fill(get_pal(mem_colors))
-MFT_memcol <- get_scale_color(get_pal(mem_colors))
-
-
-# import fonts from my poster
-font_import(paths = NULL, recursive = TRUE, prompt = TRUE,pattern = NULL)
-font_add_google('Raleway', 'Raleway')
-showtext_auto()
-font_add_google('Times New Roman', "Times New Roman")
-
-# prep for PLS
-# task PLS 
+# tidy PLS data
+```{r tidy PLS data}
 mean_brain_scores <- read.csv('data/PLS/mean-centered/brain_scores.csv')
 mean_brain_scores$category <- matlab_categories
 mean_brain_scores$superordinate <- superordinateCategory(mean_brain_scores$category)
@@ -416,35 +287,27 @@ LV1 <- pivot_longer(LV1, cols = starts_with('Lag'), names_to = 'lag', values_to 
 LV2 <- pivot_longer(LV2, cols = starts_with('Lag'), names_to = 'lag', values_to = 'score')
 
 #task non-rotated data -- commented out because we're not reporting plots for this analysis
-nr_social <- read.csv('data/PLS/non-rotated/socialnorms_means.csv', header = FALSE)
-nr_social_upper <- read.csv('data/PLS/non-rotated/socialnorms_upper.csv', header = FALSE)
-nr_social_lower <- read.csv('data/PLS/non-rotated/socialnorms_lower.csv', header = FALSE)
-nr_social$upper <- nr_social_upper$V1
-nr_social$lower <- nr_social_lower$V1
-nr_social$category <- matlab_categories
-nr_social$category <- factor(nr_social$category, levels = plotting_categories)
+# nr_social <- read.csv('data/PLS/non-rotated/socialnorms_means.csv', header = FALSE)
+# nr_social_upper <- read.csv('data/PLS/non-rotated/socialnorms_upper.csv', header = FALSE)
+# nr_social_lower <- read.csv('data/PLS/non-rotated/socialnorms_lower.csv', header = FALSE)
+# nr_social$upper <- nr_social_upper$V1
+# nr_social$lower <- nr_social_lower$V1
+# nr_social$category <- matlab_categories
+# nr_social$category <- factor(nr_social$category, levels = plotting_categories)
+# 
+# nr_superordinate <- read.csv('data/PLS/results/non-rotated/superordinate_means.csv', header = FALSE)
+# nr_superordinate_upper <- read.csv('data/PLS/results/non-rotated/superordinate_upper.csv', header = FALSE)
+# nr_superordinate_lower <- read.csv('data/PLS/results/non-rotated/superordinate_lower.csv', header = FALSE)
+# nr_superordinate$upper <- nr_superordinate_upper$V1
+# nr_superordinate$lower <- nr_superordinate_lower$V1
+# nr_superordinate$category <- matlab_categories[1:7]
+# nr_superordinate$category <- factor(nr_superordinate$category, levels = plotting_categories[2:8])
 
-nr_superordinate <- read.csv('data/PLS/results/non-rotated/superordinate_means.csv', header = FALSE)
-nr_superordinate_upper <- read.csv('data/PLS/results/non-rotated/superordinate_upper.csv', header = FALSE)
-nr_superordinate_lower <- read.csv('data/PLS/results/non-rotated/superordinate_lower.csv', header = FALSE)
-nr_superordinate$upper <- nr_superordinate_upper$V1
-nr_superordinate$lower <- nr_superordinate_lower$V1
-nr_superordinate$category <- matlab_categories[1:7]
-nr_superordinate$category <- factor(nr_superordinate$category, levels = plotting_categories[2:8])
-
-# make encoding/moral judgment dataframe
-data_old <- subset(data, old == '1' & encoding_RT > 0.25)
-
-# for behavioral analyses and plotting
-data <- data %>% group_by(subID, category, old) %>% mutate(propCorrect = mean(correct)) %>% ungroup() # so that violin plots can reflect participant response densities
-confLabels <- c('1' = 'Correct', '0' = 'Incorrect')
-memLabels <- c('1' = 'Old', '0' = 'New')
 ```
 
 
-
 # PLS plots
-```{r prep for PLS}
+```{r make PLS plots}
 #### all conditions ####
 # prep main df
 all_mean <- read.csv('data/PLS/mean-centered/all_conditions/means.csv')
@@ -508,7 +371,7 @@ ggsave('figures/paper/plot_LV3.png', width = 10, height = 5)
 
 
 
-#### drop social norms ####
+#### dropping social norms ####
 pc <- c('Authority', 'Loyalty', 'Purity', 'Harm-Emo', 'Harm-Phys', 'Fairness', 'Liberty')
 mc <- c('Authority', 'Harm-Emo', 'Harm-Phys', 'Fairness', 'Liberty', 'Loyalty', 'Purity')
 new_colors <- c('#c40233', '#E60026','#ea3c53', '#2b8cd6', '#86b1e4','#bfd2f2','#7CAE00')
@@ -559,12 +422,8 @@ p7 + p8 +
 ```
 
 
-
-
-
-# moral judgments - behavior
-```{r Moral judgments: Behavior, message=FALSE, warning=FALSE, include=FALSE}
-# compare our data to normed data from Clifford et al (2015)
+# compare our sample to normed data
+```{r norm comparison, message=FALSE, warning=FALSE, include=FALSE}
 mfv <- read.csv('data/mfv_norms.csv')
 mfv$moral_decision <- scale(mfv$moral_decision, center = T)
 mfv$dataset <- 'Normed'
@@ -649,8 +508,11 @@ as.data.frame(emmeans(normCheck2, ~ dataset*category)) %>%
   theme(axis.title.x = element_blank(),
         plot.title = element_text(hjust = 0.5))
 ggsave('figures/paper/plot_CliffComparison.png', dpi = 300, width = 10, height = 5.5)
+```
 
 
+# moral judgment model & plot
+```{r moral judgment analysis & plots}
 ## modelMoral 
 modelMoral <- lmer(moral_decision ~ category + (1|subID) + (1|vigfile), data = data_old)
 
@@ -793,103 +655,8 @@ as.data.frame(emmeans(modelMoral_sum, ~ category)) %>%
         legend.text = element_text(size = 18))
 ```
 
-# Model comparisons
-### different superordinate categories 
-```{r superordinate model comparisons}
-
-superordinateNull <- lmer(moral_decision ~ 1 + (1|subID) + (1|vigfile), data = data_old) 
-modelMoral_sup <- lmer(moral_decision ~ category + (1|subID) + (1|vigfile), data = data_old) 
-superordinateOG <- lmer(moral_decision ~ superordinate + (1|subID) + (1|vigfile), data = data_old) 
-superordinateNew <- lmer(moral_decision ~ superordinate_new + (1|subID) + (1|vigfile), data = data_old) 
-
-supCompMoral.df <- compare_performance(superordinateNull, modelMoral_sup, superordinateOG, superordinateNew, 
-                                       bayesfactor = FALSE, rank = TRUE) %>% 
-  as.data.frame() %>% 
-  mutate(AIC = round(AIC, 2),
-         BIC = round(BIC, 2),
-         R2_conditional = round(R2_conditional, 2),
-         R2_marginal = round(R2_marginal, 2),
-         ICC = round(ICC, 2),
-         RMSE = round(RMSE, 2))
-write.csv(supCompMoral.df, file = 'figures/paper/table_supCompMoral.csv', row.names = F)
-```
 
 
-### Task PLS results: LV1 
-```{r make LV plots, include=FALSE}
-p1 <- ggplot(data = mean_centered_results_LV1, 
-       aes(x=category, y=LV1, fill=category, color=category)) +
-  geom_hline(aes(yintercept = 0), size = 0.5) +
-  labs(y = 'Brain scores', title = 'LV1: 24.4% crossblock variance') +
-  scale_x_discrete(labels =c('S.N.', 'Auth.', 'Loy.', 'Pur.', 'Harm-E.', 'Harm-P.', 'Fair.', 'Lib.')) +
-  geom_col(color='black') + 
-  geom_point(color='black', size=1) +
-  geom_errorbar(aes(ymax = upper, ymin = lower), color='black', size=0.5, width=0.25) +
-  MFT_fill() + MFT_color() +
-  theme_pubr(legend = 'none',
-             base_family = 'Times New Roman',
-             base_size = 22) +
-  theme(axis.title.x = element_blank(),
-        plot.title = element_text(hjust = 0.5, size = 28))
-
-modelLV1 <- lmer(score ~ lag * category + (1 | subID), data = LV1)
-
-p2 <- modelLV1 %>% emmeans(~ lag * category) %>% as.data.frame() %>%
-  mutate(superordinate = superordinateCategory(category),
-         category = factor(category, levels = plotting_categories)) %>%
-  ggplot(aes(x=lag, y=emmean, group=category, color=category, fill=category))  + 
-  scale_x_discrete(expand = c(0, 0, 0, 0.08), labels = c('TR1', 'TR2', 'TR3', 'TR4')) +
-  geom_hline(aes(yintercept = 0), size=1) +
-  geom_line(size=1) + 
-  geom_point(aes(fill=category, color=category, shape = category), size=3) +
-  scale_shape_manual(values = c(4,15,16,17,0,1,2, 3)) +
-  MFT_fill() + MFT_color() +
-  theme_pubr(legend = 'right',
-             base_family = 'Times New Roman',
-             base_size = 22) +
-  theme(axis.title.x = element_blank(),
-        axis.title.y = element_blank(),
-        plot.title = element_text(hjust = 0.5, size = 28)) +
-  labs(y = 'Brain score', x= 'TR=2s', color='Foundation', fill='Foundation', shape='Foundation') +
-  ggtitle('Temporal brain scores')
-
-
-p3 <- ggplot(data = mean_centered_results_LV2, 
-       aes(x=category, y=LV2, fill=category, color=category)) +
-  geom_hline(aes(yintercept = 0), size = 0.5) +
-  labs(y = 'Brain scores') +
-  scale_x_discrete(labels =c('S.N.', 'Auth.', 'Loy.', 'Pur.', 'Harm-E.', 'Harm-P.', 'Fair.', 'Lib.')) +
-  geom_col(color='black') + 
-  geom_point(color='black', size=1) +
-  geom_errorbar(aes(ymax = upper, ymin = lower), color='black', size=0.5, width=0.25) +
-  MFT_fill() + MFT_color() +
-  theme_pubr(legend = 'none',
-             base_family = 'Times New Roman',
-             base_size = 22) +
-  theme(axis.title.x = element_blank(),
-        plot.title = element_text(hjust = 0.5, size = 28)) +
-  ggtitle('LV2: 18.13% crossblock variance')
-
-modelLV2 <- lmer(score ~ lag * category + (1 | subID), data = LV2)
-
-p4 <- modelLV2 %>% emmeans(~ lag * category) %>% as.data.frame() %>%
-  mutate(superordinate = superordinateCategory(category),
-         category = factor(category, levels = plotting_categories)) %>%
-  ggplot(aes(x=lag, y=emmean, group=category, color=category, fill=category))  + 
-  scale_x_discrete(expand = c(0, 0, 0, 0.08), labels = c('TR1', 'TR2', 'TR3', 'TR4')) +
-  geom_hline(aes(yintercept = 0), size=1) +
-  geom_line(size=1) + 
-  geom_point(aes(fill=category, color=category, shape = category), size=3) +
-  scale_shape_manual(values = c(4,15,16,17,0,1,2, 3)) +
-  MFT_fill() + MFT_color() +
-  theme_pubr(legend = 'right',
-             base_family = 'Times New Roman',
-             base_size = 22) +
-  theme(axis.title.x = element_blank(),
-        axis.title.y = element_blank(), 
-        plot.title = element_text(hjust = 0.5, size = 28)) +
-  labs(x= 'TR=2s', color='Foundation', fill='Foundation', shape='Foundation',title = 'Temporal brain scores')
-```
 
 ```{r emotion analyses}
 # load data
@@ -918,358 +685,9 @@ emotion_scores <- na.omit(emo_df[,19:24])
 corr <- cor(emotion_scores)
 ggcorrplot(corr, lab = TRUE) # perhaps we should drop contemptuous from the analysis
 # ggsave('emo_corr_matrix.png')
-
-p1 + p2 +  
-  plot_layout(widths = c(3, 1)) +
-  plot_layout(guides = 'collect') 
-ggsave('figures/paper/plot_LV1.png', width = 15, height = 4.5, dpi = 'retina')
-
-p3 + p4 +
-  plot_layout(widths = c(3, 1)) +
-  plot_layout(guides = 'collect')
-ggsave('figures/paper/plot_LV2.png', width = 15, height = 4.5, dpi = 'retina')
-
-
-## Non-rotated PLS - not including these plots in the paper ##
-# Analysis 1: individualizing vs. binding
-# ggplot(data = nr_superordinate, 
-#        aes(x=category, y=V1, color=category, fill=category)) +
-#   geom_hline(aes(yintercept = 0), size = 0.5) +
-#   labs(y='Brain scores', x='Foundation') +
-#   geom_col(color='black') + 
-#   geom_point(color='black', size=1) +
-#   geom_errorbar(aes(ymax = upper, ymin = lower), color='black', size=0.5, width=0.25) +
-#   MFT_fill() +
-#   theme_pubr(legend = 'none') +
-#   theme(axis.title = element_text(size = 12),
-#         axis.text = element_text(size=10),
-#         title = element_text(size=12),
-#         plot.title = element_text(hjust = 0.5, face = 'bold')) +
-#   ggtitle('Individualizing vs. Binding: p < 0.519')
-# 
-# Social Norms vs. everything else
-       aes(x=category, y=V1, color=category, fill=category)) +
-  geom_hline(aes(yintercept = 0), size = 0.5) +
-  labs(y='Brain scores', x='Foundation') +
-  scale_x_discrete(labels =c('S.N.', 'Auth.', 'Loy.', 'Pur.', 'Harm-E.', 'Harm-P.', 'Fair.', 'Lib.')) +
-  geom_col(color='black') +
-  geom_point(color='black', size=1) +
-  geom_errorbar(aes(ymax = upper, ymin = lower), color='black', size=0.5, width=0.25) +
-  MFT_fill() +
-  theme_pubr(legend = 'none',
-             base_size = 22,
-             base_family = 'Times New Roman') +
-  theme(title = element_text(size=24),
-        plot.title = element_text(hjust = 0.5),
-        axis.title.x = element_blank()) +
-  ggtitle('Social Norms vs. Moral Foundations: p < 0.059')
-ggsave('figures/paper/plot_NR.png', dpi = 'retina', width = 12)
 ```
 
-## Memory
-### Accuracy (hits & correct rejections)
-```{r, fig.width=20, fig.height=8, include=FALSE}
-
-# generalized linear mixed effect model (outcome is binary)
-modelMemory <- glmer(correct ~ category * old + (1 | subID) + (1|vigfile),
-                     data=data, family = binomial(link = 'logit'), 
-                     control=glmerControl(optimizer = 'bobyqa', 
-                                          optCtrl = list(maxfun=1e9)),
-                     contrasts = list(category=contr.sum))
-summary(modelMemory)
-
-modelMemory_betas <- as.data.frame((fixef(modelMemory)))
-colnames(modelMemory_betas) <- 'beta'
-modelMemory_betas <- modelMemory_betas %>% mutate(beta = round(beta, 2))
-write.csv(modelMemory_betas, 'figures/paper/table_modelMemory_betas.csv')
-
-# make pretty table
-tab_model(modelMemory, 
-          file = 'figures/paper/table_modelMemory.html',  
-          digits = 2, 
-          show.ci = 0.95, show.stat = TRUE, show.p = TRUE, show.ngroups = TRUE, show.df = TRUE,
-          #p.val = 'satterthwaite', 
-          strings = c(stat = 'z value', ci = 'CI (95%)', pred = 'Factors', p = 'p value'),
-          dv.labels = 'correct', 
-          col.order = c('est','ci','df.error','stat','p'),
-          pred.labels = c('Intercept', 
-                          'Social Norms', 'Authority', 'Loyalty', 'Purity', 'Harm-Emo', 'Harm-Phys', 'Fairness',
-                          'New - Old', 'Individualizing Values',
-                          'Social Norms*New', 'Authority*New', 'Loyalty*New', 'Purity*New', 'Harm-Emo*New', 'Harm-Phys*New','Fairness*New',
-                          'Social Norms*IV', 'Authority*IV', 'Loyalty*IV', 'Purity*IV', 'Harm-Emo*IV', 'Harm-Phys*IV', 'Fairness*IV',
-                          'New*Individualizing Values',
-                          'Social Norms*New*IV', 'Authority*New*IV', 'Loyalty*New*IV', 'Purity*New*IV', 
-                          'Harm-Emo*New*IV', 'Harm-Phys*New*IV','Fairness*New*IV'))
-
-# plotting prep
-data <- data %>% group_by(subID, category, old) %>% mutate(propCorrect = mean(correct)) # so that violin plots can reflect participant response densities
-memLabels <- c('0' = "New", '1' = 'Old') # labels for faceting 
-
-# plot
-emmeans(modelMemory, ~ category*old, type = 'response') %>% as.data.frame %>%
-  ggplot(aes(x=category, y=prob, fill=interaction(category,old))) +
-  geom_violin(aes(x=category, y=propCorrect), data=data, alpha=0.85, scale='count', bw=.1) +
-  geom_pointrange(aes(y=prob, ymax=asymp.LCL, ymin=asymp.UCL, shape=old), 
-                  position = position_dodge(0.9), color='black', fatten=6) +
-  scale_shape_manual(values = c(16,21), labels = c('Old', 'New')) +
-  MFT_memfill() +
-  scale_x_discrete(labels =c('S.N.', 'Auth.', 'Loy.', 'Pur.', 'Harm-E.', 'Harm-P.', 'Fair.', 'Lib.')) +
-  theme_pubr(legend = 'top',
-             base_family = 'Times New Roman',
-             base_size = 15) +
-  guides(fill=FALSE, shape=guide_legend(title=NULL)) +
-  theme(plot.title = element_text(hjust = 0.5),
-        legend.text = element_text(size = 20),
-        axis.title.x = element_blank()) + 
-  labs(y = 'Estimate probability of correct response', color = 'Old/New Status')
-ggsave('figures/paper/plot_modelMemory.png', dpi = 'retina', width = 10)
-
-# superordinate model comparison
-modelMemoryNull <- glmer(correct ~ old + (1 | subID) + (1|vigfile),
-                 data=data, family=binomial(link = 'logit'),
-                 control=glmerControl(optimizer = 'bobyqa', optCtrl=list(maxfun=5000)),
-                 contrasts = list(category=contr.sum))
-
-modelSupMemory <- glmer(correct ~ superordinate * old + (1 | subID) + (1|vigfile),
-                 data=data, family=binomial(link = 'logit'), 
-                 control=glmerControl(optimizer = 'bobyqa', optCtrl=list(maxfun=5000)),
-                 contrasts = list(superordinate=contr.sum))
-
-modelSupMemoryNew <- glmer(correct ~ superordinate_new * old + (1 | subID) + (1|vigfile),
-                 data=data, family=binomial(link = 'logit'), 
-                 control=glmerControl(optimizer = 'bobyqa',optCtrl=list(maxfun=5000)),
-                 contrasts = list(superordinate_new=contr.sum))
-
-supCompMemory <- compare_performance(modelMemoryNull, modelSupMemory, modelSupMemoryNew, modelMemory, bayesfactor = FALSE, rank = TRUE) %>% as.data.frame() %>%  mutate_at(c('AIC', 'BIC', 'R2_conditional', 'R2_marginal', 'ICC', 'RMSE'), funs(round(., 2)))
-write.csv(supCompMemory, file = 'figures/paper/supCompMemory.csv', row.names = F)
-
-# superordinate contrasts 
-supContrastMemory.df <- emmeans(modelMemory, ~ old * category, type = 'response', lmer.df = 'satterthwaite') %>% 
-  contrast(interaction = c("pairwise", old_superordinate, by = NULL)) %>% as.data.frame() %>%
-  mutate(odds_ratio = round(exp(estimate),2),
-         estimate = round(estimate, 2),
-         SE = round(SE, 2),
-         z.ratio = round(z.ratio, 2),
-         p.value = round(p.value, 3)) 
-write.csv(supContrastMemory.df, file = 'figures/paper/table_supContrastMemory.csv', row.names = F)
-
-supContrastMemoryNew.df <- emmeans(modelMemory, ~ old * category, type = 'response', lmer.df = 'satterthwaite') %>% 
-  contrast(interaction = c("pairwise", new_superordinate, by = NULL)) %>% as.data.frame() %>%
-  mutate(odds_ratio = round(exp(estimate),2),
-         estimate = round(estimate, 2),
-         SE = round(SE, 2),
-         z.ratio = round(z.ratio, 2),
-         p.value = round(p.value, 3))
-write.csv(supContrastMemoryNew.df, file = 'figures/paper/table_supContrastMemoryNew.csv', row.names = F)
-```
-
-### Confidence
-```{r, fig.width=8, fig.height=4, include=FALSE}
-
-data$correct <- factor(data$correct, levels = c('1','0'), labels = c('Correct' ,'Incorrect'))
-# run model
-modelConfidence <- lmer(confresp ~ category * old * correct + (1 | subID) + (1|vigfile),
-                        data=data,
-                        control=lmerControl(optCtrl = list(maxeval=5000)),
-                        contrasts = list(category=contr.sum))
-tab_model(modelConfidence, 
-          #file = 'figures/paper/table_modelConfidence.html',  
-          digits = 2, 
-          show.ci = 0.95, show.stat = TRUE, show.p = TRUE, show.ngroups = TRUE, show.df = TRUE,
-          p.val = 'satterthwaite', 
-          strings = c(stat = 't value', ci = 'CI (95%)', pred = 'Factors', p = 'p value'),
-          dv.labels = 'confidence', 
-          col.order = c('est','ci','df.error','stat','p'),
-          pred.labels = c('Intercept', 
-                          'Social Norms', 'Authority', 'Loyalty', 'Purity', 'Harm-Emo', 'Harm-Phys', 'Fairness',
-                          'New', 'Incorrect',
-                          'Social Norms*New', 'Authority*New', 'Loyalty*New', 'Purity*New', 'Harm-Emo*New', 'Harm-Phys*New','Fairness*New',
-                          'Social Norms*Incorrect', 'Authority*Incorrect', 'Loyalty*Incorrect', 'Purity*Incorrect', 
-                          'Harm-Emo*Incorrect', 'Harm-Phys*Incorrect','Fairness*Incorrect',
-                          'New*Incorrect',
-                          'Social Norms*New*Incorrect', 'Authority*New*Incorrect', 'Loyalty*New*Incorrect', 'Purity*New*Incorrect', 
-                          'Harm-Emo*New*Incorrect', 'Harm-Phys*New*Incorrect','Fairness*New*Incorrect'))
-
-
-modelConfidence_df <- emmeans(modelConfidence, ~ category*old*correct, type = 'response') %>% 
-  as.data.frame()
-
-ggplot(modelConfidence_df, aes(x=category, y=emmean)) +
-  facet_wrap(. ~ correct) +
-  geom_pointrange(aes(ymax=upper.CL, ymin=lower.CL, shape=old, color=category), size = 0.85, position=position_dodge(0.5)) + 
-  scale_shape_manual(values = c(16,1), labels = c('Old', 'New')) +
-  ylim(0,4) +
-  scale_x_discrete(labels =c('S.N.', 'Auth.', 'Loy.', 'Pur.', 'Harm-E.', 'Harm-P.', 'Fair.', 'Lib.')) +
-  MFT_color() + MFT_fill() + 
-  theme_pubr(legend = 'top',
-             base_family = 'Times New Roman',
-             base_size = 19) +
-  guides(color=FALSE, shape=guide_legend(title=NULL)) +
-  theme(strip.text.x = element_text(size=24, face='bold'), 
-        strip.background = element_rect(color = 'white'),
-        axis.title.x = element_blank(),
-        legend.position = c(0.05, 0.89),
-        legend.text = element_text(size = 22)) +
-  labs(y = 'Estimated mean confidence', color = 'Foundation')
-ggsave('figures/paper/plot_modelConfidence.png', width = 15, dpi = 'retina')
-
-
-ggplot(modelConfidence_df, aes(x=category, y=emmean, color=supDiffScore, group=interaction(old,supDiffScore))) +
-  facet_grid(.~correct) + 
-  ylim(-0.5, 4) +
-  labs(y = 'Estimated mean confidence', color = 'Relative Individualizing Values', shape = 'Old/New') +
-  geom_line(aes(linetype=interaction(old,supDiffScore)), position = position_dodge(0), alpha=0.4, show.legend = F) +
-  scale_linetype_manual(values=c("solid", "dashed", 'solid', 'dashed')) +
-  geom_pointrange(aes(ymax=lower.CL, ymin=upper.CL, shape=old),fatten=8, position = position_dodge(0)) +
-  scale_shape_manual(values = c(15,21), labels = c('Old', 'New')) +
-  scale_color_manual(values=c('#c40233', '#2b8cd6')) +
-  +
-  theme_pubr(legend = 'top') +
-  theme(axis.title.x = element_blank(),
-        axis.text = element_text(size = 20),
-        axis.title.y = element_text(size=18),
-        legend.text = element_text(size = 14),
-        legend.title = element_text(size = 14))
-
-# superordinate model comparison
-modelConfidenceNull <- lmer(confresp ~  old * correct + (1 | subID) + (1|vigfile), data=data,
-                        control=lmerControl(optCtrl = list(maxeval=5000)))
-modelConfidenceSup <- lmer(confresp ~ superordinate * old * correct + (1 | subID) + (1|vigfile), 
-                           data=data,control=lmerControl(optCtrl = list(maxeval=5000)))
-modelConfidenceSupNew <- lmer(confresp ~ superordinate_new * old * correct + (1 | subID) + (1|vigfile), 
-                              data=data,control=lmerControl(optCtrl = list(maxeval=5000)))
-
-supCompConf.df <- as.data.frame(compare_performance(modelConfidenceNull, modelConfidenceSup, modelConfidenceSupNew, modelConfidence, bayesfactor = F)) %>% 
-  mutate_at(c('AIC', 'BIC', 'R2_conditional', 'R2_marginal', 'ICC', 'RMSE'), funs(round(., 2)))
-write.csv(supCompConf.df, file = 'figures/paper/table_supCompConf.csv', row.names = F)
-
-# superordinate contrasts
-supContrastConf <- modelConfidence %>% 
-  emmeans(~ old * correct * category, type = 'response') %>%
-  contrast(interaction=c('pairwise', 'pairwise', old_superordinate))
-supContrastConf.eff <- eff_size(supContrastConf, sigma = sd(data$confresp), edf = df.residual(modelConfidence), method = 'identity') %>% as.data.frame() %>% mutate(effect.size = round(effect.size, 2))
-supContrastConf.df <- as.data.frame(supContrastConf) %>%
-  mutate_at(c('estimate', 'SE', 'df', 't.ratio'), funs(round(.,2)))
-supContrastConf.df$eff_size <- supContrastConf.eff$effect.size 
-write.csv(supContrastConf.df, file = 'figures/paper/table_supContrastConf.csv', row.names = F)
-
-supContrastConfNew <- modelConfidence %>% 
-  emmeans(~ old * correct * category, type = 'response') %>%
-    contrast(interaction=c('pairwise', 'pairwise', new_superordinate))
-supContrastConfNew.eff <- eff_size(supContrastConfNew, sigma = sd(data$confresp), edf = df.residual(modelConfidence), method = 'identity') %>%
-  as.data.frame() %>% mutate(effect.size = round(effect.size, 2))
-supContrastConfNew.df <- as.data.frame(supContrastConfNew) %>%
-  mutate_at(c('estimate', 'SE', 'df', 't.ratio'), funs(round(.,2)))
-supContrastConfNew.df$eff_size <- supContrastConfNew.eff$effect.size 
-write.csv(supContrastConfNew.df, file = 'figures/paper/table_supContrastConfNew.csv', row.names = F)
-```
-
-# multiple voxel extraction
-```{r}
-
-# assignSupLV1 <- function(c) {
-#   return(ifelse(c == 'Authority', 0,
-#          ifelse(c == 'Harm-Emo', 1,
-#          ifelse(c == 'Harm-Phys', 1,
-#          ifelse(c == 'Purity', 1,
-#          ifelse(c == 'Fairness', 0,
-#          ifelse(c == 'Loyalty', 0,
-#          ifelse(c == 'Liberty', 0,
-#          ifelse(c == 'Social Norms', 0, NA)))))))))
-# }
-# # amygdala
-# amyg_activity1 <- read.delim(file = '../MFT_PLS/4_TR_analysis/multiple voxel extraction/amygdala/amygdala1_fMRIvoxeldata.txt', header = FALSE, sep = "")
-# colnames(amyg_activity1) <- c('TR1','TR2','TR3','TR4')
-# amyg_activity1$category <- rep(matlab_categories, each=27)
-# amyg_activity1$subID <- dataSubs
-# amyg_activity1 <- pivot_longer(amyg_activity1, cols = c(TR1, TR2, TR3, TR4), names_to = 'TR', values_to = 'Intensity')
-# amyg_activity1$category <- factor(amyg_activity1$category, levels = plotting_categories)
-# amyg_activity1_means <- amyg_activity1 %>% group_by(category, TR) %>%
-#   summarise(Intensity = mean(Intensity))
-# amyg_activity1_means$alpha <- assignSupLV1(amyg_activity1_means$category)
-# 
-# amy1 <- ggplot(amyg_activity1_means, aes(x=TR, y=Intensity, color=category, group = category, alpha = alpha == 0)) +
-#   scale_x_discrete(expand = c(0, 0, 0, 0.08)) +
-#   geom_hline(aes(yintercept = 0), size=1) +
-#   geom_line(size=1) + 
-#   geom_point(aes(fill=category, color=category, shape = category), size=3) +
-#   scale_shape_manual(values = c(4,15,16,17,0,1,2, 3)) +
-#   scale_alpha_manual(values = c(1, 0.3), guide = FALSE) +
-#   MFT_color() + 
-#   theme_pubr(legend = 'right') +
-#   theme(plot.title = element_text(hjust = 0.5)) +
-#   ggtitle('(-32, -4, -20)')
-# 
-# amyg_activity2 <- read.delim(file = '../MFT_PLS/4_TR_analysis/multiple voxel extraction/amygdala/amygdala2_fMRIvoxeldata.txt', header = FALSE, sep = "")
-# colnames(amyg_activity2) <- c('TR1','TR2','TR3','TR4')
-# amyg_activity2$category <- rep(matlab_categories, each=27)
-# amyg_activity2$subID <- dataSubs
-# amyg_activity2 <- pivot_longer(amyg_activity2, cols = c(TR1, TR2, TR3, TR4), names_to = 'TR', values_to = 'Intensity')
-# amyg_activity2$category <- factor(amyg_activity2$category, levels = plotting_categories)
-# amyg_activity2_means <- amyg_activity2 %>% group_by(category, TR) %>%
-#   summarise(Intensity = mean(Intensity))
-# amyg_activity2_means$alpha <- assignSupLV1(amyg_activity2_means$category)
-# 
-# amy2 <- ggplot(amyg_activity2_means, aes(x=TR, y=Intensity, color=category, group = category, alpha = alpha == 0)) +
-#   scale_x_discrete(expand = c(0, 0, 0, 0.08)) +
-#   geom_hline(aes(yintercept = 0), size=1) +
-#   geom_line(size=1) + 
-#   geom_point(aes(fill=category, color=category, shape = category), size=3) +
-#   scale_shape_manual(values = c(4,15,16,17,0,1,2, 3)) +
-#   scale_alpha_manual(values = c(1, 0.3), guide = FALSE) +
-#   MFT_color() + 
-#   theme_pubr(legend = 'right') +
-#   theme(plot.title = element_text(hjust = 0.5)) +
-#   ggtitle('(-18, -8, -14)')
-# 
-# amyg_activity3 <- read.delim(file = '../MFT_PLS/4_TR_analysis/multiple voxel extraction/amygdala/amygdala3_fMRIvoxeldata.txt', header = FALSE, sep = "")
-# colnames(amyg_activity3) <- c('TR1','TR2','TR3','TR4')
-# amyg_activity3$category <- rep(matlab_categories, each=27)
-# amyg_activity3$subID <- dataSubs
-# amyg_activity3 <- pivot_longer(amyg_activity3, cols = c(TR1, TR2, TR3, TR4), names_to = 'TR', values_to = 'Intensity')
-# amyg_activity3$category <- factor(amyg_activity3$category, levels = plotting_categories)
-# amyg_activity3_means <- amyg_activity3 %>% group_by(category, TR) %>%
-#   summarise(Intensity = mean(Intensity))
-# amyg_activity3_means$alpha <- assignSupLV1(amyg_activity3_means$category)
-# 
-# 
-# amy3 <- ggplot(amyg_activity3_means, aes(x=TR, y=Intensity, color=category, group = category, alpha = alpha == 0)) +
-#   scale_x_discrete(expand = c(0, 0, 0, 0.08)) +
-#   geom_hline(aes(yintercept = 0), size=1) +
-#   geom_line(size=1) + 
-#   geom_point(aes(fill=category, color=category, shape = category), size=3) +
-#   scale_shape_manual(values = c(4,15,16,17,0,1,2, 3)) +
-#   scale_alpha_manual(values = c(1, 0.3), guide = FALSE) +
-#   MFT_color() + 
-#   theme_pubr(legend = 'right') +
-#   theme(plot.title = element_text(hjust = 0.5)) +
-#   ggtitle('(20, -8, -16)')
-# 
-# amy1 + amy2 + amy3 + plot_layout(guides = 'collect') 
-# 
-# 
-# insula_activity <- read.delim(file = '../MFT_PLS/4_TR_analysis/multiple voxel extraction/insula/insula_fMRIvoxeldata.txt', header = FALSE, sep = "")
-# colnames(insula_activity) <- c('TR1','TR2','TR3','TR4')
-# insula_activity$category <- rep(matlab_categories, each=27)
-# insula_activity$subID <- dataSubs
-# insula_activity <- pivot_longer(insula_activity, cols = c(TR1, TR2, TR3, TR4), names_to = 'TR', values_to = 'Intensity')
-# insula_activity$category <- factor(insula_activity$category, levels = plotting_categories)
-# insula_activity_means <- insula_activity %>% group_by(category, TR) %>%
-#   summarise(Intensity = mean(Intensity))
-# 
-# ggplot(insula_activity_means, aes(x=TR, y=Intensity, color=category, group = category)) +
-#   scale_x_discrete(expand = c(0, 0, 0, 0.08)) +
-#   geom_hline(aes(yintercept = 0), size=1) +
-#   geom_line(size=1) + 
-#   geom_point(aes(fill=category, color=category, shape = category), size=3) +
-#   scale_shape_manual(values = c(4,15,16,17,0,1,2, 3)) +
-#   MFT_color() + 
-#   theme_pubr() +
-#   ggtitle('Insula voxel response')
-
-```
-
-# Model comparisons
+# emotion model comparisons
 ```{r em model comparison}
 # baseline: no fixed effects
 em_null_moral <- lmer(moral_decision ~ 1 + (1|subID) + (1|vigfile), data = emo_df) 
@@ -1357,7 +775,7 @@ em_add_effsize(em_add_moral, 'moral_decision', 'PerspectiveTakingScore')
 em_add_effsize(em_add_moral, 'moral_decision', 'FantasyScore')
 
 ### MEMORY
-  eff_size(sigma=sd(emo_df$moral_decision), edf=df.residual(em_add_moral), method='eff')
+eff_size(sigma=sd(emo_df$moral_decision), edf=df.residual(em_add_moral), method='eff')
 moral_sd <- sd(emo_df$moral_decision)
 moral_anger_eff <- 1.255e-01/moral_sd
 moral_sad_eff <- 1.924e-02/moral_sd
@@ -1395,21 +813,26 @@ anger_plot + sadness_plot + disgust_plot + fear_plot + contempt_plot + amusement
 ggsave('figures/paper/plot_emAddMoral.png', width=8)
 ```
 
-# Memory
+
+# memory accuracy model & plot
 ```{r, fig.width=20, fig.height=8, include=FALSE}
 # generalized linear mixed effect model (outcome is binary)
-modelMemory <- glmer(correct ~ category * old + (1|subID) + (1|vigfile),
+modelMemory <- glmer(correct ~ category * old + (1 | subID) + (1|vigfile),
                      data=data, family = binomial(link = 'logit'), 
-                     control=glmerControl(optimizer = 'bobyqa', optCtrl = list(maxfun=5000)),
+                     control=glmerControl(optimizer = 'bobyqa', 
+                                          optCtrl = list(maxfun=1e9)),
                      contrasts = list(category=contr.sum))
 summary(modelMemory)
-# get effect size -- odds ratios
-exp(fixef(modelMemory))
+
+modelMemory_betas <- as.data.frame((fixef(modelMemory)))
+colnames(modelMemory_betas) <- 'beta'
+modelMemory_betas <- modelMemory_betas %>% mutate(beta = round(beta, 2))
+write.csv(modelMemory_betas, 'figures/paper/table_modelMemory_betas.csv')
 
 # make pretty table
 tab_model(modelMemory, 
           file = 'figures/paper/table_modelMemory.html',  
-          digits = 3, 
+          digits = 2, 
           show.ci = 0.95, show.stat = TRUE, show.p = TRUE, show.ngroups = TRUE, show.df = TRUE,
           #p.val = 'satterthwaite', 
           strings = c(stat = 'z value', ci = 'CI (95%)', pred = 'Factors', p = 'p value'),
@@ -1417,44 +840,40 @@ tab_model(modelMemory,
           col.order = c('est','ci','df.error','stat','p'),
           pred.labels = c('Intercept', 
                           'Social Norms', 'Authority', 'Loyalty', 'Purity', 'Harm-Emo', 'Harm-Phys', 'Fairness',
-                          'New - Old', 'Social Norms*New', 'Authority*New', 'Loyalty*New', 'Purity*New', 'Harm-Emo*New', 'Harm-Phys*New',
-                          'Fairness*New'))
+                          'New - Old', 'Individualizing Values',
+                          'Social Norms*New', 'Authority*New', 'Loyalty*New', 'Purity*New', 'Harm-Emo*New', 'Harm-Phys*New','Fairness*New',
+                          'Social Norms*IV', 'Authority*IV', 'Loyalty*IV', 'Purity*IV', 'Harm-Emo*IV', 'Harm-Phys*IV', 'Fairness*IV',
+                          'New*Individualizing Values',
+                          'Social Norms*New*IV', 'Authority*New*IV', 'Loyalty*New*IV', 'Purity*New*IV', 
+                          'Harm-Emo*New*IV', 'Harm-Phys*New*IV','Fairness*New*IV'))
 
-# compute effect size 
-emmeans(modelMemory, ~ category, at=list(c(old=1)), type = 'response') %>%
-  eff_size(sigma = sd(data$correct), edf = df.residual(modelMemory), method = 'eff')
-
-emmeans(modelMemory, ~ old, type = 'response') %>%
-  eff_size(sigma = sd(data$correct), edf = df.residual(modelMemory), method = 'eff')
-
-emmeans(modelMemory, ~ old | category, at=list(c(old=0,1)), type='response') %>% 
-  contrast(interaction=c('revpairwise', 'eff')) %>%
-  eff_size(sigma = sd(data$correct), edf = df.residual(modelMemory), method = 'identity')
-
+# plotting prep
+data <- data %>% group_by(subID, category, old) %>% mutate(propCorrect = mean(correct)) # so that violin plots can reflect participant response densities
+memLabels <- c('0' = "New", '1' = 'Old') # labels for faceting 
 
 # plot
 emmeans(modelMemory, ~ category*old, type = 'response') %>% as.data.frame %>%
   ggplot(aes(x=category, y=prob, fill=interaction(category,old))) +
   geom_violin(aes(x=category, y=propCorrect), data=data, alpha=0.85, scale='count', bw=.1) +
   geom_pointrange(aes(y=prob, ymax=asymp.LCL, ymin=asymp.UCL, shape=old), 
-                  position = position_dodge(0.9), color='black', fatten=4) +
+                  position = position_dodge(0.9), color='black', fatten=6) +
   scale_shape_manual(values = c(16,21), labels = c('Old', 'New')) +
-  scale_x_discrete(labels=c('S.N.', 'Auth.', 'Loy.', 'Pur.', 'Harm-E.', 'Harm-P.', 'Fair.', 'Lib.')) +
   MFT_memfill() +
-  theme_pubr(legend = 'right',
+  scale_x_discrete(labels =c('S.N.', 'Auth.', 'Loy.', 'Pur.', 'Harm-E.', 'Harm-P.', 'Fair.', 'Lib.')) +
+  theme_pubr(legend = 'top',
              base_family = 'Times New Roman',
              base_size = 15) +
   guides(fill=FALSE, shape=guide_legend(title=NULL)) +
   theme(plot.title = element_text(hjust = 0.5),
-        legend.text = element_text(size = 18),
-        axis.text.x = element_text(size=18),
+        legend.text = element_text(size = 20),
         axis.title.x = element_blank()) + 
-  labs(x = 'Foundation', y = 'Estimate probability of correct response', color = 'Old/New Status')
-ggsave('figures/paper/plot_modelMemory.png', width=10, height =4)
+  labs(y = 'Estimate probability of correct response', color = 'Old/New Status')
+ggsave('figures/paper/plot_modelMemory.png', dpi = 'retina', width = 10)
+
 
 # superordinate contrasts 
 supContrastMemory.df <- emmeans(modelMemory, ~ old * category, type = 'response', lmer.df = 'satterthwaite') %>% 
-  contrast(interaction = c("pairwise", superordinate, by = NULL)) %>% as.data.frame() %>%
+  contrast(interaction = c("pairwise", old_superordinate, by = NULL)) %>% as.data.frame() %>%
   mutate(odds_ratio = round(exp(estimate),2),
          estimate = round(estimate, 2),
          SE = round(SE, 2),
@@ -1462,6 +881,7 @@ supContrastMemory.df <- emmeans(modelMemory, ~ old * category, type = 'response'
          p.value = round(p.value, 3)) 
 write.csv(supContrastMemory.df, file = 'figures/paper/table_supContrastMemory.csv', row.names = F)
 ```
+
 
 # Memory model comparisons
 ```{r}
@@ -1503,11 +923,6 @@ emCompMemory.df <- compare_performance(em_null_memory, em_modelMemory, em_only_m
          RMSE = round(RMSE, 2)) %>%
   select(-Type)
 write.csv(emCompMemory.df, file = 'figures/paper/table_emCompMemory.csv', row.names = FALSE)
-
-
-### CONFIDENCE
-em_null_confidence <- lmer(confresp ~  correct + (1 | subID) + (1|vigfile), 
-                            data=em_compare, control=lmerControl(optCtrl = list(maxeval=5000)))
 
 # get npar
 anova(em_null_memory, em_modelMemory, em_only_memory, em_add_memory, em_int_memory)
@@ -1551,12 +966,14 @@ anger_plot + sadness_plot + disgust_plot + fear_plot + contempt_plot + amusement
 ggsave('figures/paper/plot_emMemory.png', width = 10)
 ```
 
-# Memory Confidence
-```{r}
-data$correct <- factor(data$correct, levels = c('1','0'))
 
+# memory confidence model & plot
+```{r, fig.width=8, fig.height=4, include=FALSE}
+
+data$correct <- factor(data$correct, levels = c('1','0'), labels = c('Correct' ,'Incorrect'))
 # run model
-modelConfidence <- lmer(confresp ~ category * old * correct + (1 | subID) + (1|vigfile), data=data,
+modelConfidence <- lmer(confresp ~ category * old * correct + (1 | subID) + (1|vigfile),
+                        data=data,
                         control=lmerControl(optCtrl = list(maxeval=5000)),
                         contrasts = list(category=contr.sum))
 tab_model(modelConfidence, 
@@ -1577,32 +994,51 @@ tab_model(modelConfidence,
                           'Social Norms*New*Incorrect', 'Authority*New*Incorrect', 'Loyalty*New*Incorrect', 'Purity*New*Incorrect', 
                           'Harm-Emo*New*Incorrect', 'Harm-Phys*New*Incorrect','Fairness*New*Incorrect'))
 
-# plot
-modelConfidence_df <- modelConfidence %>% emmeans(~ category * old * correct, type='response') %>% as.data.frame
+
+modelConfidence_df <- emmeans(modelConfidence, ~ category*old*correct, type = 'response') %>% 
+  as.data.frame()
 
 ggplot(modelConfidence_df, aes(x=category, y=emmean)) +
-  facet_wrap(. ~ correct, labeller = (correct=as_labeller(confLabels))) +
+  facet_wrap(. ~ correct) +
   geom_pointrange(aes(ymax=upper.CL, ymin=lower.CL, shape=old, color=category), size = 0.85, position=position_dodge(0.5)) + 
   scale_shape_manual(values = c(16,1), labels = c('Old', 'New')) +
   ylim(0,4) +
+  scale_x_discrete(labels =c('S.N.', 'Auth.', 'Loy.', 'Pur.', 'Harm-E.', 'Harm-P.', 'Fair.', 'Lib.')) +
   MFT_color() + MFT_fill() + 
   theme_pubr(legend = 'top',
-             base_family = 'Times New Roman') +
+             base_family = 'Times New Roman',
+             base_size = 19) +
   guides(color=FALSE, shape=guide_legend(title=NULL)) +
-  theme(strip.text.x = element_text(size=16, face='bold'), 
+  theme(strip.text.x = element_text(size=24, face='bold'), 
         strip.background = element_rect(color = 'white'),
-        axis.text.x = element_text(size = 12),
         axis.title.x = element_blank(),
-        axis.title.y = element_text(size=12),
-        legend.text = element_text(size=14),
-        legend.position = c(0.05, 0.89)) +
-  labs(y = 'Estimated mean confidence', x = 'Foundation', color = 'Foundation')
-ggsave('figures/paper/plot_modelConfidence.png', dpi = 'retina', width = 14, height = 4)
+        legend.position = c(0.05, 0.89),
+        legend.text = element_text(size = 22)) +
+  labs(y = 'Estimated mean confidence', color = 'Foundation')
+ggsave('figures/paper/plot_modelConfidence.png', width = 15, dpi = 'retina')
+
+
+ggplot(modelConfidence_df, aes(x=category, y=emmean, color=supDiffScore, group=interaction(old,supDiffScore))) +
+  facet_grid(.~correct) + 
+  ylim(-0.5, 4) +
+  labs(y = 'Estimated mean confidence', color = 'Relative Individualizing Values', shape = 'Old/New') +
+  geom_line(aes(linetype=interaction(old,supDiffScore)), position = position_dodge(0), alpha=0.4, show.legend = F) +
+  scale_linetype_manual(values=c("solid", "dashed", 'solid', 'dashed')) +
+  geom_pointrange(aes(ymax=lower.CL, ymin=upper.CL, shape=old),fatten=8, position = position_dodge(0)) +
+  scale_shape_manual(values = c(15,21), labels = c('Old', 'New')) +
+  scale_color_manual(values=c('#c40233', '#2b8cd6')) +
+  +
+  theme_pubr(legend = 'top') +
+  theme(axis.title.x = element_blank(),
+        axis.text = element_text(size = 20),
+        axis.title.y = element_text(size=18),
+        legend.text = element_text(size = 14),
+        legend.title = element_text(size = 14))
 
 # superordinate contrasts
 supContrastConf <- modelConfidence %>% 
   emmeans(~ old * correct * category, type = 'response') %>%
-  contrast(interaction=c('pairwise', 'pairwise', superordinate))
+  contrast(interaction=c('pairwise', 'pairwise', old_superordinate))
 supContrastConf.eff <- eff_size(supContrastConf, sigma = sd(data$confresp), edf = df.residual(modelConfidence), method = 'identity') %>% as.data.frame() %>% mutate(effect.size = round(effect.size, 2))
 supContrastConf.df <- as.data.frame(supContrastConf) %>%
   mutate_at(c('estimate', 'SE', 'df', 't.ratio'), funs(round(.,2)))
@@ -1661,174 +1097,8 @@ write.csv(emCompConf.df, file = 'figures/paper/table_emCompConf.csv', row.names 
 anova(em_null_confidence, em_modelConfidence, em_only_confidence, em_add_confidence, em_int_confidence1, em_int_confidence2)
 ```
 
-### Old code -- not used
-
-# multiple voxel extraction
-```{r}
-assignSupLV1 <- function(c) {
-  return(ifelse(c == 'Authority', 0,
-         ifelse(c == 'Harm-Emo', 1,
-         ifelse(c == 'Harm-Phys', 1,
-         ifelse(c == 'Purity', 1,
-         ifelse(c == 'Fairness', 0,
-         ifelse(c == 'Loyalty', 0,
-         ifelse(c == 'Liberty', 0,
-         ifelse(c == 'Social Norms', 0, NA)))))))))
-}
-# amygdala
-amyg_activity1 <- read.delim(file = '../MFT_PLS/4_TR_analysis/multiple voxel extraction/amygdala/amygdala1_fMRIvoxeldata.txt', header = FALSE, sep = "")
-colnames(amyg_activity1) <- c('TR1','TR2','TR3','TR4')
-amyg_activity1$category <- rep(matlab_categories, each=27)
-amyg_activity1$subID <- dataSubs
-amyg_activity1 <- pivot_longer(amyg_activity1, cols = c(TR1, TR2, TR3, TR4), names_to = 'TR', values_to = 'Intensity')
-amyg_activity1$category <- factor(amyg_activity1$category, levels = plotting_categories)
-amyg_activity1_means <- amyg_activity1 %>% group_by(category, TR) %>%
-  summarise(Intensity = mean(Intensity))
-amyg_activity1_means$alpha <- assignSupLV1(amyg_activity1_means$category)
-
-amy1 <- ggplot(amyg_activity1_means, aes(x=TR, y=Intensity, color=category, group = category, alpha = alpha == 0)) +
-  scale_x_discrete(expand = c(0, 0, 0, 0.08)) +
-  geom_hline(aes(yintercept = 0), size=1) +
-  geom_line(size=1) + 
-  geom_point(aes(fill=category, color=category, shape = category), size=3) +
-  scale_shape_manual(values = c(4,15,16,17,0,1,2, 3)) +
-  scale_alpha_manual(values = c(1, 0.3), guide = FALSE) +
-  MFT_color() + 
-  theme_pubr(legend = 'right') +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  ggtitle('(-32, -4, -20)')
-
-amyg_activity2 <- read.delim(file = '../MFT_PLS/4_TR_analysis/multiple voxel extraction/amygdala/amygdala2_fMRIvoxeldata.txt', header = FALSE, sep = "")
-colnames(amyg_activity2) <- c('TR1','TR2','TR3','TR4')
-amyg_activity2$category <- rep(matlab_categories, each=27)
-amyg_activity2$subID <- dataSubs
-amyg_activity2 <- pivot_longer(amyg_activity2, cols = c(TR1, TR2, TR3, TR4), names_to = 'TR', values_to = 'Intensity')
-amyg_activity2$category <- factor(amyg_activity2$category, levels = plotting_categories)
-amyg_activity2_means <- amyg_activity2 %>% group_by(category, TR) %>%
-  summarise(Intensity = mean(Intensity))
-amyg_activity2_means$alpha <- assignSupLV1(amyg_activity2_means$category)
-
-amy2 <- ggplot(amyg_activity2_means, aes(x=TR, y=Intensity, color=category, group = category, alpha = alpha == 0)) +
-  scale_x_discrete(expand = c(0, 0, 0, 0.08)) +
-  geom_hline(aes(yintercept = 0), size=1) +
-  geom_line(size=1) + 
-  geom_point(aes(fill=category, color=category, shape = category), size=3) +
-  scale_shape_manual(values = c(4,15,16,17,0,1,2, 3)) +
-  scale_alpha_manual(values = c(1, 0.3), guide = FALSE) +
-  MFT_color() + 
-  theme_pubr(legend = 'right') +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  ggtitle('(-18, -8, -14)')
-
-amyg_activity3 <- read.delim(file = '../MFT_PLS/4_TR_analysis/multiple voxel extraction/amygdala/amygdala3_fMRIvoxeldata.txt', header = FALSE, sep = "")
-colnames(amyg_activity3) <- c('TR1','TR2','TR3','TR4')
-amyg_activity3$category <- rep(matlab_categories, each=27)
-amyg_activity3$subID <- dataSubs
-amyg_activity3 <- pivot_longer(amyg_activity3, cols = c(TR1, TR2, TR3, TR4), names_to = 'TR', values_to = 'Intensity')
-amyg_activity3$category <- factor(amyg_activity3$category, levels = plotting_categories)
-amyg_activity3_means <- amyg_activity3 %>% group_by(category, TR) %>%
-  summarise(Intensity = mean(Intensity))
-amyg_activity3_means$alpha <- assignSupLV1(amyg_activity3_means$category)
-
-
-amy3 <- ggplot(amyg_activity3_means, aes(x=TR, y=Intensity, color=category, group = category, alpha = alpha == 0)) +
-  scale_x_discrete(expand = c(0, 0, 0, 0.08)) +
-  geom_hline(aes(yintercept = 0), size=1) +
-  geom_line(size=1) + 
-  geom_point(aes(fill=category, color=category, shape = category), size=3) +
-  scale_shape_manual(values = c(4,15,16,17,0,1,2, 3)) +
-  scale_alpha_manual(values = c(1, 0.3), guide = FALSE) +
-  MFT_color() + 
-  theme_pubr(legend = 'right') +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  ggtitle('(20, -8, -16)')
-
-amy1 + amy2 + amy3 + plot_layout(guides = 'collect') 
-
-
-insula_activity <- read.delim(file = '../MFT_PLS/4_TR_analysis/multiple voxel extraction/insula/insula_fMRIvoxeldata.txt', header = FALSE, sep = "")
-colnames(insula_activity) <- c('TR1','TR2','TR3','TR4')
-insula_activity$category <- rep(matlab_categories, each=27)
-insula_activity$subID <- dataSubs
-insula_activity <- pivot_longer(insula_activity, cols = c(TR1, TR2, TR3, TR4), names_to = 'TR', values_to = 'Intensity')
-insula_activity$category <- factor(insula_activity$category, levels = plotting_categories)
-insula_activity_means <- insula_activity %>% group_by(category, TR) %>%
-  summarise(Intensity = mean(Intensity))
-
-ggplot(insula_activity_means, aes(x=TR, y=Intensity, color=category, group = category)) +
-  scale_x_discrete(expand = c(0, 0, 0, 0.08)) +
-  geom_hline(aes(yintercept = 0), size=1) +
-  geom_line(size=1) + 
-  geom_point(aes(fill=category, color=category, shape = category), size=3) +
-  scale_shape_manual(values = c(4,15,16,17,0,1,2, 3)) +
-  MFT_color() + 
-  theme_pubr() +
-  ggtitle('Insula voxel response')
-
-```
-
-
-
 # Manuscript things
-```{r summary tables and such}
-# participant demographics -- this data is not available in the repo
-# full_demographics <- read.csv('data/ppt_log.csv', stringsAsFactors = FALSE)
-# sex_distribution <- full_demographics %>% 
-#   filter(MFT_id %in% dataSubs) %>% 
-#   count(Sex)
-# age_stats <- full_demographics %>% 
-#   filter(MFT_id %in% dataSubs) %>% 
-#   mutate(Birthdate = as.Date(Birthdate), #as.Date is from eeptools, which is not compatible with R version 4.0.0
-#          Scan.date = as.Date(Scan.date),
-#          age = age_calc(Birthdate, Scan.date, units = 'years')) %>%
-#   summarise(meanAge = mean(age), SD = sd(age))
-
-# write table with means for supplement
-data_means <- data %>% group_by(category, old) %>% summarise(moral_judgment_mean = round(mean(moral_decision, na.rm = T), 3),
-                                                                 moral_judgment_SD = round(sd(moral_decision, na.rm = T), 3),
-                                                                 memory_accuracy_mean = round(mean(correct), 3),
-                                                                 memory_accuracy_SD = round(sd(correct), 3),
-                                                                 memory_confidence_mean = round(mean(confresp), 3),
-                                                                 memory_confidence_SD = round(sd(confresp), 3))
-write.csv(data_means, file = 'figures/paper/table_dataMeans.csv', row.names = F)
-
-# write tables with means 
-# emo_df_means <- emo_df %>% group_by(category) %>% 
-#   summarise(moral_judgment_mean = round(mean(moral_decision, na.rm = T), 3),
-#             moral_judgment_SD = round(sd(moral_decision, na.rm = T), 3),
-#             memory_accuracy_mean = round(mean(correct), 3),
-#             memory_accuracy_SD = round(sd(correct), 3),
-#             memory_confidence_mean = round(mean(confresp), 3),
-#             memory_confidence_SD = round(sd(confresp), 3),
-#             anger_mean = round(mean(angry, na.rm=T), 3),
-#             anger_SD = round(sd(angry, na.rm = T), 3),
-#             amusement_mean = round(mean(amused, na.rm=T), 3),
-#             amusement_SD = round(sd(amused, na.rm=T), 3),
-#             sadness_mean = round(mean(sad, na.rm=T), 3),
-#             sadness_SD = round(sd(sad, na.rm=T), 3),
-#             fear_mean = round(mean(afraid, na.rm=T), 3),
-#             fear_SD = round(sd(afraid, na.rm=T), 3),
-#             contempt_mean = round(mean(contemptuous, na.rm=T), 3),
-#             contempt_SD = round(sd(contemptuous, na.rm = T), 3),
-#             disgust_mean = round(mean(disgusted, na.rm=T), 3),
-#             disgust_SD = round(sd(disgusted, na.rm=T),3),
-# write.csv(em_compare_means, file = 'figures/paper/table_em_compareMeans.csv', row.names = F)
-```
-
-
-# Old code -- not used
->>>>>>> 55e06d264cb262bceb2cbba45456230a88c3bbb7
-```{r, include=FALSE}
-## some handy commands
-# exp(fixef(modelOld1)): transforms model output from log likelihood to odds ratio
-# anova(modelOld1, modelOld2): use for model comparisons [**don't look at the output of either model; use the results of this comparison to guide your result-seeking**]
-# emmeans(modelNew, pairwise ~ category): gives you marginal means for each level of the fixed effect factor & pairwise comparisons among levels of the factor
-# emmeans(modelNew, 'category', type='response'): gives you probabilities for each level of the fixed effect factor
-# emmeans(modelOld1, pairwise ~ category, lmer.df = "satterthwaite"): gives you probabilities for each fixed effect and odds ratios + p-values for pairwise comparisons among levels of the fixed effect factor
-```
-
 ```{r Tidy questionnaires, include=FALSE}
-
 # load qualtrics
 foundation_matching <- read.csv('data/behavior/qualtrics/foundation_matching.csv', stringsAsFactors = FALSE)
 all_other_surveys <- read.csv('data/behavior/qualtrics/all_other_surveys.csv', stringsAsFactors = FALSE)
@@ -2053,6 +1323,185 @@ em_compare <- em_compare %>%
 # ggsave('emo_corr_matrix.png')
 ```
 
+```{r summary tables and such}
+# participant demographics -- this data is not available in the repo
+# full_demographics <- read.csv('data/ppt_log.csv', stringsAsFactors = FALSE)
+# sex_distribution <- full_demographics %>% 
+#   filter(MFT_id %in% dataSubs) %>% 
+#   count(Sex)
+# age_stats <- full_demographics %>% 
+#   filter(MFT_id %in% dataSubs) %>% 
+#   mutate(Birthdate = as.Date(Birthdate), #as.Date is from eeptools, which is not compatible with R version 4.0.0
+#          Scan.date = as.Date(Scan.date),
+#          age = age_calc(Birthdate, Scan.date, units = 'years')) %>%
+#   summarise(meanAge = mean(age), SD = sd(age))
+
+# write table with means for supplement
+data_means <- data %>% group_by(category, old) %>% summarise(moral_judgment_mean = round(mean(moral_decision, na.rm = T), 3),
+                                                                 moral_judgment_SD = round(sd(moral_decision, na.rm = T), 3),
+                                                                 memory_accuracy_mean = round(mean(correct), 3),
+                                                                 memory_accuracy_SD = round(sd(correct), 3),
+                                                                 memory_confidence_mean = round(mean(confresp), 3),
+                                                                 memory_confidence_SD = round(sd(confresp), 3))
+write.csv(data_means, file = 'figures/paper/table_dataMeans.csv', row.names = F)
+
+# write tables with means 
+# emo_df_means <- emo_df %>% group_by(category) %>% 
+#   summarise(moral_judgment_mean = round(mean(moral_decision, na.rm = T), 3),
+#             moral_judgment_SD = round(sd(moral_decision, na.rm = T), 3),
+#             memory_accuracy_mean = round(mean(correct), 3),
+#             memory_accuracy_SD = round(sd(correct), 3),
+#             memory_confidence_mean = round(mean(confresp), 3),
+#             memory_confidence_SD = round(sd(confresp), 3),
+#             anger_mean = round(mean(angry, na.rm=T), 3),
+#             anger_SD = round(sd(angry, na.rm = T), 3),
+#             amusement_mean = round(mean(amused, na.rm=T), 3),
+#             amusement_SD = round(sd(amused, na.rm=T), 3),
+#             sadness_mean = round(mean(sad, na.rm=T), 3),
+#             sadness_SD = round(sd(sad, na.rm=T), 3),
+#             fear_mean = round(mean(afraid, na.rm=T), 3),
+#             fear_SD = round(sd(afraid, na.rm=T), 3),
+#             contempt_mean = round(mean(contemptuous, na.rm=T), 3),
+#             contempt_SD = round(sd(contemptuous, na.rm = T), 3),
+#             disgust_mean = round(mean(disgusted, na.rm=T), 3),
+#             disgust_SD = round(sd(disgusted, na.rm=T),3),
+# write.csv(em_compare_means, file = 'figures/paper/table_em_compareMeans.csv', row.names = F)
+```
+
+
+# Old code -- not used
+```{r, include=FALSE}
+## some handy commands
+# exp(fixef(modelOld1)): transforms model output from log likelihood to odds ratio
+# anova(modelOld1, modelOld2): use for model comparisons [**don't look at the output of either model; use the results of this comparison to guide your result-seeking**]
+# emmeans(modelNew, pairwise ~ category): gives you marginal means for each level of the fixed effect factor & pairwise comparisons among levels of the factor
+# emmeans(modelNew, 'category', type='response'): gives you probabilities for each level of the fixed effect factor
+# emmeans(modelOld1, pairwise ~ category, lmer.df = "satterthwaite"): gives you probabilities for each fixed effect and odds ratios + p-values for pairwise comparisons among levels of the fixed effect factor
+```
+
+# multiple voxel extraction
+```{r}
+# assignSupLV1 <- function(c) {
+#   return(ifelse(c == 'Authority', 0,
+#          ifelse(c == 'Harm-Emo', 1,
+#          ifelse(c == 'Harm-Phys', 1,
+#          ifelse(c == 'Purity', 1,
+#          ifelse(c == 'Fairness', 0,
+#          ifelse(c == 'Loyalty', 0,
+#          ifelse(c == 'Liberty', 0,
+#          ifelse(c == 'Social Norms', 0, NA)))))))))
+# }
+# # amygdala
+# amyg_activity1 <- read.delim(file = '../MFT_PLS/4_TR_analysis/multiple voxel extraction/amygdala/amygdala1_fMRIvoxeldata.txt', header = FALSE, sep = "")
+# colnames(amyg_activity1) <- c('TR1','TR2','TR3','TR4')
+# amyg_activity1$category <- rep(matlab_categories, each=27)
+# amyg_activity1$subID <- dataSubs
+# amyg_activity1 <- pivot_longer(amyg_activity1, cols = c(TR1, TR2, TR3, TR4), names_to = 'TR', values_to = 'Intensity')
+# amyg_activity1$category <- factor(amyg_activity1$category, levels = plotting_categories)
+# amyg_activity1_means <- amyg_activity1 %>% group_by(category, TR) %>%
+#   summarise(Intensity = mean(Intensity))
+# amyg_activity1_means$alpha <- assignSupLV1(amyg_activity1_means$category)
+# 
+# amy1 <- ggplot(amyg_activity1_means, aes(x=TR, y=Intensity, color=category, group = category, alpha = alpha == 0)) +
+#   scale_x_discrete(expand = c(0, 0, 0, 0.08)) +
+#   geom_hline(aes(yintercept = 0), size=1) +
+#   geom_line(size=1) + 
+#   geom_point(aes(fill=category, color=category, shape = category), size=3) +
+#   scale_shape_manual(values = c(4,15,16,17,0,1,2, 3)) +
+#   scale_alpha_manual(values = c(1, 0.3), guide = FALSE) +
+#   MFT_color() + 
+#   theme_pubr(legend = 'right') +
+#   theme(plot.title = element_text(hjust = 0.5)) +
+#   ggtitle('(-32, -4, -20)')
+# 
+# amyg_activity2 <- read.delim(file = '../MFT_PLS/4_TR_analysis/multiple voxel extraction/amygdala/amygdala2_fMRIvoxeldata.txt', header = FALSE, sep = "")
+# colnames(amyg_activity2) <- c('TR1','TR2','TR3','TR4')
+# amyg_activity2$category <- rep(matlab_categories, each=27)
+# amyg_activity2$subID <- dataSubs
+# amyg_activity2 <- pivot_longer(amyg_activity2, cols = c(TR1, TR2, TR3, TR4), names_to = 'TR', values_to = 'Intensity')
+# amyg_activity2$category <- factor(amyg_activity2$category, levels = plotting_categories)
+# amyg_activity2_means <- amyg_activity2 %>% group_by(category, TR) %>%
+#   summarise(Intensity = mean(Intensity))
+# amyg_activity2_means$alpha <- assignSupLV1(amyg_activity2_means$category)
+# 
+# amy2 <- ggplot(amyg_activity2_means, aes(x=TR, y=Intensity, color=category, group = category, alpha = alpha == 0)) +
+#   scale_x_discrete(expand = c(0, 0, 0, 0.08)) +
+#   geom_hline(aes(yintercept = 0), size=1) +
+#   geom_line(size=1) + 
+#   geom_point(aes(fill=category, color=category, shape = category), size=3) +
+#   scale_shape_manual(values = c(4,15,16,17,0,1,2, 3)) +
+#   scale_alpha_manual(values = c(1, 0.3), guide = FALSE) +
+#   MFT_color() + 
+#   theme_pubr(legend = 'right') +
+#   theme(plot.title = element_text(hjust = 0.5)) +
+#   ggtitle('(-18, -8, -14)')
+# 
+# amyg_activity3 <- read.delim(file = '../MFT_PLS/4_TR_analysis/multiple voxel extraction/amygdala/amygdala3_fMRIvoxeldata.txt', header = FALSE, sep = "")
+# colnames(amyg_activity3) <- c('TR1','TR2','TR3','TR4')
+# amyg_activity3$category <- rep(matlab_categories, each=27)
+# amyg_activity3$subID <- dataSubs
+# amyg_activity3 <- pivot_longer(amyg_activity3, cols = c(TR1, TR2, TR3, TR4), names_to = 'TR', values_to = 'Intensity')
+# amyg_activity3$category <- factor(amyg_activity3$category, levels = plotting_categories)
+# amyg_activity3_means <- amyg_activity3 %>% group_by(category, TR) %>%
+#   summarise(Intensity = mean(Intensity))
+# amyg_activity3_means$alpha <- assignSupLV1(amyg_activity3_means$category)
+# 
+# 
+# amy3 <- ggplot(amyg_activity3_means, aes(x=TR, y=Intensity, color=category, group = category, alpha = alpha == 0)) +
+#   scale_x_discrete(expand = c(0, 0, 0, 0.08)) +
+#   geom_hline(aes(yintercept = 0), size=1) +
+#   geom_line(size=1) + 
+#   geom_point(aes(fill=category, color=category, shape = category), size=3) +
+#   scale_shape_manual(values = c(4,15,16,17,0,1,2, 3)) +
+#   scale_alpha_manual(values = c(1, 0.3), guide = FALSE) +
+#   MFT_color() + 
+#   theme_pubr(legend = 'right') +
+#   theme(plot.title = element_text(hjust = 0.5)) +
+#   ggtitle('(20, -8, -16)')
+# 
+# amy1 + amy2 + amy3 + plot_layout(guides = 'collect') 
+# 
+# 
+# insula_activity <- read.delim(file = '../MFT_PLS/4_TR_analysis/multiple voxel extraction/insula/insula_fMRIvoxeldata.txt', header = FALSE, sep = "")
+# colnames(insula_activity) <- c('TR1','TR2','TR3','TR4')
+# insula_activity$category <- rep(matlab_categories, each=27)
+# insula_activity$subID <- dataSubs
+# insula_activity <- pivot_longer(insula_activity, cols = c(TR1, TR2, TR3, TR4), names_to = 'TR', values_to = 'Intensity')
+# insula_activity$category <- factor(insula_activity$category, levels = plotting_categories)
+# insula_activity_means <- insula_activity %>% group_by(category, TR) %>%
+#   summarise(Intensity = mean(Intensity))
+# 
+# ggplot(insula_activity_means, aes(x=TR, y=Intensity, color=category, group = category)) +
+#   scale_x_discrete(expand = c(0, 0, 0, 0.08)) +
+#   geom_hline(aes(yintercept = 0), size=1) +
+#   geom_line(size=1) + 
+#   geom_point(aes(fill=category, color=category, shape = category), size=3) +
+#   scale_shape_manual(values = c(4,15,16,17,0,1,2, 3)) +
+#   MFT_color() + 
+#   theme_pubr() +
+#   ggtitle('Insula voxel response')
+
+```
+
+# Behavioral PLS
+```{r behavioral PLS}
+# create txt file for analysis -- participants nested in condition, conservatism score assigned to each participant
+# let's do 1 analysis where we split up conservatism btwn social and economic, and another where we use the mean conservatism score
+two_cond <- cbind.data.frame(rep(matlab_categories, each=26), rep(secs$subID, 8), 
+                             rep(secs$EconomicConservatism, 8), rep(secs$SocialConservatism, 8))
+names <- c('foundation', 'subID', 'EconomicConservatism', 'SocialConservatism')
+colnames(two_cond) <- names
+two_cond %>% select(EconomicConservatism, SocialConservatism) %>%
+  write.table(., 'data/two_cond_behav.txt', row.names = F, col.names = F, sep=' ')
+
+mean_cond <- cbind.data.frame(rep(matlab_categories, each=26), rep(secs$subID, 8), rep(secs$MeanConservatism, 8))
+names <- c('foundation', 'subID', 'Conservatism')
+colnames(mean_cond) <- names
+mean_cond %>% select(Conservatism) %>%
+  write.table(., 'data/mean_cond_behav.txt', row.names = F, col.names=F, sep=' ')
+```
+
+# code for plotting complex models from over the summer
 ```{r em_int_moral summary stuff}
 
 # compute effect size
@@ -2414,25 +1863,4 @@ em_compare <- em_compare %>%
 #              base_size = 20) +
 #   theme(axis.title.x = element_blank())
 # ggsave('figures/paper/plot_modelMoral.png', dpi=300)
-```
-```
-
-
-# Behavioral PLS
-```{r behavioral PLS}
-# create txt file for analysis -- participants nested in condition, conservatism score assigned to each participant
-# let's do 1 analysis where we split up conservatism btwn social and economic, and another where we use the mean conservatism score
-two_cond <- cbind.data.frame(rep(matlab_categories, each=26), rep(secs$subID, 8), 
-                             rep(secs$EconomicConservatism, 8), rep(secs$SocialConservatism, 8))
-names <- c('foundation', 'subID', 'EconomicConservatism', 'SocialConservatism')
-colnames(two_cond) <- names
-two_cond %>% select(EconomicConservatism, SocialConservatism) %>%
-  write.table(., 'data/two_cond_behav.txt', row.names = F, col.names = F, sep=' ')
-
-mean_cond <- cbind.data.frame(rep(matlab_categories, each=26), rep(secs$subID, 8), rep(secs$MeanConservatism, 8))
-names <- c('foundation', 'subID', 'Conservatism')
-colnames(mean_cond) <- names
-mean_cond %>% select(Conservatism) %>%
-  write.table(., 'data/mean_cond_behav.txt', row.names = F, col.names=F, sep=' ')
-
 ```
