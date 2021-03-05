@@ -1,132 +1,133 @@
-vigtext,category,moral_decision
-You see a girl ignoring her father's orders by taking the car after her curfew.,Authority,3.5
-You see a woman refusing to stand when the judge walks into the courtroom.,Authority,3
-You see a girl repeatedly interrupting her teacher as he explains a new concept.,Authority,3
-You see an intern disobeying an order to dress professionally and comb his hair.,Authority,2.9
-You see a man turn his back and walk away while his boss questions his work.,Authority,3.1
-You see a staff member talking loudly and interrupting the mayor's speech to the public.,Authority,3.8
-You see a teenage girl coming home late and ignoring her parents' strict curfew.,Authority,3.3
-You see a boy spray-painting anarchy symbols on the side of the police station.,Authority,3.9
-You see an employee trying to undermine all of her boss' ideas in front of others.,Authority,3.6
-You see a teaching assistant talking back to the teacher in front of the classrom.,Authority,3.5
-You see a group of women having a long and loud conversation during a church sermon.,Authority,3.8
-You see a star player ignoring her coach's order to come to the bench during a game.,Authority,3.1
-You see a player publicly yelling at his soccer coach during a playoff game.,Authority,3.1
-You see a man secretly watching sports on his cell phone during a pastor's sermon.,Authority,2.8
-You see a boy turning up the TV as his father talks about his military service.,Authority,3.1
-You see a student stating that her professor is a fool during an afternoon class.,Authority,3
-You see a student copying a classmate's answer sheet on a makeup final exam.,Fairness,4.4
-You see a runner taking a shortcut on the course during the marathon in order to win.,Fairness,4.4
-You see a tenant bribing a landlord to be the first to get their apartment repainted.,Fairness,3.2
-You see a soccer player pretending to be seriously fouled by an opposing player.,Fairness,3.5
-You see someone cheating in a card game while playing with a group of strangers.,Fairness,3.6
-You see a professor giving a bad grade to a student just because he dislikes him.,Fairness,4.7
-You see a referee intentionally making bad calls that help his favored team win.,Fairness,4
-"You see a manager taking half the doughnuts from a box, leaving little for others.",Fairness,3
-You see a judge taking on a criminal case although he is friends with the defendant.,Fairness,4.1
-You see a student getting an A on a group project when he didn't do his part.,Fairness,3.8
-You see an employee lying about how many hours she worked during the week.,Fairness,3.9
-You see a woman getting hired only because her father is close friends with the boss.,Fairness,3.4
-You see a girl asking for allowance even though her brother did her chores for her.,Fairness,3.7
-"You see a girl taking all the Halloween candy from a bowl, leaving none for others.",Fairness,3.5
-You see a politician using federal tax dollars to build an extension on his home.,Fairness,4.8
-You see a boy skipping to the front of the line because his friend is an employee.,Fairness,3.4
-You see a woman lying about the number of vacation days she has taken at work.,Fairness,3.2
-You see a teenage boy chuckling at an amputee he passes by while on the subway.,Harm-Emo,4.4
-You see a girl laughing at another student forgetting her lines at a school play.,Harm-Emo,3.4
-You see a woman commenting out loud about how fat another woman looks in her jeans.,Harm-Emo,4
-You see a man quickly canceling a blind date as soon as he sees the woman.,Harm-Emo,4
-You see a boy telling a woman that she looks just like her overweight bulldog. ,Harm-Emo,4.3
-You see a girl laughing when she realizes her friend's dad is the janitor.,Harm-Emo,3.9
-You see a man snickering as he passes by a cancer patient with a bald head.,Harm-Emo,4.4
-You see a girl saying that another girl is too ugly to be a varsity cheerleader.,Harm-Emo,3.8
-You see a teenage girl openly staring at a disfigured woman as she walks past.,Harm-Emo,3
-You see a boy making fun of his brother for getting dumped by his girlfriend.,Harm-Emo,3.2
-You see a man laughing at a disabled co-worker while at an office softball game.,Harm-Emo,4.5
-You see a man loudly telling his wife that the dinner she cooked tastes awful.,Harm-Emo,3.4
-You see a man telling a woman that her painting looks like it was done by children.,Harm-Emo,2.9
-You see a woman clearly avoiding sitting next to an obese woman on the bus.,Harm-Emo,3
-You see a girl telling a boy that his older brother is much more attractive than him.,Harm-Emo,2.4
-You see a girl telling her classmate that she looks like she has gained weight.,Harm-Emo,3.2
-You see a woman swerving her car in order to intentionally run over a squirrel.,Harm-Phys,4.2
-You see a woman throwing her cat across the room for scratching the furniture.,Harm-Phys,4.2
-You see a boy throwing rocks at cows that are grazing in the local pasture.,Harm-Phys,4.3
-You see a man lashing his pony with a whip for breaking loose from its pen.,Harm-Phys,3.9
-You see a boy setting a series of traps to kill stray cats in his neighborhood.,Harm-Phys,4.6
-You see a zoo trainer jabbing a dolphin to get it to entertain his customers.,Harm-Phys,4.2
-You see someone leaving his dog outside in the rain after it dug in the trash.,Harm-Phys,3.7
-You see a girl shooting geese repeatedly with a pellet gun out in the woods.,Harm-Phys,4
-You see a woman snatching away her dog's food for making a mess in the living room.,Harm-Phys,3.2
-You see a woman throwing a stapler at her colleague who is snoring during her talk.,Harm-Phys,4
-You see a teacher hitting a student's hand with a ruler for falling asleep in class.,Harm-Phys,3.7
-You see a woman slapping another woman who she is arguing with in the parking lot.,Harm-Phys,3.8
-You see a girl throwing her hot coffee on a woman who is dating her ex-boyfriend,Harm-Phys,4.3
-You see a wife hitting her husband on the side of his head for coming home late.,Harm-Phys,3.9
-You see a boy placing a thumbtack sticking up on the chair of another student.,Harm-Phys,3.8
-You see a woman spanking her child with a spatula for getting bad grades in school.,Harm-Phys,3.6
-You see a man telling his fiance that she has to switch to his political party.,Liberty,3.9
-You see a father requiring his son to become a commercial airline pilot like him.,Liberty,2.9
-You see a man blocking his wife from leaving home or interacting with others.,Liberty,4.3
-You see a manager coercing her employees into eating at her brother's diner.,Liberty,3.2
-You see a man telling his girlfriend that she must convert to his religion.,Liberty,3.5
-You see a mother telling her son that she is going to choose all of his friends.,Liberty,3.2
-You see a man forbidding his wife to wear clothing that he has not first approved.,Liberty,4.1
-You see a boss ordering an employee to revoke his citizenship in his home country.,Liberty,4.3
-You see a boss pressuring employees to buy goods from her family's general store.,Liberty,3.7
-You see a woman pressuring her daughter to become a famous evening news anchor.,Liberty,2.5
-You see a public leader on TV trying to ban the wearing of hooded sweatshirts.,Liberty,3.7
-You see a mother forcing her daughter to enroll as a pre-med student in college.,Liberty,3.3
-You see a father requiring his son to take up the family restaurant business.,Liberty,2.5
-You see a teacher ordering a student to get a normal haircut before coming to class.,Liberty,3.8
-You see a teenager at a cafeteria forcing a younger student to pay for her lunch.,Liberty,4
-You see a mayor trying to ban people from hugging and kissing in public in his city.,Liberty,4.2
-You see a pastor banning his congregants from wearing bright colors in the church.,Liberty,3.6
-You see an employee joking with competitors about how bad his company did last year.,Loyalty,3
-You see a coach celebrating with the opposing team's players who just won the game.,Loyalty,2.8
-You see a former US General saying publicly he would never buy any American product.,Loyalty,3.5
-You see a mayor saying that the neighboring town is a much better town.,Loyalty,2.6
-You see the US Ambassador joking in Great Britain about the stupidity of Americans.,Loyalty,3.8
-You see a man leaving his family business to go work for their main competitor.,Loyalty,2.7
-You see a teacher publicly saying she hopes another school wins the math contest.,Loyalty,2.9
-You see a head cheerleader booing her high school's team during a homecoming game.,Loyalty,3.3
-You see the class president saying on TV that her rival college is a better school.,Loyalty,2.4
-You see a Hollywood star agreeing with a foreign dictator's denunciation of the US.,Loyalty,3.2
-You see a college president singing a rival school's fight song during a pep rally.,Loyalty,2.7
-You see a man secretly voting against his wife in a local beauty pageant.,Loyalty,2.9
-You see an American telling foreigners that the US is an evil force in the world.,Loyalty,3.7
-You see the coach's wife sponsoring a bake sale for her husband's rival team.,Loyalty,2.5
-You see a former Secretary of State publicly giving up his citizenship to the US.,Loyalty,3.1
-You see a US swimmer cheering as a Chinese foe beats his teammate to win the gold.,Loyalty,2.8
-You see a man having sex with a frozen chicken before cooking it for dinner.,Sanctity,4
-You see a very drunk woman making out with multiple strangers on the city bus.,Sanctity,4
-You see a family eating the carcass of their pet dog that had been run over.,Sanctity,4.2
-You see a drunk elderly man offering to have oral sex with anyone in the bar.,Sanctity,4.4
-You see a teenager urinating in the wave pool at a crowded amusement park.,Sanctity,4.4
-You see a man in a bar using his phone to watch people having sex with animals.,Sanctity,4.3
-You see a teenage male in a dorm bathroom secretly using a stranger's toothbrush.,Sanctity,3.6
-You see a woman having intimate relations with a recently deceased loved one.,Sanctity,4.3
-You see a homosexual in a gay bar offering sex to anyone who buys him a drink.,Sanctity,3.6
-You see an employee at a morgue eating his pepperoni pizza off of a dead body.,Sanctity,4.2
-You see a girl and her sister making out with each other just for practice.,Sanctity,3.8
-You see a story about a remote tribe eating the flesh of their deceased members.,Sanctity,3.3
-You see a woman burping and farting loudly while eating at a fast food truck.,Sanctity,3.1
-You see a man searching through the trash to find women's discarded underwear.,Sanctity,4
-You see two first cousins getting married to each other in an elaborate wedding.,Sanctity,3.7
-You see a single man ordering an inflatable sex doll that looks like his secretary.,Sanctity,2.5
-You see a college student drinking until she vomits on herself and falls asleep.,Sanctity,3.3
-You see someone using an old rotary phone and refusing to go buy a new one.,Social Norms,1
-You see a man staying inside his home with the shades drawn on a rare sunny day.,Social Norms,1.1
-You see a woman drinking her entire cup of coffee using a stirring spoon.,Social Norms,1.2
-You see a woman eating dessert before her main entree arrives on the table.,Social Norms,1.2
-You see a woman continuing to wear a large sun hat inside her apartment complex.,Social Norms,1.2
-You see someone at the school gym lifting free weights in nice business clothes.,Social Norms,1.2
-You see a man eating a bowl of cereal in the morning with water instead of milk.,Social Norms,1.1
-You see a woman using a fork to eat a bowl of vanilla ice cream and marshmallows.,Social Norms,1.1
-You see a man putting ketchup all over his chicken Caesar salad while at lunch.,Social Norms,1.2
-You see a man wearing clothes that are clearly several sizes too big for his body.,Social Norms,1.3
-You see a man walking down a dark hallway while still wearing his sunglasses.,Social Norms,1.2
-You see someone driving around in a dirty car that has not been washed recently.,Social Norms,1.2
-You see a woman watching a game on television in black-and-white instead of color.,Social Norms,1.1
-You see someone reading the ending of a spy novel before reading the beginning.,Social Norms,1.2
-You see a teenage girl wearing a long trench coat on a hot summer afternoon.,Social Norms,1.2
-"You see a woman answering a phone call with the word ""goodbye"" instead of ""hello.""",Social Norms,1.5
+vigtext,category,vigfile,moral_decision,arousal,,,,,,,,,,,,,
+You see a boy spray-painting anarchy symbols on the side of the police station.,Authority,auth06,3.9,2.8,,,,,,,,,,,,,
+You see a boy turning up the TV as his father talks about his military service.,Authority,auth09,3.1,3.2,,,,,,,,,,,,,
+You see a girl ignoring her father's orders by taking the car after her curfew.,Authority,auth01,3.5,2.9,,,,,,,,,,,,,
+You see a girl repeatedly interrupting her teacher as he explains a new concept.,Authority,auth03,3.0,2.6,,,,,,,,,,,,,
+You see a group of women having a long and loud conversation during a church sermon.,Authority,auth12,3.8,3.3,,,,,,,,,,,,,
+You see a man secretly watching sports on his cell phone during a pastor's sermon.,Authority,,2.8,2.3,,,,,,,,,,,,,
+You see a man turn his back and walk away while his boss questions his work.,Authority,auth13,3.1,2.8,,,,,,,,,,,,,
+You see a player publicly yelling at his soccer coach during a playoff game.,Authority,auth08,3.1,2.2,,,,,,,,,,,,,
+You see a staff member talking loudly and interrupting the mayor's speech to the public.,Authority,auth11,3.8,3.1,,,,,,,,,,,,,
+You see a star player ignoring her coach's order to come to the bench during a game.,Authority,auth15,3.1,2.4,,,,,,,,,,,,,
+You see a student stating that her professor is a fool during an afternoon class.,Authority,auth14,3.0,2.6,,,,,,,,,,,,,
+You see a teaching assistant talking back to the teacher in front of the classrom.,Authority,auth10,3.5,2.9,,,,,,,,,,,,,
+You see a teenage girl coming home late and ignoring her parents' strict curfew.,Authority,auth05,3.3,2.6,,,,,,,,,,,,,
+You see a woman refusing to stand when the judge walks into the courtroom.,Authority,auth02,3.0,2.4,,,,,,,,,,,,,
+You see an employee trying to undermine all of her boss' ideas in front of others.,Authority,auth07,4.3,2.8,,,,,,,,,,,,,
+You see a woman spray painting graffiti across the steps of the local courthouse.,Authority,,3.6,3.1,,,,,,,,,,,,,
+You see an intern disobeying an order to dress professionally and comb his hair.,Authority,auth04,2.9,2.4,,,,,,,,,,,,,
+You see a boy skipping to the front of the line because his friend is an employee.,Fairness,fair12,3.4,2.7,,,,,,,,,,,,,
+You see a girl asking for allowance even though her brother did her chores for her.,Fairness,fair10,3.7,3.2,,,,,,,,,,,,,
+"You see a girl taking all the Halloween candy from a bowl, leaving none for others.",Fairness,fair11,3.5,2.8,,,,,,,,,,,,,
+You see a judge taking on a criminal case although he is friends with the defendant.,Fairness,fair06,4.1,3.8,,,,,,,,,,,,,
+"You see a manager taking half the doughnuts from a box, leaving little for others.",Fairness,,3.0,2.3,,,,,,,,,,,,,
+You see a politician using federal tax dollars to build an extension on his home.,Fairness,fair15,4.8,3.9,,,,,,,,,,,,,
+You see a professor giving a bad grade to a student just because he dislikes him.,Fairness,fair14,4.7,4.1,,,,,,,,,,,,,
+You see a referee intentionally making bad calls that help his favored team win.,Fairness,fair05,4.0,3.1,,,,,,,,,,,,,
+You see a runner taking a shortcut on the course during the marathon in order to win.,Fairness,fair02,4.4,3.3,,,,,,,,,,,,,
+You see a soccer player pretending to be seriously fouled by an opposing player.,Fairness,fair04,3.5,2.6,,,,,,,,,,,,,
+You see a student copying a classmate's answer sheet on a makeup final exam.,Fairness,fair01,4.4,3.7,,,,,,,,,,,,,
+You see a student getting an A on a group project when he didn't do his part.,Fairness,fair07,3.8,3.5,,,,,,,,,,,,,
+You see a tenant bribing a landlord to be the first to get their apartment repainted.,Fairness,fair03,3.2,2.2,,,,,,,,,,,,,
+You see a woman getting hired only because her father is close friends with the boss.,Fairness,fair09,3.4,3.1,,,,,,,,,,,,,
+You see a woman lying about the number of vacation days she has taken at work.,Fairness,fair13,3.2,2.8,,,,,,,,,,,,,
+You see an employee lying about how many hours she worked during the week.,Fairness,fair08,3.9,3.2,,,,,,,,,,,,,
+You see someone cheating in a card game while playing with a group of strangers.,Fairness,,3.6,2.7,,,,,,,,,,,,,
+You see a boy making fun of his brother for getting dumped by his girlfriend.,Harm-Emo,careemo09,3.2,2.8,,,,,,,,,,,,,
+You see a boy telling a woman that she looks just like her overweight bulldog. ,Harm-Emo,careemo05,4.3,3.5,,,,,,,,,,,,,
+You see a girl laughing at another student forgetting her lines at a school play.,Harm-Emo,careemo02,3.4,3.1,,,,,,,,,,,,,
+You see a girl laughing when she realizes her friend's dad is the janitor.,Harm-Emo,careemo06,3.9,3.5,,,,,,,,,,,,,
+You see a girl saying that another girl is too ugly to be a varsity cheerleader.,Harm-Emo,careemo07,3.8,3.2,,,,,,,,,,,,,
+You see a girl telling a boy that his older brother is much more attractive than him.,Harm-Emo,careemo13,2.4,2.2,,,,,,,,,,,,,
+You see a girl telling her classmate that she looks like she has gained weight.,Harm-Emo,careemo14,3.2,3.0,,,,,,,,,,,,,
+You see a man laughing at a disabled co-worker while at an office softball game.,Harm-Emo,careemo15,4.5,4.2,,,,,,,,,,,,,
+You see a man loudly telling his wife that the dinner she cooked tastes awful.,Harm-Emo,careemo10,3.4,3.5,,,,,,,,,,,,,
+You see a man quickly canceling a blind date as soon as he sees the woman.,Harm-Emo,careemo04,4.0,3.3,,,,,,,,,,,,,
+You see a man snickering as he passes by a cancer patient with a bald head.,Harm-Emo,careemo11,4.4,4.2,,,,,,,,,,,,,
+You see a man telling a woman that her painting looks like it was done by children.,Harm-Emo,,2.9,2.8,,,,,,,,,,,,,
+You see a teenage boy chuckling at an amputee he passes by while on the subway.,Harm-Emo,careemo01,4.4,3.9,,,,,,,,,,,,,
+You see a teenage girl openly staring at a disfigured woman as she walks past.,Harm-Emo,careemo08,3.0,3.2,,,,,,,,,,,,,
+You see a woman clearly avoiding sitting next to an obese woman on the bus.,Harm-Emo,careemo12,3.0,2.9,,,,,,,,,,,,,
+You see a woman commenting out loud about how fat another woman looks in her jeans.,Harm-Emo,careemo03,4.0,3.7,,,,,,,,,,,,,
+You see a boy placing a thumbtack sticking up on the chair of another student.,Harm-Phys,carephys08,3.8,3.2,,,,,,,,,,,,,
+You see a boy setting a series of traps to kill stray cats in his neighborhood.,Harm-Phys,carephys06,4.6,4.1,,,,,,,,,,,,,
+You see a boy throwing rocks at cows that are grazing in the local pasture.,Harm-Phys,,4.3,3.9,,,,,,,,,,,,,
+You see a girl shooting geese repeatedly with a pellet gun out in the woods.,Harm-Phys,carephys05,4.0,3.6,,,,,,,,,,,,,
+You see a girl throwing her hot coffee on a woman who is dating her ex-boyfriend,Harm-Phys,carephys07,4.3,3.4,,,,,,,,,,,,,
+You see a man lashing his pony with a whip for breaking loose from its pen.,Harm-Phys,carephys01,3.9,3.8,,,,,,,,,,,,,
+You see a teacher hitting a student's hand with a ruler for falling asleep in class.,Harm-Phys,carephys02,3.7,3.5,,,,,,,,,,,,,
+You see a wife hitting her husband on the side of his head for coming home late.,Harm-Phys,carephys04,3.9,3.1,,,,,,,,,,,,,
+You see a woman slapping another woman who she is arguing with in the parking lot.,Harm-Phys,carephys03,3.8,3.4,,,,,,,,,,,,,
+You see a woman snatching away her dog's food for making a mess in the living room.,Harm-Phys,carephys11,3.2,3.3,,,,,,,,,,,,,
+You see a woman spanking her child with a spatula for getting bad grades in school.,Harm-Phys,carephys10,3.6,3.6,,,,,,,,,,,,,
+You see a woman swerving her car in order to intentionally run over a squirrel.,Harm-Phys,carephys13,4.2,3.9,,,,,,,,,,,,,
+You see a woman throwing a stapler at her colleague who is snoring during her talk.,Harm-Phys,carephys15,4.0,3.1,,,,,,,,,,,,,
+You see a woman throwing her cat across the room for scratching the furniture.,Harm-Phys,carephys12,4.2,3.7,,,,,,,,,,,,,
+You see a zoo trainer jabbing a dolphin to get it to entertain his customers.,Harm-Phys,carephys14,4.2,4.1,,,,,,,,,,,,,
+You see someone leaving his dog outside in the rain after it dug in the trash.,Harm-Phys,carephys09,3.7,3.6,,,,,,,,,,,,,
+You see a boss ordering an employee to revoke his citizenship in his home country.,Liberty,,4.3,3.3,,,,,,,,,,,,,
+You see a boss pressuring employees to buy goods from her family's general store.,Liberty,lib08,3.7,3.0,,,,,,,,,,,,,
+You see a father requiring his son to become a commercial airline pilot like him.,Liberty,lib02,2.9,2.6,,,,,,,,,,,,,
+You see a father requiring his son to take up the family restaurant business.,Liberty,lib12,2.5,2.7,,,,,,,,,,,,,
+You see a man blocking his wife from leaving home or interacting with others.,Liberty,lib03,4.3,4.0,,,,,,,,,,,,,
+You see a man forbidding his wife to wear clothing that he has not first approved.,Liberty,lib07,4.1,3.5,,,,,,,,,,,,,
+You see a man telling his fiance that she has to switch to his political party.,Liberty,lib01,3.9,3.3,,,,,,,,,,,,,
+You see a man telling his girlfriend that she must convert to his religion.,Liberty,lib05,3.5,2.9,,,,,,,,,,,,,
+You see a manager coercing her employees into eating at her brother's diner.,Liberty,lib04,3.2,2.6,,,,,,,,,,,,,
+You see a mayor trying to ban people from hugging and kissing in public in his city.,Liberty,lib15,4.2,3.6,,,,,,,,,,,,,
+You see a mother forcing her daughter to enroll as a pre-med student in college.,Liberty,lib11,3.3,3.1,,,,,,,,,,,,,
+You see a mother telling her son that she is going to choose all of his friends.,Liberty,lib06,3.2,3.2,,,,,,,,,,,,,
+You see a pastor banning his congregants from wearing bright colors in the church.,Liberty,,3.6,3.1,,,,,,,,,,,,,
+You see a public leader on TV trying to ban the wearing of hooded sweatshirts.,Liberty,lib10,3.7,3.2,,,,,,,,,,,,,
+You see a teacher ordering a student to get a normal haircut before coming to class.,Liberty,lib13,3.8,3.0,,,,,,,,,,,,,
+You see a teenager at a cafeteria forcing a younger student to pay for her lunch.,Liberty,lib14,4.0,3.5,,,,,,,,,,,,,
+You see a woman pressuring her daughter to become a famous evening news anchor.,Liberty,lib09,2.5,2.6,,,,,,,,,,,,,
+You see a coach celebrating with the opposing team's players who just won the game.,Loyalty,loy02,2.8,2.5,,,,,,,,,,,,,
+You see a college president singing a rival school's fight song during a pep rally.,Loyalty,loy11,2.7,2.1,,,,,,,,,,,,,
+You see a former Secretary of State publicly giving up his citizenship to the US.,Loyalty,loy14,3.1,2.7,,,,,,,,,,,,,
+You see a former US General saying publicly he would never buy any American product.,Loyalty,loy03,3.5,3.1,,,,,,,,,,,,,
+You see a head cheerleader booing her high school's team during a homecoming game.,Loyalty,loy08,3.3,2.3,,,,,,,,,,,,,
+You see a Hollywood star agreeing with a foreign dictator's denunciation of the US.,Loyalty,loy10,3.2,2.7,,,,,,,,,,,,,
+You see a man leaving his family business to go work for their main competitor.,Loyalty,loy06,2.7,2.6,,,,,,,,,,,,,
+You see a man secretly voting against his wife in a local beauty pageant.,Loyalty,,2.9,2.7,,,,,,,,,,,,,
+You see a mayor saying that the neighboring town is a much better town.,Loyalty,loy04,2.6,2.5,,,,,,,,,,,,,
+You see a teacher publicly saying she hopes another school wins the math contest.,Loyalty,loy07,2.9,2.7,,,,,,,,,,,,,
+You see a US swimmer cheering as a Chinese foe beats his teammate to win the gold.,Loyalty,loy15,2.8,2.6,,,,,,,,,,,,,
+You see an American telling foreigners that the US is an evil force in the world.,Loyalty,loy12,3.7,3.4,,,,,,,,,,,,,
+You see an employee joking with competitors about how bad his company did last year.,Loyalty,loy01,3.0,2.1,,,,,,,,,,,,,
+You see the class president saying on TV that her rival college is a better school.,Loyalty,loy09,2.4,1.9,,,,,,,,,,,,,
+You see the coach's wife sponsoring a bake sale for her husband's rival team.,Loyalty,loy13,2.5,2.0,,,,,,,,,,,,,
+You see the US Ambassador joking in Great Britain about the stupidity of Americans.,Loyalty,loy05,3.8,3.4,,,,,,,,,,,,,
+You see a college student drinking until she vomits on herself and falls asleep.,Purity,pur15,3.3,3.0,,,,,,,,,,,,,
+You see a drunk elderly man offering to have oral sex with anyone in the bar.,Purity,pur03,4.4,3.1,,,,,,,,,,,,,
+You see a family eating the carcass of their pet dog that had been run over.,Purity,pur02,4.2,4.2,,,,,,,,,,,,,
+You see a girl and her sister making out with each other just for practice.,Purity,pur10,3.8,3.5,,,,,,,,,,,,,
+You see a homosexual in a gay bar offering sex to anyone who buys him a drink.,Purity,pur08,3.6,2.7,,,,,,,,,,,,,
+You see a man having sex with a frozen chicken before cooking it for dinner.,Purity,pur01,4.0,3.5,,,,,,,,,,,,,
+You see a man in a bar using his phone to watch people having sex with animals.,Purity,pur05,4.3,3.7,,,,,,,,,,,,,
+You see a man searching through the trash to find women's discarded underwear.,Purity,pur12,4.0,3.7,,,,,,,,,,,,,
+You see a single man ordering an inflatable sex doll that looks like his secretary.,Purity,,2.5,2.4,,,,,,,,,,,,,
+You see a story about a remote tribe eating the flesh of their deceased members.,Purity,pur11,3.3,3.3,,,,,,,,,,,,,
+You see a teenage male in a dorm bathroom secretly using a stranger's toothbrush.,Purity,pur06,3.6,2.8,,,,,,,,,,,,,
+You see a teenager urinating in the wave pool at a crowded amusement park.,Purity,pur04,4.4,3.6,,,,,,,,,,,,,
+You see a very drunk woman making out with multiple strangers on the city bus.,Purity,pur14,4.0,3.4,,,,,,,,,,,,,
+You see a woman burping and farting loudly while eating at a fast food truck.,Purity,,3.1,2.9,,,,,,,,,,,,,
+You see a woman having intimate relations with a recently deceased loved one.,Purity,pur07,4.3,3.8,,,,,,,,,,,,,
+You see an employee at a morgue eating his pepperoni pizza off of a dead body.,Purity,pur09,4.2,3.6,,,,,,,,,,,,,
+You see two first cousins getting married to each other in an elaborate wedding.,Purity,pur13,3.7,3.4,,,,,,,,,,,,,
+You see a man eating a bowl of cereal in the morning with water instead of milk.,Social Norms,socnorm07,1.1,1.4,,,,,,,,,,,,,
+You see a man putting ketchup all over his chicken Caesar salad while at lunch.,Social Norms,socnorm09,1.2,1.5,,,,,,,,,,,,,
+You see a man staying inside his home with the shades drawn on a rare sunny day.,Social Norms,socnorm02,1.1,1.3,,,,,,,,,,,,,
+You see a man walking down a dark hallway while still wearing his sunglasses.,Social Norms,socnorm10,1.2,1.7,,,,,,,,,,,,,
+You see a man wearing clothes that are clearly several sizes too big for his body.,Social Norms,,1.3,1.6,,,,,,,,,,,,,
+You see a teenage girl wearing a long trench coat on a hot summer afternoon.,Social Norms,socnorm14,1.2,1.4,,,,,,,,,,,,,
+"You see a woman answering a phone call with the word ""goodbye"" instead of ""hello.""",Social Norms,socnorm15,1.5,1.5,,,,,,,,,,,,,
+You see a woman continuing to wear a large sun hat inside her apartment complex.,Social Norms,socnorm05,1.2,1.6,,,,,,,,,,,,,
+You see a woman drinking her entire cup of coffee using a stirring spoon.,Social Norms,socnorm03,1.2,1.2,,,,,,,,,,,,,
+You see a woman eating dessert before her main entree arrives on the table.,Social Norms,socnorm04,1.2,1.7,,,,,,,,,,,,,
+You see a woman using a fork to eat a bowl of vanilla ice cream and marshmallows.,Social Norms,socnorm08,1.1,1.5,,,,,,,,,,,,,
+You see a woman watching a game on television in black-and-white instead of color.,Social Norms,socnorm12,1.1,2.0,,,,,,,,,,,,,
+You see someone at the school gym lifting free weights in nice business clothes.,Social Norms,socnorm06,1.2,1.4,,,,,,,,,,,,,
+You see someone driving around in a dirty car that has not been washed recently.,Social Norms,socnorm11,1.2,1.4,,,,,,,,,,,,,
+You see someone reading the ending of a spy novel before reading the beginning.,Social Norms,socnorm13,1.2,1.6,,,,,,,,,,,,,
+You see someone using an old rotary phone and refusing to go buy a new one.,Social Norms,socnorm01,1.0,1.4,,,,,,,,,,,,,
