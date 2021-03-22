@@ -114,14 +114,11 @@ temporal_brain_scores <- function(df) {
     geom_line(size=1) + 
     geom_point(aes(fill=category, color=category, shape = category), size=3) +
     scale_shape_manual(values = c(4,15,16,17,0,1,2, 3)) +
-    #MFT_fill() + MFT_color() +
     theme_pubr(legend = 'right') +
     theme(axis.title.x = element_blank(),
-          axis.title.y = element_blank(), 
-          axis.text = element_text(size = 12),
-          plot.title = element_text(hjust = 0.5, size = 14)) +
-    labs(y = 'Brain score', x= 'TR=2s', color='Foundation', fill='Foundation', shape='Foundation') +
-    ggtitle('Temporal brain scores')
+          axis.title.y = element_text(size=14), 
+          axis.text = element_text(size = 14)) +
+    labs(y = 'Temporal brain scores', color='Foundation', fill='Foundation', shape='Foundation')
 }
 ```
 
@@ -327,13 +324,13 @@ LV1_tbs <- read.csv('data/PLS/mean-centered/all_conditions/LV1_tbs.csv')
 LV1_tbs$subID <- rep(1:27, each = 8)
 LV1_tbs$category <- matlab_categories
 LV1_tbs <- pivot_longer(LV1_tbs, cols = starts_with('Lag'), names_to = 'lag', values_to = 'score')
-p1 <- brain_scores(all_LV1, ~LV1, 'LV1: 26.99% crossblock variance, p<0.000') + MFT_color() + MFT_fill()
+p1 <- brain_scores(all_LV1, ~LV1, '') + MFT_color() + MFT_fill()
 p2 <- temporal_brain_scores(LV1_tbs) + MFT_color() + MFT_fill()
 p1 + p2 +
   plot_layout(ncol = 2, nrow = 1, widths = c(1.95, 0.95), guides = 'collect') +
   plot_annotation(title = '') &
   theme(text = element_text(family = 'Times New Roman'), plot.tag = element_text(size = 11), plot.title = element_text(hjust=0.5))
-ggsave('figures/paper/plot_LV1.png', width = 10.5, height = 3)
+ggsave('figures/paper/plot_LV1.png', width = 11, height = 3)
 
 # plot LV2
 all_LV2 <- select(all_mean, category, superordinate, LV2)
@@ -344,13 +341,13 @@ LV2_tbs <- read.csv('data/PLS/mean-centered/all_conditions/LV2_tbs.csv')
 LV2_tbs$subID <- rep(1:27, each = 8)
 LV2_tbs$category <- matlab_categories
 LV2_tbs <- pivot_longer(LV2_tbs, cols = starts_with('Lag'), names_to = 'lag', values_to = 'score')
-p3 <- brain_scores(all_LV2, ~LV2, 'LV2: 20.51% crossblock variance, p<0.010') + MFT_color() + MFT_fill() 
+p3 <- brain_scores(all_LV2, ~LV2, '') + MFT_color() + MFT_fill() 
 p4 <- temporal_brain_scores(LV2_tbs) + MFT_color() + MFT_fill() 
 p3 + p4 +
-  plot_layout(ncol = 2, nrow = 1, widths = c(2, 0.95), guides = 'collect') +
+  plot_layout(ncol = 2, nrow = 1, widths = c(1.95, 0.95), guides = 'collect') +
   plot_annotation(title = '') &
   theme(text = element_text(family = 'Times New Roman'), plot.tag = element_text(size = 11), plot.title = element_text(hjust=0.5))
-ggsave('figures/paper/plot_LV2.png', width = 10, height = 3)
+ggsave('figures/paper/plot_LV2.png', width = 11, height = 3)
 
 # plot LV3
 all_LV3 <- select(all_mean, category, superordinate, LV3)
@@ -360,14 +357,14 @@ all_LV3$category <- factor(all_LV3$category, levels=plotting_categories)
 LV3_tbs <- read.csv('data/PLS/mean-centered/all_conditions/LV3_tbs.csv')
 LV3_tbs$subID <- rep(1:27, each = 8)
 LV3_tbs$category <- matlab_categories
-LV3_tbs <- pivot_longer(LV3_tbs, cols = starts_with('Lag'), names_to = 'lag', values_to = 'score')
-p5 <- brain_scores(all_LV3, ~LV3, 'LV3: 20.51% crossblock variance, p<0.050') + MFT_color() + MFT_fill()
-p6 <- temporal_brain_scores(LV3_tbs) + MFT_color() + MFT_fill()
+LV3_tbs <- pivot_longer(LV3_tbs, cols = starts_with('Lag'), names_to = 'lag', values_to = 'score') 
+p5 <- brain_scores(all_LV3, ~LV3, '') + MFT_color() + MFT_fill()
+p6 <- temporal_brain_scores(LV3_tbs) + MFT_color() + MFT_fill() 
 p5 + p6 +
-  plot_layout(ncol = 2, nrow = 1, widths = c(2, 0.95), guides = 'collect') +
+  plot_layout(ncol = 2, nrow = 1, widths = c(1.95, 0.95), guides = 'collect') +
   plot_annotation(title = '') &
   theme(text = element_text(family = 'Times New Roman'), plot.tag = element_text(size = 11), plot.title = element_text(hjust=0.5))
-ggsave('figures/paper/plot_LV3.png', width = 10, height = 5)
+ggsave('figures/paper/plot_LV3_new.png', width = 11, height = 3)
 
 
 
@@ -536,7 +533,7 @@ emmeans(modelMoral, ~ category) %>%
 modelMoral_df <- as.data.frame(emmeans(modelMoral, ~ category))
 ggplot(modelMoral_df, aes(x=category, y=emmean)) +
   ylim(0.98,4) +
-  labs(y='Estimated mean moral judgment') +
+  labs(y='Estimated mean moral wrongness judgment') +
   scale_x_discrete(labels =c('S.N.', 'Auth.', 'Loy.', 'Pur.', 'Harm-E.', 'Harm-P.', 'Fair.', 'Lib.')) +
   geom_violin(data=data_old, mapping=aes(y=moral_decision, fill=category), alpha=0.85, bw=0.45) + 
   geom_pointrange(aes(ymin=lower.CL, ymax=upper.CL), alpha=1, fatten=5, color='black') +
@@ -1180,18 +1177,19 @@ qualtrics_means <- cbind(qualtrics_means, disgust_mean)
 # score secs - conservatism increases with score
 secs <- select(all_other_surveys, starts_with('sub'), starts_with('secs'))
 colnames(secs) <- substr(colnames(secs), 6, 8)
+colnames(secs) <- paste0('var', colnames(secs))
 names(secs)[1] <- 'subID'
 secs <- secs[-1,]
 secs[,2:13] <- as.numeric(unlist(secs[,2:13]))
-social <- c('1','3','4','7','8','11','12')
-economic <- c('2', '5', '6', '9', '10')
+social <- c('var1','var3','var4','var7','var8','var11','var12')
+economic <- c('var2', 'var5', 'var6', 'var9', 'var10')
 reverse100 <- function(x) 100 - x
-reverseScoredSECS <- c('1', '5')
+reverseScoredSECS <- c('var1', 'var5')
 secs[,reverseScoredSECS] <- reverse100(secs[,reverseScoredSECS])
 secs <- secs %>% 
   mutate(SocialConservatism = rowMeans(select(., social), na.rm = TRUE),
          EconomicConservatism = rowMeans(select(., economic), na.rm = TRUE),
-         MeanConservatism = rowMeans(select(., 1:12), na.rm = TRUE),
+         MeanConservatism = rowMeans(select(., var1:var12), na.rm = TRUE),
          subID = as.numeric(subID)) %>%
   filter(subID != 20, subID %in% dataSubs)
 
