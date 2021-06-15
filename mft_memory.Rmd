@@ -27,18 +27,20 @@ library(extrafont)
 se <- function(x) sqrt(var(x)/length(x))
 `%notin%` <- Negate(`%in%`)
 emm_options(lmerTest.limit = 5000)
-emm_options(pbkrtest.limit = 2500)
 
 # getting var names straightened out 
 assignCategory <- function(c) {
   return(ifelse(substr(c, 1,4) == 'auth', 'Authority', 
          ifelse(substr(c, 1,7) == 'careemo', 'Harm-Emo', 
+         ifelse(substr(c, 1,5) == 'carem', 'Harm-Emo',
          ifelse(substr(c, 1,8) == 'carephys', 'Harm-Phys', 
+         ifelse(substr(c, 1,5) == 'carep', 'Harm-Phys',
          ifelse(substr(c, 1,4) == 'fair', 'Fairness', 
          ifelse(substr(c, 1,3) == 'lib', 'Liberty', 
          ifelse(substr(c, 1,3) == 'loy', 'Loyalty',
          ifelse(substr(c, 1,3) == 'pur' , 'Purity', 
-         ifelse(substr(c, 1,7) == 'socnorm', 'Social Norms', NA)))))))))
+         ifelse(substr(c, 1,4) == 'socn', 'Social Norms',
+         ifelse(substr(c, 1,7) == 'socnorm', 'Social Norms', NA))))))))))))
 }
 plotting_categories <- c('Social Norms', 
                          'Authority', 'Loyalty', 'Purity', 
@@ -249,61 +251,39 @@ memLabels <- c('1' = 'Old', '0' = 'New')
 
 # make data_old
 data_old <- subset(data, old == '1' & encoding_RT > 0.25)
+
+# make data_sup
+# score secs - conservatism increases with score
+secs <- select(all_other_surveys, starts_with('sub'), starts_with('secs'))
+colnames(secs) <- substr(colnames(secs), 6, 8)
+colnames(secs) <- paste0('var', colnames(secs))
+names(secs)[1] <- 'subID'
+secs <- secs[-1,]
+secs[,2:13] <- as.numeric(unlist(secs[,2:13]))
+social <- c('var1','var3','var4','var7','var8','var11','var12')
+economic <- c('var2', 'var5', 'var6', 'var9', 'var10')
+reverse100 <- function(x) 100 - x
+reverseScoredSECS <- c('var1', 'var5')
+secs[,reverseScoredSECS] <- reverse100(secs[,reverseScoredSECS])
+secs <- secs %>% 
+  mutate(SocialConservatism = rowMeans(select(., social), na.rm = TRUE),
+         EconomicConservatism = rowMeans(select(., economic), na.rm = TRUE),
+         MeanConservatism = rowMeans(select(., var1:var12), na.rm = TRUE),
+         subID = as.numeric(subID)) %>%
+  filter(subID != 20, subID %in% dataSubs)
+
+secs_means <- secs %>%
+  summarise(socialConservatismMean = mean(SocialConservatism),
+            socialConservatismSD = sd(SocialConservatism),
+            economicConservatismMean = mean(EconomicConservatism),
+            economicConservatismSD = sd(EconomicConservatism))
+
+data_sup <- secs %>% select(subID, MeanConservatism) %>%
+  merge(data, .)
 ```
 
 
-# tidy PLS data
-```{r tidy PLS data}
-mean_brain_scores <- read.csv('data/PLS/mean-centered/brain_scores.csv')
-mean_brain_scores$category <- matlab_categories
-mean_brain_scores$superordinate <- superordinateCategory(mean_brain_scores$category)
-upper_CIs <- read.csv('data/PLS/mean-centered/upper_CIs.csv')
-lower_CIs <- read.csv('data/PLS/mean-centered/lower_CIs.csv')
-colnames(upper_CIs) <- paste0('upper_', colnames(upper_CIs))
-colnames(lower_CIs) <- paste0('lower_', colnames(lower_CIs))
-mean_centered_results_LV1 <- select(mean_brain_scores, category, superordinate, LV1)
-mean_centered_results_LV1$upper <- upper_CIs$upper_LV1
-mean_centered_results_LV1$lower <- lower_CIs$lower_LV1
-mean_centered_results_LV1$category <- factor(mean_centered_results_LV1$category, 
-                                             levels=plotting_categories)
-
-mean_centered_results_LV2 <- select(mean_brain_scores, category, superordinate, LV2)
-mean_centered_results_LV2$upper <- upper_CIs$upper_LV2
-mean_centered_results_LV2$lower <- lower_CIs$lower_LV2
-mean_centered_results_LV2$category <- factor(mean_centered_results_LV2$category, 
-                                             levels=plotting_categories)
-# task temporal brain score data
-LV1 <- read.csv('data/PLS/mean-centered/temporal_brainscores_LV1_all.csv')
-LV2 <- read.csv('data/PLS/mean-centered/temporal_brainscores_LV2_all.csv')
-LV1$subID <- rep(dataSubs, each = 8)
-LV2$subID <- rep(dataSubs, each = 8)
-LV1$category <- matlab_categories
-LV2$category <- matlab_categories
-
-LV1 <- pivot_longer(LV1, cols = starts_with('Lag'), names_to = 'lag', values_to = 'score')
-LV2 <- pivot_longer(LV2, cols = starts_with('Lag'), names_to = 'lag', values_to = 'score')
-
-#task non-rotated data -- commented out because we're not reporting plots for this analysis
-# nr_social <- read.csv('data/PLS/non-rotated/socialnorms_means.csv', header = FALSE)
-# nr_social_upper <- read.csv('data/PLS/non-rotated/socialnorms_upper.csv', header = FALSE)
-# nr_social_lower <- read.csv('data/PLS/non-rotated/socialnorms_lower.csv', header = FALSE)
-# nr_social$upper <- nr_social_upper$V1
-# nr_social$lower <- nr_social_lower$V1
-# nr_social$category <- matlab_categories
-# nr_social$category <- factor(nr_social$category, levels = plotting_categories)
-# 
-# nr_superordinate <- read.csv('data/PLS/results/non-rotated/superordinate_means.csv', header = FALSE)
-# nr_superordinate_upper <- read.csv('data/PLS/results/non-rotated/superordinate_upper.csv', header = FALSE)
-# nr_superordinate_lower <- read.csv('data/PLS/results/non-rotated/superordinate_lower.csv', header = FALSE)
-# nr_superordinate$upper <- nr_superordinate_upper$V1
-# nr_superordinate$lower <- nr_superordinate_lower$V1
-# nr_superordinate$category <- matlab_categories[1:7]
-# nr_superordinate$category <- factor(nr_superordinate$category, levels = plotting_categories[2:8])
-
-```
-
-
-# PLS plots
+# mean-centered PLS plots
 ```{r make PLS plots}
 #### all conditions ####
 # prep main df
@@ -332,6 +312,7 @@ p1 + p2 +
   theme(text = element_text(family = 'Times New Roman'), plot.tag = element_text(size = 11), plot.title = element_text(hjust=0.5))
 ggsave('figures/paper/plot_LV1.png', width = 11, height = 3)
 
+
 # plot LV2
 all_LV2 <- select(all_mean, category, superordinate, LV2)
 all_LV2$upper <- all_upper_CIs$upper_LV2
@@ -348,6 +329,7 @@ p3 + p4 +
   plot_annotation(title = '') &
   theme(text = element_text(family = 'Times New Roman'), plot.tag = element_text(size = 11), plot.title = element_text(hjust=0.5))
 ggsave('figures/paper/plot_LV2.png', width = 11, height = 3)
+
 
 # plot LV3
 all_LV3 <- select(all_mean, category, superordinate, LV3)
@@ -366,58 +348,160 @@ p5 + p6 +
   theme(text = element_text(family = 'Times New Roman'), plot.tag = element_text(size = 11), plot.title = element_text(hjust=0.5))
 ggsave('figures/paper/plot_LV3_new.png', width = 11, height = 3)
 
-
-
 #### dropping social norms ####
-pc <- c('Authority', 'Loyalty', 'Purity', 'Harm-Emo', 'Harm-Phys', 'Fairness', 'Liberty')
-mc <- c('Authority', 'Harm-Emo', 'Harm-Phys', 'Fairness', 'Liberty', 'Loyalty', 'Purity')
-new_colors <- c('#c40233', '#E60026','#ea3c53', '#2b8cd6', '#86b1e4','#bfd2f2','#7CAE00')
-viz_palette(new_colors)
-fdns_color <- get_scale_color(get_pal(new_colors))
-fdns_fill <- get_scale_fill(get_pal(new_colors))
-
-# prep main df
-fdns_mean <- read.csv('data/PLS/mean-centered/just_foundations/means_fdns.csv')
-fdns_mean$category <- mc
-fdns_mean$superordinate <- superordinateCategory(fdns_mean$category)
-fdns_upper_CIs <- read.csv('data/PLS/mean-centered/just_foundations/upper_fdns.csv')
-fdns_lower_CIs <- read.csv('data/PLS/mean-centered/just_foundations/lower_fdns.csv')
-colnames(fdns_upper_CIs) <- paste0('upper_', colnames(fdns_upper_CIs))
-colnames(fdns_lower_CIs) <- paste0('lower_', colnames(fdns_lower_CIs))
-
-# plot LV1
-fdns_LV1 <- select(fdns_mean, category, superordinate, LV1)
-fdns_LV1$upper <- fdns_upper_CIs$upper_LV1
-fdns_LV1$lower <- fdns_lower_CIs$lower_LV1
-fdns_LV1$category <- factor(fdns_LV1$category, levels=pc)
-fdns_LV1_tbs <- read.csv('data/PLS/mean-centered/just_foundations/LV1_tbs_fdns.csv')
-fdns_LV1_tbs$subID <- rep(1:27, each = 7)
-fdns_LV1_tbs$category <- mc
-fdns_LV1_tbs <- pivot_longer(fdns_LV1_tbs, cols = starts_with('Lag'), names_to = 'lag', values_to = 'score')
-p5 <- brain_scores(fdns_LV1, ~LV1, 'LV1: 28.39% crossblock variance, p<0.002') + fdns_color() + fdns_fill()
-p6 <- temporal_brain_scores(fdns_LV1_tbs) + fdns_color() + fdns_fill()
-p5 + p6 +
-  plot_layout(ncol = 2, nrow = 2, widths = c(2, 0.95), guides = 'collect') +
-  plot_annotation(title = '') &
-  theme(text = element_text(family = 'Times New Roman'), plot.tag = element_text(size = 11), plot.title = element_text(hjust=0.5))
-
-# plot LV2
-fdns_LV2 <- select(fdns_mean, category, superordinate, LV2)
-fdns_LV2$upper <- fdns_upper_CIs$upper_LV2
-fdns_LV2$lower <- fdns_lower_CIs$lower_LV2
-fdns_LV2$category <- factor(fdns_LV2$category,levels=pc)
-fdns_LV2_tbs <- read.csv('data/PLS/mean-centered/just_foundations/LV2_tbs_fdns.csv')
-fdns_LV2_tbs$subID <- rep(1:27, each = 7)
-fdns_LV2_tbs$category <- mc
-fdns_LV2_tbs <- pivot_longer(fdns_LV2_tbs, cols = starts_with('Lag'), names_to = 'lag', values_to = 'score')
-p7 <- brain_scores(fdns_LV2, ~LV2, 'LV2: 25.01% crossblock variance, p<0.010') + fdns_fill() + fdns_color()
-p8 <- temporal_brain_scores(fdns_LV2_tbs) + fdns_color() + fdns_fill()
-p7 + p8 +
-  plot_layout(ncol = 2, nrow = 2, widths = c(2, 0.95), guides = 'collect') +
-  plot_annotation(title = '') &
-  theme(text = element_text(family = 'Times New Roman'), plot.tag = element_text(size = 11), plot.title = element_text(hjust=0.5))
+# pc <- c('Authority', 'Loyalty', 'Purity', 'Harm-Emo', 'Harm-Phys', 'Fairness', 'Liberty')
+# mc <- c('Authority', 'Harm-Emo', 'Harm-Phys', 'Fairness', 'Liberty', 'Loyalty', 'Purity')
+# new_colors <- c('#c40233', '#E60026','#ea3c53', '#2b8cd6', '#86b1e4','#bfd2f2','#7CAE00')
+# viz_palette(new_colors)
+# fdns_color <- get_scale_color(get_pal(new_colors))
+# fdns_fill <- get_scale_fill(get_pal(new_colors))
+# 
+# # prep main df
+# fdns_mean <- read.csv('data/PLS/mean-centered/just_foundations/means_fdns.csv')
+# fdns_mean$category <- mc
+# fdns_mean$superordinate <- superordinateCategory(fdns_mean$category)
+# fdns_upper_CIs <- read.csv('data/PLS/mean-centered/just_foundations/upper_fdns.csv')
+# fdns_lower_CIs <- read.csv('data/PLS/mean-centered/just_foundations/lower_fdns.csv')
+# colnames(fdns_upper_CIs) <- paste0('upper_', colnames(fdns_upper_CIs))
+# colnames(fdns_lower_CIs) <- paste0('lower_', colnames(fdns_lower_CIs))
+# 
+# # plot LV1
+# fdns_LV1 <- select(fdns_mean, category, superordinate, LV1)
+# fdns_LV1$upper <- fdns_upper_CIs$upper_LV1
+# fdns_LV1$lower <- fdns_lower_CIs$lower_LV1
+# fdns_LV1$category <- factor(fdns_LV1$category, levels=pc)
+# fdns_LV1_tbs <- read.csv('data/PLS/mean-centered/just_foundations/LV1_tbs_fdns.csv')
+# fdns_LV1_tbs$subID <- rep(1:27, each = 7)
+# fdns_LV1_tbs$category <- mc
+# fdns_LV1_tbs <- pivot_longer(fdns_LV1_tbs, cols = starts_with('Lag'), names_to = 'lag', values_to = 'score')
+# p5 <- brain_scores(fdns_LV1, ~LV1, 'LV1: 28.39% crossblock variance, p<0.002') + fdns_color() + fdns_fill()
+# p6 <- temporal_brain_scores(fdns_LV1_tbs) + fdns_color() + fdns_fill()
+# p5 + p6 +
+#   plot_layout(ncol = 2, nrow = 2, widths = c(2, 0.95), guides = 'collect') +
+#   plot_annotation(title = '') &
+#   theme(text = element_text(family = 'Times New Roman'), plot.tag = element_text(size = 11), plot.title = element_text(hjust=0.5))
+# 
+# # plot LV2
+# fdns_LV2 <- select(fdns_mean, category, superordinate, LV2)
+# fdns_LV2$upper <- fdns_upper_CIs$upper_LV2
+# fdns_LV2$lower <- fdns_lower_CIs$lower_LV2
+# fdns_LV2$category <- factor(fdns_LV2$category,levels=pc)
+# fdns_LV2_tbs <- read.csv('data/PLS/mean-centered/just_foundations/LV2_tbs_fdns.csv')
+# fdns_LV2_tbs$subID <- rep(1:27, each = 7)
+# fdns_LV2_tbs$category <- mc
+# fdns_LV2_tbs <- pivot_longer(fdns_LV2_tbs, cols = starts_with('Lag'), names_to = 'lag', values_to = 'score')
+# p7 <- brain_scores(fdns_LV2, ~LV2, 'LV2: 25.01% crossblock variance, p<0.010') + fdns_fill() + fdns_color()
+# p8 <- temporal_brain_scores(fdns_LV2_tbs) + fdns_color() + fdns_fill()
+# p7 + p8 +
+#   plot_layout(ncol = 2, nrow = 2, widths = c(2, 0.95), guides = 'collect') +
+#   plot_annotation(title = '') &
+#   theme(text = element_text(family = 'Times New Roman'), plot.tag = element_text(size = 11), plot.title = element_text(hjust=0.5))
 ```
 
+
+# non-rotated PLS plots
+```{r non-rotated plots}
+# load all data
+nr_means <- read.csv('data/PLS/non-rotated/nr_means.csv', header = FALSE)
+nr_upper <- read.csv('data/PLS/non-rotated/nr_upper.csv', header = FALSE)
+nr_lower <- read.csv('data/PLS/non-rotated/nr_lower.csv', header = FALSE)
+nr_means$category <- matlab_categories
+nr_means$category <- factor(nr_means$category, levels = plotting_categories)
+colnames(nr_upper) <- paste0('upper_', colnames(nr_upper))
+colnames(nr_lower) <- paste0('lower_', colnames(nr_lower))
+
+# social norms contrast
+nr_social <- nr_means %>% select(category, V2)
+nr_social$upper <- nr_upper$upper_V2
+nr_social$lower <- nr_lower$lower_V2
+# temporal brain scores
+nr_social_tbs <- read.csv('data/PLS/non-rotated/socialnorms_tbs.csv', header=FALSE)
+colnames(nr_social_tbs) <- c('Lag0', 'Lag1', 'Lag2','Lag3', 'Lag4', 'Lag5', 'Lag6')
+nr_social_tbs$subID <- rep(dataSubs, each = 8)
+nr_social_tbs$category <- matlab_categories 
+nr_social_tbs <- pivot_longer(nr_social_tbs, cols = starts_with('Lag'), names_to = 'lag', values_to = 'score')
+# plot
+p7 <- brain_scores(nr_social, ~V2, '') + MFT_color() + MFT_fill()
+p8 <- temporal_brain_scores(nr_social_tbs) + MFT_color() + MFT_fill()
+p7 + p8 +
+  plot_layout(ncol = 2, nrow = 1, widths = c(1.95, 0.95), guides = 'collect') +
+  plot_annotation(title = '') &
+  theme(text = element_text(family = 'Times New Roman'), plot.tag = element_text(size = 11),
+        plot.title =element_text(hjust=0.5))
+ggsave('figures/paper/plot_NRsocial.png', width = 11, height = 3)
+
+  
+# superordinate contrast - all foundations (not including plot in paper)
+nr_sup <- nr_means %>% select(category, V1)
+nr_sup$upper <- nr_upper$upper_V1
+nr_sup$lower <- nr_lower$lower_V1
+# temporal brain scores
+nr_sup_tbs <- read.csv('data/PLS/non-rotated/superordinate_tbs.csv', header=F)
+colnames(nr_sup_tbs) <- c('Lag0', 'Lag1', 'Lag2','Lag3', 'Lag4', 'Lag5', 'Lag6')
+nr_sup_tbs$subID <- rep(dataSubs, each = 8)
+nr_sup_tbs$category <- matlab_categories 
+nr_sup_tbs <- pivot_longer(nr_sup_tbs, cols = starts_with('Lag'), names_to = 'lag', values_to = 'score')
+
+p9 <- brain_scores(nr_sup, ~V1, '') + MFT_color() + MFT_fill()
+p10 <- temporal_brain_scores(nr_sup_tbs) + MFT_color() + MFT_fill()
+
+p9 + p10 +
+  plot_layout(ncol = 2, nrow = 1, widths = c(1.95, 0.95), guides = 'collect') +
+  plot_annotation(title = '') &
+  theme(text = element_text(family = 'Times New Roman'), plot.tag = element_text(size = 11), 
+        plot.title =element_text(hjust=0.5))
+ggsave('figures/paper/plot_NRsup.png', width = 11, height = 3)
+
+
+# superordinate NR with Authority & Social Norms = 0
+nr_auth0 <- read.csv('data/PLS/non-rotated/nr_superordinate_auth0_means.csv', header = F) 
+nr_auth0$upper <- read.csv('data/PLS/non-rotated/nr_superordinate_auth0_upper.csv', header = F) %>% unlist()
+nr_auth0$lower <- read.csv('data/PLS/non-rotated/nr_superordinate_auth0_lower.csv', header = F) %>% unlist()
+nr_auth0$category <- c('Authority', 'Harm-Emo', "Harm-Phys", "Fairness",'Loyalty', 'Purity') %>%
+  factor(., levels = c('Authority', 'Loyalty', 'Purity', 'Harm-Emo', 'Harm-Phys', 'Fairness'))
+# temporal brain scores
+nr_auth0_tbs <- read.csv('data/PLS/non-rotated/nr_superordinate_auth0_tbs.csv', header=F)
+colnames(nr_auth0_tbs) <- c('Lag0', 'Lag1', 'Lag2','Lag3', 'Lag4', 'Lag5', 'Lag6')
+nr_auth0_tbs$subID <- rep(dataSubs, each = 6)
+nr_auth0_tbs$category <- c('Authority', 'Harm-Emo', "Harm-Phys", "Fairness",'Loyalty', 'Purity')
+nr_auth0_tbs <- pivot_longer(nr_auth0_tbs, cols = starts_with('Lag'), names_to = 'lag', values_to = 'score')
+
+# hard code the plots
+p11 <- ggplot(nr_auth0, aes(x=category, y=V1, fill=category)) +
+    geom_hline(aes(yintercept = 0), size = 0.5) +
+    labs(y = 'Brain scores', x = 'Foundation') +
+    geom_col(color='black') + 
+    geom_point(color='black', size=1) +
+    geom_errorbar(aes(ymax = upper, ymin = lower), color='black', size=0.5, width=0.25) +
+    scale_fill_manual(values = c('#c40233', '#E60026','#ea3c53', '#2b8cd6', '#86b1e4','#bfd2f2')) +
+    scale_x_discrete(labels = c('Auth.', 'Loy.','Pur.', 'Harm-E.', "Harm-P.", "Fair.")) +
+    theme_pubr(legend = 'none') +
+    theme(axis.title.x = element_blank(),
+          axis.title.y = element_text(size=14),
+          axis.text = element_text(size = 14),
+          plot.title = element_text(hjust = 0.5, size = 16))
+
+p12 <- lmer(score ~ lag * category + (1 | subID), data = nr_auth0_tbs) %>%
+    emmeans(~ lag * category) %>% as.data.frame() %>%
+    mutate(category = factor(category, levels = c('Authority', 'Loyalty', 'Purity', 'Harm-Emo', 'Harm-Phys', 'Fairness'))) %>%
+    ggplot(aes(x=lag, y=emmean, group=category, color=category, fill=category))  + 
+    scale_x_discrete(expand = c(0, 0, 0, 0.1), labels = c('TR1', 'TR2', 'TR3', 'TR4', 'TR5', 'TR6', 'TR7')) +
+    geom_hline(aes(yintercept = 0), size=1) +
+    geom_line(size=1) + 
+    geom_point(aes(fill=category, color=category, shape = category), size=3) +
+    scale_shape_manual(values = c(4,15,16,17,0,1,2, 3)) +
+    scale_color_manual(values = c('#c40233', '#E60026','#ea3c53', '#2b8cd6', '#86b1e4','#bfd2f2')) +
+    theme_pubr(legend = 'right') +
+    theme(axis.title.x = element_blank(),
+          axis.title.y = element_text(size=14), 
+          axis.text = element_text(size = 14)) +
+    labs(y = 'Temporal brain scores', color='Foundation', fill='Foundation', shape='Foundation')
+
+p11 + p12 +  
+  plot_layout(ncol = 2, nrow = 1, widths = c(1.95, 0.95), guides = 'collect') &
+  theme(text = element_text(family = 'Times New Roman'), plot.tag = element_text(size = 11))
+ggsave('figures/paper/plot_NRLV2.png', width = 11, height = 3)
+```
 
 # compare our sample to normed data
 ```{r norm comparison, message=FALSE, warning=FALSE, include=FALSE}
@@ -560,96 +644,68 @@ supContrastMoral.df <- as.data.frame(supContrastMoral) %>%
 supContrastMoral.df$eff_size <- supContrastMoral.eff$effect.size 
 write.csv(supContrastMoral.df, file = 'figures/paper/table_supContrastMoral.csv', row.names = F)
 
-# arousal analysis
-arousal_range <- function(arousal, precision=0.5) {
-  return(seq(min(data_old[,arousal], na.rm=TRUE),
-             max(data_old[,arousal], na.rm=TRUE),
+```
+
+# superordinate model
+```{r superordinate model}
+# actually, we should just run a model to test superordinate differences
+data_sup <- data_sup %>% mutate(MeanConservatism = scale(MeanConservatism))
+modelSuperordinate <- lmer(moral_decision ~ superordinate*MeanConservatism + (1|subID) + (1|vigfile), data=data_sup)
+conservatism_range <- function(conservatism, precision=0.5) {
+  return(seq(min(data_sup[,conservatism], na.rm=TRUE),
+             max(data_sup[,conservatism], na.rm=TRUE),
              precision))
 }
 
-modelMoral_arousal <- lmer(moral_decision ~ category*arousal + (1|subID) + (1|vigfile), data=data_old, 
-                           contrasts = list(category=contr.sum))
+emm_options(pbkrtest.limit = 3050) # to enable df calculations
 
-arousal_trends <- as.data.frame(emmeans(modelMoral_arousal, ~ arousal | category, at=list(arousal=arousal_range('arousal'))))
-arousal_effect <- as.data.frame(emmeans(modelMoral_arousal, ~ arousal, at=list(arousal=arousal_range('arousal'))))
-arousal.emt <- emtrends(modelMoral_arousal, ~ category, 'arousal')
+conservatism_trends <- as.data.frame(emmeans(modelSuperordinate, ~ MeanConservatism | superordinate, at=list(conservatism=conservatism_range('MeanConservatism'))))
+conservatism_effect <- as.data.frame(emmeans(modelSuperordinate, ~ MeanConservatism, at=list(conservatism=conservatism_range('MeanConservatism'))))
+conservatism.emt <- emtrends(modelSuperordinate, ~ superordinate, 'MeanConservatism')
 
-emmeans(modelMoral_arousal, ~ category, at=list(arousal=c(0, 1))) %>%
-  eff_size(sigma = sd(data_old$arousal), edf = df.residual(modelMoral_arousal), method = 'eff')
+# effect size for simple main effects
+emmeans(modelSuperordinate, ~ superordinate, at=list(MeanConservatism=c(0, 1))) %>%
+  eff_size(sigma = sd(data_sup$MeanConservatism), edf = df.residual(modelSuperordinate), method = 'eff')
+emmeans(modelSuperordinate, ~ MeanConservatism, at=list(MeanConservatism=c(0, 1))) %>%
+  eff_size(sigma = sd(data_sup$MeanConservatism), edf = df.residual(modelSuperordinate), method = 'revpairwise')
 
-emmeans(modelMoral_arousal, ~ arousal, at=list(arousal=c(0, 1))) %>%
-  eff_size(sigma = sd(data_old$arousal), edf = df.residual(modelMoral_arousal), method = 'revpairwise')
+# effect size for interactions
+emmeans(modelSuperordinate, ~ MeanConservatism * superordinate, at=list(MeanConservatism=c(0,1))) %>%
+  contrast(interaction=c('revpairwise', 'eff')) %>%
+  eff_size(sigma = sd(data_sup$MeanConservatism), edf = df.residual(modelSuperordinate), method = 'identity')
 
-# mixed model contrast
-con_df <- 
-  
-# plot
-ggplot(arousal_trends, aes(x=arousal, y=emmean,ymin=lower.CL, ymax=upper.CL)) +
-  geom_hline(yintercept = 1.5, linetype='dashed') + 
-  geom_line(data = arousal_effect) +
-  geom_ribbon(data = arousal_effect, alpha = 0.2) +
-  geom_line(aes(color=category)) +
-  geom_ribbon(aes(fill=category), alpha=0.3) +
-  facet_grid(. ~ category) +
-  MFT_color() + MFT_fill() +
-  theme_pubr(legend = 'none') +
-  labs(y='Estimated moral judgment', x='Arousal') + 
-  theme(strip.text = element_text(face = 'bold', size = 12))
-ggsave('figures/arousal.png', dpi = 300, width = 13, height = 4)
-contrast(arousal.emt, adjust = 'none')
+tab_model(modelSuperordinate, 
+          file = 'figures/paper/table_modelSuperordinate.html',  
+          digits = 2, 
+          show.ci = 0.95, show.stat = TRUE, show.p = TRUE, show.ngroups = TRUE, show.df = TRUE,
+          p.val = 'satterthwaite', 
+          strings = c(stat = 't value', ci = 'CI (95%)', pred = 'Factors', p = 'p value'),
+          dv.labels = 'moral judgment', 
+          col.order = c('est','ci','df.error','stat','p'),
+          pred.labels = c('Intercept (Social Norms)', 
+                          'Liberty', 'Individualizing', 'Binding', 'Conservatism',
+                          'Liberty*Conservatism', 'Individualizing*Conservatism', 'Binding*Conservatism'))
 
-# arousal analysis with normed data
-arousal_norm_range <- function(arousal, precision=0.5) {
-  return(seq(min(mfv[,arousal], na.rm=TRUE),
-             max(mfv[,arousal], na.rm=TRUE),
+
+
+# without liberty
+data_sup <- data_sup %>% filter(superordinate != 'Liberty')
+modelSuperordinate <- lmer(moral_decision ~ superordinate*scale(MeanConservatism) + (1|subID) + (1|vigfile), data=data_sup)
+conservatism_range <- function(conservatism, precision=0.5) {
+  return(seq(min(data_sup[,conservatism], na.rm=TRUE),
+             max(data_sup[,conservatism], na.rm=TRUE),
              precision))
 }
-modelMoral_norm <- lm(moral_decision ~ category*arousal, data=mfv, contrasts = list(category=contr.sum))
-arousal_norm_trends <- as.data.frame(emmeans(modelMoral_norm, ~ arousal | category, at=list(arousal=arousal_norm_range('arousal'))))
-arousal_norm_effect <- as.data.frame(emmeans(modelMoral_norm, ~ arousal, at=list(arousal=arousal_norm_range('arousal'))))
-arousal_norm.emt <- emtrends(modelMoral_norm, ~ category, 'arousal')
 
-ggplot(arousal_norm_trends, aes(x=arousal, y=emmean,ymin=lower.CL, ymax=upper.CL)) +
-  geom_hline(yintercept = 1.2, linetype='dashed') + 
-  geom_line(data = arousal_norm_effect) +
-  geom_ribbon(data = arousal_norm_effect, alpha = 0.2) +
-  geom_line(aes(color=category)) +
-  geom_ribbon(aes(fill=category), alpha=0.3) +
-  facet_grid(. ~ category) +
-  MFT_color() + MFT_fill() +
-  theme_pubr(legend = 'none') +
-  labs(y='Estimated moral judgment', x='Arousal', title='Estimates using normed data') + 
-  theme(strip.text = element_text(face = 'bold', size = 12),
-        plot.title = element_text(hjust = 0.5))
-ggsave('figures/arousal_norm.png', dpi = 300, width = 13, height = 4)
-contrast(arousal_norm.emt, adjust = 'none')
+conservatism_trends <- as.data.frame(emmeans(modelSuperordinate, ~ MeanConservatism | superordinate, at=list(conservatism=conservatism_range('MeanConservatism'))))
+conservatism_effect <- as.data.frame(emmeans(modelSuperordinate, ~ MeanConservatism, at=list(conservatism=conservatism_range('MeanConservatism'))))
+conservatism.emt <- emtrends(modelSuperordinate, ~ superordinate, 'MeanConservatism')
 
-emmeans(modelMoral_norm, ~ category, at=list(arousal=c(0, 1))) %>%
-  eff_size(sigma = sd(mfv$arousal), edf = df.residual(modelMoral_norm), method = 'eff')
+emmeans(modelSuperordinate, ~ superordinate, at=list(MeanConservatism=c(0, 1))) %>%
+  eff_size(sigma = sd(data_sup$MeanConservatism), edf = df.residual(modelSuperordinate), method = 'eff')
 
-emmeans(modelMoral_norm, ~ arousal, at=list(arousal=c(0, 1))) %>%
-  eff_size(sigma = sd(mfv$arousal), edf = df.residual(modelMoral_norm), method = 'pairwise')
-
-# sum-coded modelMoral
-modelMoral_sum <- lmer(moral_decision ~ category + (1|subID) + (1|vigfile), data=data_old, contrasts=list(category=contr.sum))
-summary(modelMoral_sum)
-as.data.frame(emmeans(modelMoral_sum, ~ category)) %>%
-  ggplot(aes(x=category, y=emmean)) +
-  ylim(0.98,4) +
-  labs(y='Estimated mean moral judgment') +
-  scale_x_discrete(labels =c('S.N.', 'Auth.', 'Loy.', 'Pur.', 'Harm-E.', 'Harm-P.', 'Fair.', 'Lib.')) +
-  geom_violin(data=data_old, mapping=aes(y=moral_decision, fill=category), alpha=0.85, bw=0.45) + 
-  geom_pointrange(aes(ymin=lower.CL, ymax=upper.CL), alpha=1, fatten=5, color='black') +
-  geom_hline(yintercept=2.5) + 
-  MFT_fill() + MFT_color() +
-  theme_pubr(legend = 'none',
-             base_family = 'Times New Roman',
-             base_size = 20) +
-  theme(axis.title.x = element_blank(),
-        axis.text = element_text(size = 20),
-        axis.title.y = element_text(size=18),
-        legend.title = element_text(size = 18),
-        legend.text = element_text(size = 18))
+emmeans(modelSuperordinate, ~ MeanConservatism, at=list(MeanConservatism=c(0, 1))) %>%
+  eff_size(sigma = sd(data_sup$MeanConservatism), edf = df.residual(modelSuperordinate), method = 'revpairwise')
 ```
 
 
@@ -682,6 +738,74 @@ emotion_scores <- na.omit(emo_df[,19:24])
 corr <- cor(emotion_scores)
 ggcorrplot(corr, lab = TRUE) # perhaps we should drop contemptuous from the analysis
 # ggsave('emo_corr_matrix.png')
+
+
+# # arousal analysis
+# arousal_range <- function(arousal, precision=0.5) {
+#   return(seq(min(data_old[,arousal], na.rm=TRUE),
+#              max(data_old[,arousal], na.rm=TRUE),
+#              precision))
+# }
+# 
+# modelMoral_arousal <- lmer(moral_decision ~ category*arousal + (1|subID) + (1|vigfile), data=data_old, 
+#                            contrasts = list(category=contr.sum))
+# 
+# arousal_trends <- as.data.frame(emmeans(modelMoral_arousal, ~ arousal | category, at=list(arousal=arousal_range('arousal'))))
+# arousal_effect <- as.data.frame(emmeans(modelMoral_arousal, ~ arousal, at=list(arousal=arousal_range('arousal'))))
+# arousal.emt <- emtrends(modelMoral_arousal, ~ category, 'arousal')
+# 
+# emmeans(modelMoral_arousal, ~ category, at=list(arousal=c(0, 1))) %>%
+#   eff_size(sigma = sd(data_old$arousal), edf = df.residual(modelMoral_arousal), method = 'eff')
+# 
+# emmeans(modelMoral_arousal, ~ arousal, at=list(arousal=c(0, 1))) %>%
+#   eff_size(sigma = sd(data_old$arousal), edf = df.residual(modelMoral_arousal), method = 'revpairwise')
+#   
+# # plot
+# ggplot(arousal_trends, aes(x=arousal, y=emmean,ymin=lower.CL, ymax=upper.CL)) +
+#   geom_hline(yintercept = 1.5, linetype='dashed') + 
+#   geom_line(data = arousal_effect) +
+#   geom_ribbon(data = arousal_effect, alpha = 0.2) +
+#   geom_line(aes(color=category)) +
+#   geom_ribbon(aes(fill=category), alpha=0.3) +
+#   facet_grid(. ~ category) +
+#   MFT_color() + MFT_fill() +
+#   theme_pubr(legend = 'none') +
+#   labs(y='Estimated moral judgment', x='Arousal') + 
+#   theme(strip.text = element_text(face = 'bold', size = 12))
+# ggsave('figures/arousal.png', dpi = 300, width = 13, height = 4)
+# contrast(arousal.emt, adjust = 'none')
+# 
+# # arousal analysis with normed data
+# arousal_norm_range <- function(arousal, precision=0.5) {
+#   return(seq(min(mfv[,arousal], na.rm=TRUE),
+#              max(mfv[,arousal], na.rm=TRUE),
+#              precision))
+# }
+# modelMoral_norm <- lm(moral_decision ~ category*arousal, data=mfv, contrasts = list(category=contr.sum))
+# arousal_norm_trends <- as.data.frame(emmeans(modelMoral_norm, ~ arousal | category, at=list(arousal=arousal_norm_range('arousal'))))
+# arousal_norm_effect <- as.data.frame(emmeans(modelMoral_norm, ~ arousal, at=list(arousal=arousal_norm_range('arousal'))))
+# arousal_norm.emt <- emtrends(modelMoral_norm, ~ category, 'arousal')
+# 
+# ggplot(arousal_norm_trends, aes(x=arousal, y=emmean,ymin=lower.CL, ymax=upper.CL)) +
+#   geom_hline(yintercept = 1.2, linetype='dashed') + 
+#   geom_line(data = arousal_norm_effect) +
+#   geom_ribbon(data = arousal_norm_effect, alpha = 0.2) +
+#   geom_line(aes(color=category)) +
+#   geom_ribbon(aes(fill=category), alpha=0.3) +
+#   facet_grid(. ~ category) +
+#   MFT_color() + MFT_fill() +
+#   theme_pubr(legend = 'none') +
+#   labs(y='Estimated moral judgment', x='Arousal', title='Estimates using normed data') + 
+#   theme(strip.text = element_text(face = 'bold', size = 12),
+#         plot.title = element_text(hjust = 0.5))
+# ggsave('figures/arousal_norm.png', dpi = 300, width = 13, height = 4)
+# contrast(arousal_norm.emt, adjust = 'none')
+# 
+# emmeans(modelMoral_norm, ~ category, at=list(arousal=c(0, 1))) %>%
+#   eff_size(sigma = sd(mfv$arousal), edf = df.residual(modelMoral_norm), method = 'eff')
+# 
+# emmeans(modelMoral_norm, ~ arousal, at=list(arousal=c(0, 1))) %>%
+#   eff_size(sigma = sd(mfv$arousal), edf = df.residual(modelMoral_norm), method = 'pairwise')
 ```
 
 # emotion model comparisons
@@ -729,6 +853,44 @@ write.csv(em_comp_moral.df, file = 'figures/paper/table_emCompMoral.csv', row.na
 summary(em_add_moral)
 ```
 
+# emotion comparisons without authority
+```{r}
+emo_df2 <- emo_df %>% filter(category != 'Authority')
+# baseline: no fixed effects
+em_null_moral <- lmer(moral_decision ~ 1 + (1|subID) + (1|vigfile), data = emo_df2) 
+
+# standard: category as fixed effect
+em_modelMoral <- lmer(moral_decision ~ category + (1|subID) + (1|vigfile), data = emo_df2, contrasts = list(category=contr.sum))
+
+# just emotions as fixed effects
+em_only_moral <- lmer(moral_decision ~ angry + sad + disgusted + afraid + contemptuous + amused +
+                        (1|subID) + (1|vigfile), data=emo_df2)
+
+# add emotion to foundations
+em_add_moral <- lmer(moral_decision ~ category + angry + sad + disgusted + afraid + contemptuous + amused +
+                        (1|subID) + (1|vigfile), data=emo_df2, contrasts = list(category=contr.sum))
+
+# see if emotion effects hold up when removing social norms -- they do 
+# em_add_moral2 <- emo_df %>% filter(category != 'Social Norms') %>%
+#   lmer(moral_decision ~ category + angry + sad + disgusted + afraid + contemptuous + amused +
+#                         (1|subID) + (1|vigfile), ., contrasts = list(category=contr.sum))
+
+# each emotion interacts with category
+em_int_moral <- lmer(moral_decision ~ 
+                        category * angry + 
+                        category * sad + 
+                        category * disgusted + 
+                        category * afraid + 
+                        category * contemptuous + 
+                        category * amused + 
+                        (1|subID) + (1|vigfile), data = emo_df2,
+                    contrasts = list(category=contr.sum))
+
+em_comp_moral.df2 <- compare_performance(em_null_moral, em_modelMoral, em_only_moral, em_add_moral, em_int_moral,
+                                        bayesfactor = FALSE, rank = TRUE)
+
+
+```
 # Summarize em_add_moral
 ```{r sum-code em_category, include = FALSE}
 # make pretty table
@@ -1367,15 +1529,6 @@ write.csv(data_means, file = 'figures/paper/table_dataMeans.csv', row.names = F)
 ```
 
 
-# Old code -- not used
-```{r, include=FALSE}
-## some handy commands
-# exp(fixef(modelOld1)): transforms model output from log likelihood to odds ratio
-# anova(modelOld1, modelOld2): use for model comparisons [**don't look at the output of either model; use the results of this comparison to guide your result-seeking**]
-# emmeans(modelNew, pairwise ~ category): gives you marginal means for each level of the fixed effect factor & pairwise comparisons among levels of the factor
-# emmeans(modelNew, 'category', type='response'): gives you probabilities for each level of the fixed effect factor
-# emmeans(modelOld1, pairwise ~ category, lmer.df = "satterthwaite"): gives you probabilities for each fixed effect and odds ratios + p-values for pairwise comparisons among levels of the fixed effect factor
-```
 
 # multiple voxel extraction
 ```{r}
@@ -1495,8 +1648,15 @@ two_cond %>% select(EconomicConservatism, SocialConservatism) %>%
 mean_cond <- cbind.data.frame(rep(matlab_categories, each=26), rep(secs$subID, 8), rep(secs$MeanConservatism, 8))
 names <- c('foundation', 'subID', 'Conservatism')
 colnames(mean_cond) <- names
-mean_cond %>% select(Conservatism) %>%
+mean_cond %>% 
+  filter(foundation %in% c('Authority', 'Loyalty', 'Purity', 'Harm-Emo', 'Harm-Phys', 'Fairness')) %>%
+  select(Conservatism) %>%
   write.table(., 'data/mean_cond_behav.txt', row.names = F, col.names=F, sep=' ')
+
+mean_cond %>% 
+  filter(foundation %in% c('Loyalty', 'Purity', 'Harm-Emo', 'Harm-Phys', 'Fairness')) %>%
+  select(Conservatism) %>%
+  write.table(., 'data/NR_sup_dropAuth.txt', row.names = F, col.names=F, sep=' ')
 ```
 
 # code for plotting complex models from over the summer
