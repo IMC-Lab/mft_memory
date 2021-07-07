@@ -109,7 +109,7 @@ temporal_brain_scores <- function(df) {
     mutate(superordinate = superordinateCategory(category),
            category = factor(category, levels = plotting_categories)) %>%
     ggplot(aes(x=lag, y=emmean, group=category, color=category, fill=category))  + 
-    scale_x_discrete(expand = c(0, 0, 0, 0.1), labels = c('TR1', 'TR2', 'TR3', 'TR4', 'TR5', 'TR6', 'TR7')) +
+    scale_x_discrete(expand = c(0, 0, 0, 0.2), labels = c('TR1', 'TR2', 'TR3', 'TR4', 'TR5', 'TR6', 'TR7')) +
     geom_hline(aes(yintercept = 0), size=1) +
     geom_line(size=1) + 
     geom_point(aes(fill=category, color=category, shape = category), size=3) +
@@ -254,58 +254,6 @@ memLabels <- c('1' = 'Old', '0' = 'New')
 data_old <- subset(data, old == '1' & encoding_RT > 0.25)
 ```
 
-
-# tidy PLS data
-```{r tidy PLS data}
-mean_brain_scores <- read.csv('data/PLS/mean-centered/brain_scores.csv')
-mean_brain_scores$category <- matlab_categories
-mean_brain_scores$superordinate <- superordinateCategory(mean_brain_scores$category)
-upper_CIs <- read.csv('data/PLS/mean-centered/upper_CIs.csv')
-lower_CIs <- read.csv('data/PLS/mean-centered/lower_CIs.csv')
-colnames(upper_CIs) <- paste0('upper_', colnames(upper_CIs))
-colnames(lower_CIs) <- paste0('lower_', colnames(lower_CIs))
-mean_centered_results_LV1 <- select(mean_brain_scores, category, superordinate, LV1)
-mean_centered_results_LV1$upper <- upper_CIs$upper_LV1
-mean_centered_results_LV1$lower <- lower_CIs$lower_LV1
-mean_centered_results_LV1$category <- factor(mean_centered_results_LV1$category, 
-                                             levels=plotting_categories)
-
-mean_centered_results_LV2 <- select(mean_brain_scores, category, superordinate, LV2)
-mean_centered_results_LV2$upper <- upper_CIs$upper_LV2
-mean_centered_results_LV2$lower <- lower_CIs$lower_LV2
-mean_centered_results_LV2$category <- factor(mean_centered_results_LV2$category, 
-                                             levels=plotting_categories)
-# task temporal brain score data
-LV1 <- read.csv('data/PLS/mean-centered/temporal_brainscores_LV1_all.csv')
-LV2 <- read.csv('data/PLS/mean-centered/temporal_brainscores_LV2_all.csv')
-LV1$subID <- rep(dataSubs, each = 8)
-LV2$subID <- rep(dataSubs, each = 8)
-LV1$category <- matlab_categories
-LV2$category <- matlab_categories
-
-LV1 <- pivot_longer(LV1, cols = starts_with('Lag'), names_to = 'lag', values_to = 'score')
-LV2 <- pivot_longer(LV2, cols = starts_with('Lag'), names_to = 'lag', values_to = 'score')
-
-#task non-rotated data -- commented out because we're not reporting plots for this analysis
-# nr_social <- read.csv('data/PLS/non-rotated/socialnorms_means.csv', header = FALSE)
-# nr_social_upper <- read.csv('data/PLS/non-rotated/socialnorms_upper.csv', header = FALSE)
-# nr_social_lower <- read.csv('data/PLS/non-rotated/socialnorms_lower.csv', header = FALSE)
-# nr_social$upper <- nr_social_upper$V1
-# nr_social$lower <- nr_social_lower$V1
-# nr_social$category <- matlab_categories
-# nr_social$category <- factor(nr_social$category, levels = plotting_categories)
-# 
-# nr_superordinate <- read.csv('data/PLS/results/non-rotated/superordinate_means.csv', header = FALSE)
-# nr_superordinate_upper <- read.csv('data/PLS/results/non-rotated/superordinate_upper.csv', header = FALSE)
-# nr_superordinate_lower <- read.csv('data/PLS/results/non-rotated/superordinate_lower.csv', header = FALSE)
-# nr_superordinate$upper <- nr_superordinate_upper$V1
-# nr_superordinate$lower <- nr_superordinate_lower$V1
-# nr_superordinate$category <- matlab_categories[1:7]
-# nr_superordinate$category <- factor(nr_superordinate$category, levels = plotting_categories[2:8])
-
-```
-
-
 # PLS plots
 ```{r make PLS plots}
 #### all conditions ####
@@ -327,13 +275,30 @@ LV1_tbs <- read.csv('data/PLS/mean-centered/all_conditions/LV1_tbs.csv')
 LV1_tbs$subID <- rep(1:27, each = 8)
 LV1_tbs$category <- matlab_categories
 LV1_tbs <- pivot_longer(LV1_tbs, cols = starts_with('Lag'), names_to = 'lag', values_to = 'score')
-p1 <- brain_scores(all_LV1, ~LV1, 'LV1: 26.99% crossblock variance, p<0.000') + MFT_color() + MFT_fill()
+p1 <- brain_scores(all_LV1, ~LV1, 'LV1: 26.99% crossblock variance, p<0.001') + MFT_color() + MFT_fill()
 p2 <- temporal_brain_scores(LV1_tbs) + MFT_color() + MFT_fill()
 p1 + p2 +
   plot_layout(ncol = 2, nrow = 1, widths = c(1.95, 0.95), guides = 'collect') +
   plot_annotation(title = '') &
   theme(text = element_text(family = 'Times New Roman'), plot.tag = element_text(size = 11), plot.title = element_text(hjust=0.5))
 ggsave('figures/paper/plot_LV1.png', width = 10.5, height = 3)
+
+## DIBS poster plots
+brain_scores(all_LV1, ~LV1, '') + MFT_color() + MFT_fill() + 
+  scale_x_discrete(breaks = c('Social Norms', 'Authority','Loyalty','Purity',
+                              'Harm-Emo','Harm-Phys','Fairness', 'Liberty')) +
+  theme(text = element_text(family='Avenir'),
+        axis.text = element_text(size=16),
+        axis.title.y = element_text(size=16))
+ggsave('figures/poster/LV1.png', dpi = 'retina', width=10.5)
+
+temporal_brain_scores(LV1_tbs) + MFT_color() + MFT_fill() +
+  labs(title=NULL, y=NULL) +
+  theme(text=element_text(family='Avenir'),
+        axis.text = element_text(size=20),
+        legend.position = 'none') 
+ggsave('figures/poster/LV1_tbs.png', dpi='retina', width=5)
+
 
 # plot LV2
 all_LV2 <- select(all_mean, category, superordinate, LV2)
@@ -351,6 +316,21 @@ p3 + p4 +
   plot_annotation(title = '') &
   theme(text = element_text(family = 'Times New Roman'), plot.tag = element_text(size = 11), plot.title = element_text(hjust=0.5))
 ggsave('figures/paper/plot_LV2.png', width = 10, height = 3)
+
+brain_scores(all_LV2, ~LV2, '') + MFT_color() + MFT_fill() + 
+  scale_x_discrete(breaks = c('Social Norms', 'Authority','Loyalty','Purity',
+                              'Harm-Emo','Harm-Phys','Fairness', 'Liberty')) +
+  theme(text = element_text(family='Avenir'),
+        axis.text = element_text(size=16),
+        axis.title.y = element_text(size=16))
+ggsave('figures/poster/LV2.png', dpi = 'retina', width=10.5)
+
+temporal_brain_scores(LV2_tbs) + MFT_color() + MFT_fill() +
+  labs(title=NULL, y=NULL) +
+  theme(text=element_text(family='Avenir'),
+        axis.text = element_text(size=20),
+        legend.position = 'none') 
+ggsave('figures/poster/LV2_tbs.png', dpi='retina', width=5)
 
 # plot LV3
 all_LV3 <- select(all_mean, category, superordinate, LV3)
@@ -730,6 +710,50 @@ em_comp_moral.df <- compare_performance(em_null_moral, em_modelMoral, em_only_mo
   select(-Type)
 write.csv(em_comp_moral.df, file = 'figures/paper/table_emCompMoral.csv', row.names = F)
 summary(em_add_moral)
+
+ggplot(em_comp_moral.df, aes(x=Model, y=AIC, fill=Model)) +
+  coord_cartesian(ylim = c(6700, 7200)) +
+  scale_x_discrete(labels = c('Add.', 'Int.', 'Found.', 'Null', 'Em.')) + 
+  geom_col(width=0.75) +
+  scale_fill_manual(values = wes_palette("Darjeeling1")) +
+  #scale_color_manual(values = wes_palette("Darjeeling1")) + 
+  theme_pubr(legend = 'none') +
+  labs(x=NULL, y=NULL) +
+  theme(text=element_text(family = 'Avenir', size=16))
+ggsave('figures/poster/AIC.png', width=6, height = 4)
+
+ggplot(em_comp_moral.df, aes(x=Model, y=BIC, fill=Model)) +
+  coord_cartesian(ylim = c(6800, 7200)) +
+  scale_x_discrete(labels = c('Add.', 'Int.', 'Found.', 'Null', 'Em.')) + 
+  geom_col(width=0.75) +
+  scale_fill_manual(values = wes_palette("Darjeeling1")) +
+  #scale_color_manual(values = wes_palette("Darjeeling1")) + 
+  theme_pubr(legend = 'none') +
+  labs(x=NULL, y=NULL) +
+  theme(text=element_text(family = 'Avenir', size=16))
+ggsave('figures/poster/BIC.png', width=6, height = 4)
+
+ggplot(em_comp_moral.df, aes(x=Model, y=R2_conditional, fill=Model)) +
+  coord_cartesian(ylim = c(0.4, 0.6)) +
+  scale_x_discrete(labels = c('Add.', 'Int.', 'Found.', 'Null', 'Em.')) + 
+  geom_col(width=0.75) +
+  scale_fill_manual(values = wes_palette("Darjeeling1")) +
+  #scale_color_manual(values = wes_palette("Darjeeling1")) + 
+  theme_pubr(legend = 'none') +
+  labs(x=NULL, y=NULL) +
+  theme(text=element_text(family = 'Avenir', size=16))
+ggsave('figures/poster/R2.png', width=6, height = 4)
+
+ggplot(em_comp_moral.df, aes(x=Model, y=RMSE, fill=Model)) +
+  coord_cartesian(ylim = c(0.6, 0.8)) +
+  scale_x_discrete(labels = c('Add.', 'Int.', 'Found.', 'Null', 'Em.')) + 
+  geom_col(width=0.75) +
+  scale_fill_manual(values = wes_palette("Darjeeling1")) +
+  #scale_color_manual(values = wes_palette("Darjeeling1")) + 
+  theme_pubr(legend = 'none') +
+  labs(x=NULL, y=NULL) +
+  theme(text=element_text(family = 'Avenir', size=16))
+ggsave('figures/poster/RMSE.png', width=6, height = 4)
 ```
 
 # Summarize em_add_moral
