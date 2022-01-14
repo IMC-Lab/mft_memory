@@ -15,11 +15,9 @@ library(devtools)
 library(ggpubr)
 library(ggeffects)
 library(sjPlot)
-library(RColorBrewer)
 library(paletti)
 library(patchwork)
 library(ggcorrplot)
-library(extrafont)
 ```
 
 # Global variables, helper functions, etc
@@ -313,23 +311,6 @@ p1 + p2 +
 ggsave('figures/paper/plot_LV1.png', width = 11, height = 3)
 
 
-## DIBS poster plots
-brain_scores(all_LV1, ~LV1, '') + MFT_color() + MFT_fill() + 
-  scale_x_discrete(breaks = c('Social Norms', 'Authority','Loyalty','Purity',
-                              'Harm-Emo','Harm-Phys','Fairness', 'Liberty')) +
-  theme(text = element_text(family='Avenir'),
-        axis.text = element_text(size=16),
-        axis.title.y = element_text(size=16))
-ggsave('figures/poster/LV1.png', dpi = 'retina', width=10.5)
-
-temporal_brain_scores(LV1_tbs) + MFT_color() + MFT_fill() +
-  labs(title=NULL, y=NULL) +
-  theme(text=element_text(family='Avenir'),
-        axis.text = element_text(size=20),
-        legend.position = 'none') 
-ggsave('figures/poster/LV1_tbs.png', dpi='retina', width=5)
-
-
 # plot LV2
 all_LV2 <- select(all_mean, category, superordinate, LV2)
 all_LV2$upper <- all_upper_CIs$upper_LV2
@@ -379,6 +360,34 @@ p5 + p6 +
   plot_annotation(title = '') &
   theme(text = element_text(family = 'Times New Roman'), plot.tag = element_text(size = 11), plot.title = element_text(hjust=0.5))
 ggsave('figures/paper/plot_LV3_new.png', width = 11, height = 3)
+
+# plot amygdala voxel response during LV2
+amy_LV2 <- read.csv('data/PLS/mean-centered/all_conditions/LV2_amy_responseFunction.csv', header=F)
+colnames(amy_LV2) <- paste0('TR', 1:7)
+amy_LV2$subID <- rep(1:27, each = 8)
+amy_LV2$category <- matlab_categories
+amy_LV2 <- pivot_longer(amy_LV2, cols=starts_with('TR'), names_to='TR', values_to='signal')
+
+amy_LV2 %>%
+lmer(signal ~ TR * category + (1 | subID), .) %>%
+    emmeans(~ TR * category) %>% as.data.frame() %>%
+    mutate(superordinate = superordinateCategory(category),
+           category = factor(category, levels = plotting_categories)) %>%
+    ggplot(aes(x=TR, y=emmean, group=category, color=category, fill=category))  + 
+    scale_x_discrete(expand = c(0, 0, 0, 0.2)) +
+    geom_hline(aes(yintercept = 0), size=1) +
+    geom_line(size=1) + 
+    geom_point(aes(fill=category, color=category, shape = category), size=3) +
+    scale_shape_manual(values = c(4,15,16,17,0,1,2, 3)) +
+    MFT_color() + MFT_fill() +
+    theme_pubr(legend = 'right') +
+    theme(text=element_text(family='Times New Roman'),
+          axis.title.x = element_blank(),
+          axis.title.y = element_text(size=14), 
+          axis.text = element_text(size = 14),
+          plot.title = element_text(size=16, hjust=0.5)) +
+    labs(y = 'BOLD signal', color='Foundation', fill='Foundation', shape='Foundation', title='MC-LV2: Amygdala response function')
+ggsave('../additionalFigures/LV2_amy_responseFunction.png', dpi='retina', width=8)
 
 #### dropping social norms ####
 # pc <- c('Authority', 'Loyalty', 'Purity', 'Harm-Emo', 'Harm-Phys', 'Fairness', 'Liberty')
@@ -1608,105 +1617,6 @@ write.csv(data_means, file = 'figures/paper/table_dataMeans.csv', row.names = F)
 
 # multiple voxel extraction
 ```{r}
-# assignSupLV1 <- function(c) {
-#   return(ifelse(c == 'Authority', 0,
-#          ifelse(c == 'Harm-Emo', 1,
-#          ifelse(c == 'Harm-Phys', 1,
-#          ifelse(c == 'Purity', 1,
-#          ifelse(c == 'Fairness', 0,
-#          ifelse(c == 'Loyalty', 0,
-#          ifelse(c == 'Liberty', 0,
-#          ifelse(c == 'Social Norms', 0, NA)))))))))
-# }
-# # amygdala
-# amyg_activity1 <- read.delim(file = '../MFT_PLS/4_TR_analysis/multiple voxel extraction/amygdala/amygdala1_fMRIvoxeldata.txt', header = FALSE, sep = "")
-# colnames(amyg_activity1) <- c('TR1','TR2','TR3','TR4')
-# amyg_activity1$category <- rep(matlab_categories, each=27)
-# amyg_activity1$subID <- dataSubs
-# amyg_activity1 <- pivot_longer(amyg_activity1, cols = c(TR1, TR2, TR3, TR4), names_to = 'TR', values_to = 'Intensity')
-# amyg_activity1$category <- factor(amyg_activity1$category, levels = plotting_categories)
-# amyg_activity1_means <- amyg_activity1 %>% group_by(category, TR) %>%
-#   summarise(Intensity = mean(Intensity))
-# amyg_activity1_means$alpha <- assignSupLV1(amyg_activity1_means$category)
-# 
-# amy1 <- ggplot(amyg_activity1_means, aes(x=TR, y=Intensity, color=category, group = category, alpha = alpha == 0)) +
-#   scale_x_discrete(expand = c(0, 0, 0, 0.08)) +
-#   geom_hline(aes(yintercept = 0), size=1) +
-#   geom_line(size=1) + 
-#   geom_point(aes(fill=category, color=category, shape = category), size=3) +
-#   scale_shape_manual(values = c(4,15,16,17,0,1,2, 3)) +
-#   scale_alpha_manual(values = c(1, 0.3), guide = FALSE) +
-#   MFT_color() + 
-#   theme_pubr(legend = 'right') +
-#   theme(plot.title = element_text(hjust = 0.5)) +
-#   ggtitle('(-32, -4, -20)')
-# 
-# amyg_activity2 <- read.delim(file = '../MFT_PLS/4_TR_analysis/multiple voxel extraction/amygdala/amygdala2_fMRIvoxeldata.txt', header = FALSE, sep = "")
-# colnames(amyg_activity2) <- c('TR1','TR2','TR3','TR4')
-# amyg_activity2$category <- rep(matlab_categories, each=27)
-# amyg_activity2$subID <- dataSubs
-# amyg_activity2 <- pivot_longer(amyg_activity2, cols = c(TR1, TR2, TR3, TR4), names_to = 'TR', values_to = 'Intensity')
-# amyg_activity2$category <- factor(amyg_activity2$category, levels = plotting_categories)
-# amyg_activity2_means <- amyg_activity2 %>% group_by(category, TR) %>%
-#   summarise(Intensity = mean(Intensity))
-# amyg_activity2_means$alpha <- assignSupLV1(amyg_activity2_means$category)
-# 
-# amy2 <- ggplot(amyg_activity2_means, aes(x=TR, y=Intensity, color=category, group = category, alpha = alpha == 0)) +
-#   scale_x_discrete(expand = c(0, 0, 0, 0.08)) +
-#   geom_hline(aes(yintercept = 0), size=1) +
-#   geom_line(size=1) + 
-#   geom_point(aes(fill=category, color=category, shape = category), size=3) +
-#   scale_shape_manual(values = c(4,15,16,17,0,1,2, 3)) +
-#   scale_alpha_manual(values = c(1, 0.3), guide = FALSE) +
-#   MFT_color() + 
-#   theme_pubr(legend = 'right') +
-#   theme(plot.title = element_text(hjust = 0.5)) +
-#   ggtitle('(-18, -8, -14)')
-# 
-# amyg_activity3 <- read.delim(file = '../MFT_PLS/4_TR_analysis/multiple voxel extraction/amygdala/amygdala3_fMRIvoxeldata.txt', header = FALSE, sep = "")
-# colnames(amyg_activity3) <- c('TR1','TR2','TR3','TR4')
-# amyg_activity3$category <- rep(matlab_categories, each=27)
-# amyg_activity3$subID <- dataSubs
-# amyg_activity3 <- pivot_longer(amyg_activity3, cols = c(TR1, TR2, TR3, TR4), names_to = 'TR', values_to = 'Intensity')
-# amyg_activity3$category <- factor(amyg_activity3$category, levels = plotting_categories)
-# amyg_activity3_means <- amyg_activity3 %>% group_by(category, TR) %>%
-#   summarise(Intensity = mean(Intensity))
-# amyg_activity3_means$alpha <- assignSupLV1(amyg_activity3_means$category)
-# 
-# 
-# amy3 <- ggplot(amyg_activity3_means, aes(x=TR, y=Intensity, color=category, group = category, alpha = alpha == 0)) +
-#   scale_x_discrete(expand = c(0, 0, 0, 0.08)) +
-#   geom_hline(aes(yintercept = 0), size=1) +
-#   geom_line(size=1) + 
-#   geom_point(aes(fill=category, color=category, shape = category), size=3) +
-#   scale_shape_manual(values = c(4,15,16,17,0,1,2, 3)) +
-#   scale_alpha_manual(values = c(1, 0.3), guide = FALSE) +
-#   MFT_color() + 
-#   theme_pubr(legend = 'right') +
-#   theme(plot.title = element_text(hjust = 0.5)) +
-#   ggtitle('(20, -8, -16)')
-# 
-# amy1 + amy2 + amy3 + plot_layout(guides = 'collect') 
-# 
-# 
-# insula_activity <- read.delim(file = '../MFT_PLS/4_TR_analysis/multiple voxel extraction/insula/insula_fMRIvoxeldata.txt', header = FALSE, sep = "")
-# colnames(insula_activity) <- c('TR1','TR2','TR3','TR4')
-# insula_activity$category <- rep(matlab_categories, each=27)
-# insula_activity$subID <- dataSubs
-# insula_activity <- pivot_longer(insula_activity, cols = c(TR1, TR2, TR3, TR4), names_to = 'TR', values_to = 'Intensity')
-# insula_activity$category <- factor(insula_activity$category, levels = plotting_categories)
-# insula_activity_means <- insula_activity %>% group_by(category, TR) %>%
-#   summarise(Intensity = mean(Intensity))
-# 
-# ggplot(insula_activity_means, aes(x=TR, y=Intensity, color=category, group = category)) +
-#   scale_x_discrete(expand = c(0, 0, 0, 0.08)) +
-#   geom_hline(aes(yintercept = 0), size=1) +
-#   geom_line(size=1) + 
-#   geom_point(aes(fill=category, color=category, shape = category), size=3) +
-#   scale_shape_manual(values = c(4,15,16,17,0,1,2, 3)) +
-#   MFT_color() + 
-#   theme_pubr() +
-#   ggtitle('Insula voxel response')
 
 ```
 
@@ -1714,25 +1624,25 @@ write.csv(data_means, file = 'figures/paper/table_dataMeans.csv', row.names = F)
 ```{r behavioral PLS}
 # create txt file for analysis -- participants nested in condition, conservatism score assigned to each participant
 # let's do 1 analysis where we split up conservatism btwn social and economic, and another where we use the mean conservatism score
-two_cond <- cbind.data.frame(rep(matlab_categories, each=26), rep(secs$subID, 8), 
-                             rep(secs$EconomicConservatism, 8), rep(secs$SocialConservatism, 8))
-names <- c('foundation', 'subID', 'EconomicConservatism', 'SocialConservatism')
-colnames(two_cond) <- names
-two_cond %>% select(EconomicConservatism, SocialConservatism) %>%
-  write.table(., 'data/two_cond_behav.txt', row.names = F, col.names = F, sep=' ')
-
-mean_cond <- cbind.data.frame(rep(matlab_categories, each=26), rep(secs$subID, 8), rep(secs$MeanConservatism, 8))
-names <- c('foundation', 'subID', 'Conservatism')
-colnames(mean_cond) <- names
-mean_cond %>% 
-  filter(foundation %in% c('Authority', 'Loyalty', 'Purity', 'Harm-Emo', 'Harm-Phys', 'Fairness')) %>%
-  select(Conservatism) %>%
-  write.table(., 'data/mean_cond_behav.txt', row.names = F, col.names=F, sep=' ')
-
-mean_cond %>% 
-  filter(foundation %in% c('Loyalty', 'Purity', 'Harm-Emo', 'Harm-Phys', 'Fairness')) %>%
-  select(Conservatism) %>%
-  write.table(., 'data/NR_sup_dropAuth.txt', row.names = F, col.names=F, sep=' ')
+# two_cond <- cbind.data.frame(rep(matlab_categories, each=26), rep(secs$subID, 8), 
+#                              rep(secs$EconomicConservatism, 8), rep(secs$SocialConservatism, 8))
+# names <- c('foundation', 'subID', 'EconomicConservatism', 'SocialConservatism')
+# colnames(two_cond) <- names
+# two_cond %>% select(EconomicConservatism, SocialConservatism) %>%
+#   write.table(., 'data/two_cond_behav.txt', row.names = F, col.names = F, sep=' ')
+# 
+# mean_cond <- cbind.data.frame(rep(matlab_categories, each=26), rep(secs$subID, 8), rep(secs$MeanConservatism, 8))
+# names <- c('foundation', 'subID', 'Conservatism')
+# colnames(mean_cond) <- names
+# mean_cond %>% 
+#   filter(foundation %in% c('Authority', 'Loyalty', 'Purity', 'Harm-Emo', 'Harm-Phys', 'Fairness')) %>%
+#   select(Conservatism) %>%
+#   write.table(., 'data/mean_cond_behav.txt', row.names = F, col.names=F, sep=' ')
+# 
+# mean_cond %>% 
+#   filter(foundation %in% c('Loyalty', 'Purity', 'Harm-Emo', 'Harm-Phys', 'Fairness')) %>%
+#   select(Conservatism) %>%
+#   write.table(., 'data/NR_sup_dropAuth.txt', row.names = F, col.names=F, sep=' ')
 ```
 
 # code for plotting complex models from over the summer
