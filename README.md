@@ -8,4 +8,4 @@ _Abstract_: Moral Foundations Theory (MFT) is a framework with enormous influenc
 PLS analyses were conducted using a [PLS toolbox](https://www.rotman-baycrest.on.ca/index.php?section=84) in MATLAB developed at the [Rotman Research Institute](https://www.baycrest.org/Baycrest/Research-Innovation/About-Us/Rotman-Research-Institute). Datamats and text files used for the PLS analyses can be found in [`data/PLS/analysis files`](https://github.com/IMC-Lab/mft_memory/tree/master/data/PLS/analysis%20files). Preprocessed nfiti files used in the PLS analysis will soon be available on [OpenNeuro](https://openneuro.org/).  Result `.mat` files for the mean-centered and non-rotated analyses can be found in [`data/PLS/mean-centered`](https://github.com/IMC-Lab/mft_memory/tree/master/data/PLS/mean-centered) and [`data/PLS/non-rotated`](https://github.com/IMC-Lab/mft_memory/tree/master/data/PLS/non-rotated), respectively. Each of these directories also contains `.csv` files with values relevant for plotting extracted from the `.mat` results file. 
 
 # Questions? Comments?
-Email maria.khoudary [at] duke.edu. 
+Email ari.khoudary [at] gmail.com
